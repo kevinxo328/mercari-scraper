@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pythonproject1"
+version = "0.1.0"
+description = ""
+authors = ["Kevin Liu <kevinxo328@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+selenium = "^4.4.3"
+requests = "^2.28.1"
+beautifulsoup4 = "^4.11.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
