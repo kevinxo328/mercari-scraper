@@ -1,8 +1,16 @@
 import time
+from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from database import connect_db
+
+
+def go_next_page(driver):
+    button = driver.find_element(by=By.CSS_SELECTOR, value='[data-testid="pagination-next-button"]')
+    button.click()
+    time.sleep(8)
 
 
 def get_info(driver):
@@ -10,11 +18,13 @@ def get_info(driver):
     items = layout.find_elements(by=By.CSS_SELECTOR, value='[data-testid="item-cell"]')
 
     data = [{'name': item.find_element(by=By.TAG_NAME, value='mer-item-thumbnail').get_attribute('item-name'),
-             'price': item.find_element(by=By.TAG_NAME, value='mer-item-thumbnail').get_attribute('price'),
+             'price': int(item.find_element(by=By.TAG_NAME, value='mer-item-thumbnail').get_attribute('price')),
              'img': item.find_element(by=By.TAG_NAME, value='mer-item-thumbnail').get_attribute('src'),
-             'link': item.find_element(by=By.TAG_NAME, value='a').get_attribute('href')}
+             'link': item.find_element(by=By.TAG_NAME, value='a').get_attribute('href'), 'created-date': datetime.now()}
             for item in items]
-    print(data)
+
+    go_next_page(driver)
+    return data
 
 
 def scraper(keyword):
@@ -24,10 +34,21 @@ def scraper(keyword):
     url = f'{baseurl}search?keyword={keyword}&status=on_sale'
     browser.get(url)
     time.sleep(8)
-    get_info(browser)
+
+    data = []
+
+    # 開始爬蟲
+    for num in range(0, 5):
+        data.extend(get_info(driver=browser))
+
+    db = connect_db()
+    collection = db['items-info']
+    collection.delete_many({})
+    collection.insert_many(data)
+
     browser.quit()
 
 
 if __name__ == '__main__':
-    scraper('beams')
+    scraper('yoke')
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
