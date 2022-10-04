@@ -42,7 +42,7 @@ def scraper(keyword):
         data.extend(get_info(driver=browser))
 
     db = connect_db()
-    collection = db['items-info']
+    collection = db['scraper_results']
     collection.delete_many({})
     collection.insert_many(data)
 
