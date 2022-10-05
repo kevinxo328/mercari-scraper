@@ -27,28 +27,32 @@ def get_info(driver):
     return data
 
 
-def scraper(keyword):
+def scraper(collection, keyword, user, price_max, price_min):
     service = Service(executable_path="./chromedriver")
     browser = webdriver.Chrome(service=service)
     baseurl = 'https://jp.mercari.com/'
-    url = f'{baseurl}search?keyword={keyword}&status=on_sale'
+    url = f'{baseurl}search?keyword={keyword}&status=on_sale&price_max={price_max}&price_min={price_min}'
     browser.get(url)
     time.sleep(8)
 
     data = []
 
     # 開始爬蟲
-    for num in range(0, 5):
-        data.extend(get_info(driver=browser))
+    for num in range(0, 2):
+        data.extend([{**info, 'user': user} for info in get_info(driver=browser)])
 
-    db = connect_db()
-    collection = db['scraper_results']
-    collection.delete_many({})
     collection.insert_many(data)
 
     browser.quit()
 
 
 if __name__ == '__main__':
-    scraper('yoke')
+    db = connect_db()
+    condition_collection = db['scraper_conditions']
+    result_collection = db['scraper_results']
+    result_collection.delete_many({})
+
+    for condition in condition_collection.find({}):
+        scraper(collection=result_collection, keyword=condition['keyword'], user=condition['user'],
+                price_max=condition.get('price_max'), price_min=condition.get('price_min'))
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
