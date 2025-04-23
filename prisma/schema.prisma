@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ScrapeKeyword {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  keyword   String @unique
+  minPrice Float?
+  maxPrice  Float?
+  category String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  results   ScrapeResult[]
+}
+
+model ScrapeResult {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  price     Float
+  url       String
+  imageUrl   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  keywordId  String   @db.ObjectId
+  keyword    ScrapeKeyword @relation(fields: [keywordId], references: [id])
+}

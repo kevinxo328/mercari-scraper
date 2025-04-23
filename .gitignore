@@ -5,3 +5,10 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Environment variables
+.env*
+!.env.example
+
+# Prisma Client
+/prisma/generated
