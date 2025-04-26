@@ -59,7 +59,7 @@ test.describe("Crawl Mercari", () => {
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
-        for (let i = 0; i <= itemCount; i++) {
+        for (let i = 0; i < itemCount; i++) {
           const itemCell = itemCells.nth(i);
           const priceElement = await itemCell.locator(".merPrice");
           const priceText = (await priceElement.innerText()).split("\n");
