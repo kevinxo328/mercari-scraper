@@ -3,9 +3,13 @@ import {getMercariUrl, MercariCategory} from "../utils/mercari";
 import {PrismaClient} from "../prisma/generated/prisma";
 import core from "@actions/core";
 
+core?.debug("Starting Mercari Crawler Test");
+
 test.describe("Crawl Mercari", () => {
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
+
+  core?.debug("Setting up database connection");
 
   let keywords: {
     keyword: string;
@@ -19,9 +23,13 @@ test.describe("Crawl Mercari", () => {
   test.beforeAll(async () => {
     // Fetch keywords from the database
     try {
+      core?.debug("Fetching keywords from the database");
       keywords = await prisma.scrapeKeyword.findMany();
+      core?.debug(`Fetched ${keywords.length} keywords from the database`);
     } catch (e) {
       console.error(e);
+      core?.debug("Error fetching keywords from the database");
+      throw e;
     }
   });
 
