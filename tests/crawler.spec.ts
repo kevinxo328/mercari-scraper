@@ -3,6 +3,7 @@ import {getMercariUrl, MercariCategory} from "../utils/mercari";
 import {PrismaClient} from "../prisma/generated/prisma";
 
 test.describe("Crawl Mercari", () => {
+  const MAX_ITEM_COUNT = 100; // Maximum number of items to crawl per keyword
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
 
@@ -70,7 +71,7 @@ test.describe("Crawl Mercari", () => {
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
-        for (let i = 0; i < itemCount; i++) {
+        for (let i = 0; i < Math.min(MAX_ITEM_COUNT, itemCount); i++) {
           console.log(
             `Crawling keyword: ${record.keyword} - Item ${i + 1}/${itemCount}`
           );
