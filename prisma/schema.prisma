@@ -29,6 +29,7 @@ model ScrapeResult {
   id        String   @id @default(uuid()) @db.Uuid
   title     String @db.VarChar(255)
   price     Int
+  currency String @db.VarChar(20)
   url       String @unique
   imageUrl   String
   createdAt DateTime @default(now())
