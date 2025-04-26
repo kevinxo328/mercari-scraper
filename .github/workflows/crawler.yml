@@ -1,9 +1,9 @@
 name: Crawl Mercari
 
 on:
-  schedule:
-    # 每日 UTC 04:00 (等同於 UTC+8 12:00) 執行
-    - cron: "0 4 * * *"
+  # schedule:
+  #   # 每日 UTC 04:00 (等同於 UTC+8 12:00) 執行
+  #   - cron: "0 4 * * *"
   workflow_dispatch:
 
 jobs:
