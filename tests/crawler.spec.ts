@@ -1,54 +1,131 @@
 import {test} from "@playwright/test";
-import {getMercariUrl} from "../utils/mercari";
+import {getMercariUrl, MercariCategory} from "../utils/mercari";
+import {PrismaClient} from "../prisma/generated/prisma";
 
-test.beforeEach(async ({page}) => {
-  // Set the viewport size to 1280 x 7200 to make sure the item cells are fully loaded.
-  await page.setViewportSize({width: 1280, height: 7200});
-});
+test.describe("Crawl Mercari", () => {
+  // Set the timeout for the entire test suite to 30 minutes
+  test.setTimeout(1800_000);
 
-test("Crawl items", async ({page}) => {
-  const keyword = "ancellm";
-  await page.goto(getMercariUrl(keyword));
+  let keywords: {
+    keyword: string;
+    category: string;
+    minPrice: number | null;
+    maxPrice: number | null;
+    id: string;
+  }[] = [];
+  const prisma = new PrismaClient();
 
-  // If the page has a dialog, close it
-  const dialog = await page.getByRole("dialog");
-  if (dialog) {
-    await dialog.waitFor();
-    const closeButton = await dialog.getByLabel(/Close/);
-    await closeButton.click();
-
-    // Wait for the dialog to close
-    await page.waitForTimeout(2000);
-  }
-
-  const itemCells = await page.getByTestId("item-cell");
-  const itemCount = await itemCells.count();
-
-  if (itemCount > 0) {
-    for (let i = 0; i < itemCount; i++) {
-      const itemCell = itemCells.nth(i);
-      const priceElement = await itemCell.locator(".merPrice");
-      const priceText = (await priceElement.innerText()).split("\n");
-      const mercariHost = "https://jp.mercari.com";
-
-      const title = await itemCell
-        .getByTestId("thumbnail-item-name")
-        .innerText();
-      const link =
-        mercariHost +
-        (await itemCell.getByTestId("thumbnail-link").getAttribute("href"));
-      const imageUrl = await itemCell.locator("img").getAttribute("src");
-      const currency = priceText[0].replace("$", "");
-      const price = priceText[1];
-      const itemId = link.split("/").pop();
-
-      console.log(`Item ${i + 1}: ${title}`);
-      console.log(`Link: ${link}`);
-      console.log(`Image URL: ${imageUrl}`);
-      console.log(`Price: ${currency} ${price}`);
-      console.log(`Item ID: ${itemId}`);
+  test.beforeAll(async () => {
+    // Fetch keywords from the database
+    try {
+      keywords = await prisma.scrapeKeyword.findMany();
+    } catch (e) {
+      console.error(e);
     }
-  } else {
-    console.log(`No items found for keyword: ${keyword}`);
-  }
+  });
+
+  test.beforeEach(async ({page}) => {
+    // Set the viewport size for the page to ensure all items are visible.
+    await page.setViewportSize({width: 1280, height: 72000});
+  });
+
+  test.afterAll(async () => {
+    // Close the database connection
+    await prisma.$disconnect();
+  });
+
+  test("Crawl Items", async ({page}) => {
+    for (const record of keywords) {
+      await page.goto(
+        getMercariUrl({
+          keyword: record.keyword,
+          category:
+            MercariCategory[record.category as keyof typeof MercariCategory],
+          ...(record.minPrice && {minPrice: record.minPrice}),
+          ...(record.maxPrice && {maxPrice: record.maxPrice}),
+        })
+      );
+
+      // If the page has a dialog, close it
+      const dialog = await page.getByRole("dialog");
+      if (dialog) {
+        await dialog.waitFor();
+        const closeButton = await dialog.getByLabel(/Close/);
+        await closeButton.click();
+        await page.waitForTimeout(2000);
+      }
+
+      const itemCells = await page.getByTestId("item-cell");
+      const itemCount = await itemCells.count();
+
+      if (itemCount > 0) {
+        for (let i = 0; i < itemCount; i++) {
+          const itemCell = itemCells.nth(i);
+          const priceElement = await itemCell.locator(".merPrice");
+          const priceText = (await priceElement.innerText()).split("\n");
+          const mercariHost = "https://jp.mercari.com";
+
+          const data = {
+            title: await itemCell
+              .getByTestId("thumbnail-item-name")
+              .innerText(),
+            url:
+              mercariHost +
+              (await itemCell
+                .getByTestId("thumbnail-link")
+                .getAttribute("href")),
+            imageUrl: (await itemCell.locator("img").getAttribute("src")) || "",
+            price: parseInt(priceText[1].replace(/,/g, "")),
+            currency: priceText[0].replace("$", ""),
+          };
+
+          const existingRecord = await prisma.scrapeResult.findFirst({
+            where: {url: data.url},
+            include: {keywords: true},
+          });
+
+          if (!existingRecord) {
+            await prisma.scrapeResult.create({
+              data: {
+                ...data,
+                keywords: {
+                  connect: [{id: record.id}],
+                },
+              },
+            });
+          } else {
+            const existingKeywordRelation = existingRecord.keywords.some(
+              (k: {id: string}) => k.id === record.id
+            );
+            if (
+              existingRecord.price !== data.price ||
+              existingRecord.imageUrl !== data.imageUrl ||
+              existingRecord.title !== data.title ||
+              existingRecord.currency !== data.currency ||
+              existingRecord.url !== data.url ||
+              !existingKeywordRelation
+            ) {
+              await prisma.scrapeResult.update({
+                where: {id: existingRecord.id},
+                data: {
+                  title: data.title,
+                  url: data.url,
+                  imageUrl: data.imageUrl,
+                  price: data.price,
+                  currency: data.currency,
+                  keywords: {
+                    connect: [{id: record.id}],
+                  },
+                },
+              });
+            }
+          }
+        }
+      } else {
+        console.log(`No items found for keyword: ${record.keyword}`);
+      }
+      // Wait for a short period before the next iteration
+      await page.waitForTimeout(2000);
+    }
+  });
 });
