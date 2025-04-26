@@ -58,14 +58,7 @@ test.describe("Crawl Mercari", () => {
 
       // If the page has a dialog, close it
       const modalScrim = await page.getByTestId("merModalBaseScrim");
-      await modalScrim
-        .waitFor({
-          state: "attached",
-          timeout: 5000,
-        })
-        .catch(() => {
-          console.log("No modal scrim found");
-        });
+      await page.waitForTimeout(3000);
 
       if ((await modalScrim.count()) > 0) {
         await modalScrim.click({
