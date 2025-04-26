@@ -36,6 +36,15 @@ test.describe("Crawl Mercari", () => {
 
   test("Crawl Items", async ({page}) => {
     for (const record of keywords) {
+      // Block images to speed up the loading time.
+      await page.route("**/*", (route) => {
+        return route.request().resourceType() === "image" ||
+          route.request().resourceType() === "media" ||
+          route.request().resourceType() === "font"
+          ? route.abort()
+          : route.continue();
+      });
+
       await page.goto(
         getMercariUrl({
           keyword: record.keyword,
@@ -48,7 +57,7 @@ test.describe("Crawl Mercari", () => {
 
       // If the page has a dialog, close it
       const modalScrim = await page.getByTestId("merModalBaseScrim");
-      if (modalScrim) {
+      if ((await modalScrim.count()) > 0) {
         await modalScrim.click({
           force: true,
           timeout: 5000,
