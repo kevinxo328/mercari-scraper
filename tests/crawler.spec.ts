@@ -74,9 +74,12 @@ test.describe("Crawl Mercari", () => {
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
-        for (let i = 0; i < Math.min(MAX_ITEM_COUNT, itemCount); i++) {
+        const crawlingItemCount = Math.min(itemCount / MAX_ITEM_COUNT);
+        for (let i = 0; i <= crawlingItemCount - 1; i++) {
           console.log(
-            `Crawling keyword: ${record.keyword} - Item ${i + 1}/${itemCount}`
+            `Crawling keyword: ${record.keyword} - Item ${
+              i + 1
+            }/${crawlingItemCount}`
           );
 
           const itemCell = itemCells.nth(i);
