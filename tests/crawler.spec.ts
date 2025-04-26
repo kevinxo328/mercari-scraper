@@ -61,10 +61,7 @@ test.describe("Crawl Mercari", () => {
 
       if (itemCount > 0) {
         for (let i = 0; i < itemCount; i++) {
-          core.setOutput(
-            "Crawling...",
-            `${record.keyword}: ${i + 1} / ${itemCount}`
-          );
+          core?.debug(`Crawling ${record.keyword}: ${i + 1} / ${itemCount}`);
           const itemCell = itemCells.nth(i);
           const priceElement = await itemCell.locator(".merPrice");
           const priceText = (await priceElement.innerText()).split("\n");
