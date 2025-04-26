@@ -1,6 +1,7 @@
 import {test} from "@playwright/test";
 import {getMercariUrl, MercariCategory} from "../utils/mercari";
 import {PrismaClient} from "../prisma/generated/prisma";
+import core from "@actions/core";
 
 test.describe("Crawl Mercari", () => {
   // Set the timeout for the entire test suite to 30 minutes
@@ -60,6 +61,10 @@ test.describe("Crawl Mercari", () => {
 
       if (itemCount > 0) {
         for (let i = 0; i < itemCount; i++) {
+          core.setOutput(
+            "Crawling...",
+            `${record.keyword}: ${i + 1} / ${itemCount}`
+          );
           const itemCell = itemCells.nth(i);
           const priceElement = await itemCell.locator(".merPrice");
           const priceText = (await priceElement.innerText()).split("\n");
