@@ -40,15 +40,19 @@ test.describe("Crawl Mercari", () => {
           : route.continue();
       });
 
-      await page.goto(
-        getMercariUrl({
-          keyword: record.keyword,
-          category:
-            MercariCategory[record.category as keyof typeof MercariCategory],
-          ...(record.minPrice && {minPrice: record.minPrice}),
-          ...(record.maxPrice && {maxPrice: record.maxPrice}),
-        })
-      );
+      await page
+        .goto(
+          getMercariUrl({
+            keyword: record.keyword,
+            category:
+              MercariCategory[record.category as keyof typeof MercariCategory],
+            ...(record.minPrice && {minPrice: record.minPrice}),
+            ...(record.maxPrice && {maxPrice: record.maxPrice}),
+          })
+        )
+        .catch((e) => {
+          console.error(`Error navigating to URL: ${e}`);
+        });
 
       // If the page has a dialog, close it
       const modalScrim = await page.getByTestId("merModalBaseScrim");
@@ -75,9 +79,17 @@ test.describe("Crawl Mercari", () => {
           );
 
           const itemCell = itemCells.nth(i);
-          const priceElement = await itemCell.locator(".merPrice");
-          const priceText = (await priceElement.innerText()).split("\n");
           const mercariHost = "https://jp.mercari.com";
+
+          // TODO: Get the price from the aria-label attribute to ensure getting the correct yen value without Japan proxy.
+          const priceSource = (
+            await itemCell
+              .locator("[itemtype]")
+              .getAttribute("aria-label", {timeout: 3000})
+              .catch((e) => {
+                console.error(`Error getting aria-label: ${e}`);
+              })
+          )?.split(" ");
 
           const data = {
             title: await itemCell
@@ -89,8 +101,14 @@ test.describe("Crawl Mercari", () => {
                 .getByTestId("thumbnail-link")
                 .getAttribute("href")),
             imageUrl: (await itemCell.locator("img").getAttribute("src")) || "",
-            price: parseInt(priceText[1].replace(/,/g, "")),
-            currency: priceText[0].replace("$", ""),
+            price: priceSource
+              ? parseInt(
+                  priceSource[priceSource.length - 2]
+                    .replace("円", "")
+                    .replace(/,/g, "")
+                )
+              : -1,
+            currency: priceSource ? "JPY" : "",
           };
 
           const existingRecord = await prisma.scrapeResult.findFirst({
