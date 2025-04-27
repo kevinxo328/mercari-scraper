@@ -1,20 +1,19 @@
 import {test} from "@playwright/test";
 import {getMercariUrl, MercariCategory} from "../utils/mercari";
-import {PrismaClient} from "../prisma/generated/prisma";
+import {PrismaClient, type ScrapeKeyword} from "../prisma/generated/prisma";
+
+// Set the viewport size for the page to ensure all items are visible.
+test.use({
+  viewport: {width: 1280, height: 72000},
+});
 
 test.describe("Crawl Mercari", () => {
-  const MAX_ITEM_COUNT = 100; // Maximum number of items to crawl per keyword
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
 
-  let keywords: {
-    keyword: string;
-    category: string;
-    minPrice: number | null;
-    maxPrice: number | null;
-    id: string;
-  }[] = [];
+  const MAX_ITEM_COUNT = 100; // Maximum number of items to crawl per keyword
   const prisma = new PrismaClient();
+  let keywords: ScrapeKeyword[] = [];
 
   test.beforeAll(async () => {
     // Fetch keywords from the database
@@ -23,11 +22,6 @@ test.describe("Crawl Mercari", () => {
     } catch (e) {
       console.error(e);
     }
-  });
-
-  test.beforeEach(async ({page}) => {
-    // Set the viewport size for the page to ensure all items are visible.
-    await page.setViewportSize({width: 1280, height: 72000});
   });
 
   test.afterAll(async () => {
