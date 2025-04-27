@@ -7,11 +7,11 @@ test.use({
   viewport: {width: 1280, height: 72000},
 });
 
-test.describe("Crawl Mercari", () => {
+test.describe("Scrape Mercari", () => {
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
 
-  const MAX_ITEM_COUNT = 100; // Maximum number of items to crawl per keyword
+  const MAX_ITEM_COUNT = 100; // Maximum number of items to scrape per keyword
   const prisma = new PrismaClient();
   let keywords: ScrapeKeyword[] = [];
 
@@ -29,7 +29,7 @@ test.describe("Crawl Mercari", () => {
     await prisma.$disconnect();
   });
 
-  test("Crawl Items", async ({page}) => {
+  test("Scrape Items", async ({page}) => {
     for (const record of keywords) {
       // Block images to speed up the loading time.
       await page.route("**/*", (route) => {
@@ -70,12 +70,12 @@ test.describe("Crawl Mercari", () => {
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
-        const crawlingItemCount = Math.min(itemCount, MAX_ITEM_COUNT);
-        for (let i = 0; i <= crawlingItemCount - 1; i++) {
+        const scrapingItemCount = Math.min(itemCount, MAX_ITEM_COUNT);
+        for (let i = 0; i <= scrapingItemCount - 1; i++) {
           console.log(
-            `Crawling keyword: ${record.keyword} - Item ${
+            `Scraping keyword: ${record.keyword} - Item ${
               i + 1
-            }/${crawlingItemCount}`
+            }/${scrapingItemCount}`
           );
 
           const itemCell = itemCells.nth(i);
