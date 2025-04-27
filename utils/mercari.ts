@@ -26,8 +26,8 @@ export function getMercariUrl({
     keyword,
     status,
     category_id: category,
-    ...(!!minPrice && {minPrice: minPrice.toString()}),
-    ...(!!maxPrice && {maxPrice: maxPrice.toString()}),
+    ...(!!minPrice && {price_min: minPrice.toString()}),
+    ...(!!maxPrice && {price_max: maxPrice.toString()}),
   });
   return `https://jp.mercari.com/search?${params.toString()}`;
 }
