@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import './globals.css';
+import AppHeader from '../components/AppHeader';
 
 export const metadata: Metadata = {
   title: 'Mercari Scraper',
@@ -17,7 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AppHeader />
+        {children}
+      </body>
     </html>
   );
 }
