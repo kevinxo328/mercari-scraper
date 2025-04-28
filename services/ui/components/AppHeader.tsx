@@ -1,8 +1,8 @@
-import { prisma } from '@/utils/db';
+import { dbClient } from '@/utils/db';
 
 const AppHeader = async () => {
   const getLatestUpdateTime = async () => {
-    const latestUpdate = await prisma.scrapeResult.findFirst({
+    const latestUpdate = await dbClient.scrapeResult.findFirst({
       orderBy: {
         updatedAt: 'desc'
       },
