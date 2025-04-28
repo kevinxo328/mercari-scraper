@@ -1,3 +1,4 @@
+import ScrapeResultCard from '@/components/ScrapeResultCard';
 import { dbClient } from '@/utils/db';
 
 export default async function Page() {
@@ -11,24 +12,14 @@ export default async function Page() {
       <h4 className="text-lg font-semibold mb-4">Results</h4>
       <div className="grid @max-[400px]:grid-cols-2 grid-cols-3 lg:grid-cols-6 gap-6">
         {scrapeResults.map((result) => (
-          <a
-            href={result.url}
+          <ScrapeResultCard
             key={result.id}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative"
-          >
-            <div className="aspect-square overflow-hidden bg-gray-100 rounded-lg">
-              <img
-                className="object-contain object-center  w-full h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
-                src={result.imageUrl}
-                alt={result.title}
-              />
-            </div>
-            <p className="absolute bottom-2 left-0 bg-gray-950/80 py-2 px-3 text:lg sm:text-xl font-semibold text-white rounded-r-full">
-              {result.price.toLocaleString()} {result.currency}
-            </p>
-          </a>
+            url={result.url}
+            title={result.title}
+            imageUrl={result.imageUrl}
+            price={result.price}
+            currency={result.currency}
+          />
         ))}
       </div>
     </main>
