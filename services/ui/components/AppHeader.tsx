@@ -1,4 +1,21 @@
-const AppHeader = () => {
+import { prisma } from '@/utils/db';
+
+const AppHeader = async () => {
+  const getLatestUpdateTime = async () => {
+    const latestUpdate = await prisma.scrapeResult.findFirst({
+      orderBy: {
+        updatedAt: 'desc'
+      },
+      select: {
+        updatedAt: true
+      }
+    });
+    return latestUpdate?.updatedAt;
+  };
+
+  const latestUpdateTime = await getLatestUpdateTime();
+  const localeTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <header className="bg-white p-4 flex items-center gap-2 sticky">
       <svg
@@ -12,7 +29,7 @@ const AppHeader = () => {
         <g id="mercari-logo">
           <path
             fill="#ff0211"
-            fill-rule="evenodd"
+            fillRule="evenodd"
             d="M42.65,14.15l0,21a3.55,3.55,0,0,1-2,3.17l-17.8,8.59a3.54,3.54,0,0,1-3.08,0L9.25,41.82,2,38.27A3.51,3.51,0,0,1,0,35.1l0-21a3.5,3.5,0,0,1,2-3.14L19.79,2.07a3.55,3.55,0,0,1,3.16,0L40.71,11A3.53,3.53,0,0,1,42.65,14.15Z"
           ></path>
           <circle fill="#4dc9ff" cx="36.03" cy="14.65" r="9.56"></circle>
@@ -23,6 +40,14 @@ const AppHeader = () => {
         </g>
       </svg>
       <h1 className="text-md font-bold">Mercari Scraper</h1>
+      <div className="ml-auto">
+        <p className="text-right text-xs sm:text-sm text-gray-500">
+          Last updated: <br className="sm:hidden" />
+          {latestUpdateTime
+            ? `${latestUpdateTime.toLocaleTimeString()} ${localeTimeZone}`
+            : 'N/A'}
+        </p>
+      </div>
     </header>
   );
 };
