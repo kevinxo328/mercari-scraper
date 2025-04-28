@@ -25,8 +25,8 @@ export default async function Page() {
                 alt={result.title}
               />
             </div>
-            <p className="absolute bottom-2 left-0 bg-gray-950/70 py-2 px-4 text-sm font-semibold text-white rounded-r-full">
-              {result.currency} {result.price.toLocaleString()}
+            <p className="absolute bottom-2 left-0 bg-gray-950/80 py-2 px-3 text:lg sm:text-xl font-semibold text-white rounded-r-full">
+              {result.price.toLocaleString()} {result.currency}
             </p>
           </a>
         ))}
