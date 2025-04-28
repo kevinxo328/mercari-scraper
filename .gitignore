@@ -16,3 +16,7 @@ playwright/.cache/
 
 # Prisma Client
 generated
+
+# Next.js
+.next
+out

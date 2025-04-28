@@ -1,0 +1,10 @@
+{
+  "name": "@mercari-scraper/ui",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
