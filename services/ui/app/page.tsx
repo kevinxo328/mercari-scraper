@@ -1,10 +1,19 @@
 import PaginatedScrapeResults from '@/components/PaginatedScrapeResults';
+import { dbClient } from '@/utils/db';
+
+const LIMIT = 50;
 
 export default async function Page() {
+  const initialResults = await dbClient.scrapeResult.findMany({
+    orderBy: { updatedAt: 'desc' },
+    take: LIMIT,
+    skip: 0
+  });
+
   return (
     <main className="mx-auto p-4 container @container">
       <h4 className="text-lg font-semibold mb-4">Results</h4>
-      <PaginatedScrapeResults />
+      <PaginatedScrapeResults initialResults={initialResults} limit={50} />
     </main>
   );
 }

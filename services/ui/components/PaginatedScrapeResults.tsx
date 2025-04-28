@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react';
 import ScrapeResultCard from './ScrapeResultCard';
 
-const LIMIT = 50;
-
 type ScrapeResult = {
   id: string;
   url: string;
@@ -14,21 +12,30 @@ type ScrapeResult = {
   currency: string;
 };
 
-const PaginatedScrapeResults = () => {
-  const [scrapeResults, setScrapeResults] = useState<ScrapeResult[]>([]);
-  const [page, setPage] = useState(1);
+type Props = {
+  initialResults: ScrapeResult[];
+  limit: number;
+};
+
+const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
+  const [scrapeResults, setScrapeResults] =
+    useState<ScrapeResult[]>(initialResults);
   const [isEndOfResults, setEndOfResults] = useState(false);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
+
+  // If initialResults is empty, set page to 0. Otherwise, set it to 1.
+  // This is to prevent the first page from being fetched when the component mounts.
+  const [page, setPage] = useState<number>(initialResults.length > 0 ? 1 : 0);
 
   const fetchScrapeResults = async ({ page }: { page: number }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/scrape/results?page=${page}&limit=${LIMIT}`
+        `/api/scrape/results?page=${page}&limit=${limit}`
       );
       const data = await response.json();
 
-      setEndOfResults(data.length < LIMIT);
+      setEndOfResults(data.length < limit);
       setScrapeResults((prev) => [...prev, ...data]);
     } catch (error) {
       console.error('Error fetching scrape results:', error);
@@ -38,7 +45,11 @@ const PaginatedScrapeResults = () => {
   };
 
   useEffect(() => {
-    fetchScrapeResults({ page });
+    if (page === 0) {
+      setPage(1); // Set page to 1 if initialResults is empty
+    } else if ((page === 1 && scrapeResults.length === 0) || page > 1) {
+      fetchScrapeResults({ page });
+    }
   }, [page]);
 
   return (
