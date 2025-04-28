@@ -1,26 +1,24 @@
 {
-  "name": "mercari-scraper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "test": "playwright test",
-    "test:debug": "playwright test --debug",
-    "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report",
-    "postinstall": "prisma generate"
+    "prettier": "prettier --check .",
+    "prettier:write": "prettier --write .",
+    "preinstall": "prisma generate --schema=packages/db/schema.prisma",
+    "test": "playwright test --config=services/scraper/playwright.config.ts",
+    "test:debug": "playwright test --debug --config=services/scraper/playwright.config.ts",
+    "test:ui": "playwright test --ui --config=services/scraper/playwright.config.ts",
+    "test:report": "playwright show-report services/scraper/playwright-report"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.14.1",
-    "prisma": "^6.6.0",
-    "ts-node": "^10.9.2",
+    "@types/node": "^22.15.2",
+    "prettier": "3.5.3",
     "typescript": "^5.8.3"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.6.0"
   }
 }

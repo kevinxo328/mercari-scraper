@@ -1,0 +1,13 @@
+{
+  "name": "@mercari-scraper/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "generated/prisma/index.js",
+  "types": "generated/prisma/index.d.ts",
+  "devDependencies": {
+    "prisma": "^6.6.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.6.0"
+  }
+}

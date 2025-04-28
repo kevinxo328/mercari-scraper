@@ -1,0 +1,8 @@
+{
+  "name": "@mercari-scraper/scraper",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}

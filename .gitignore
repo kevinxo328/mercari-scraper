@@ -1,14 +1,18 @@
+.DS_Store
+node_modules
+*.log
+dist
+build
 
 # Playwright
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # Environment variables
 .env*
 !.env.example
 
 # Prisma Client
-/prisma/generated
+generated

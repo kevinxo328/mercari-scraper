@@ -1,5 +1,5 @@
 export enum MercariCategory {
-  MENFASHION = "2",
+  MENFASHION = '2'
 }
 
 /**
@@ -13,7 +13,7 @@ export function getMercariUrl({
   keyword,
   category = MercariCategory.MENFASHION,
   minPrice,
-  maxPrice,
+  maxPrice
 }: {
   keyword: string;
   status?: string;
@@ -21,13 +21,13 @@ export function getMercariUrl({
   minPrice?: number | null;
   maxPrice?: number | null;
 }) {
-  const status = "on_sale"; // default is on_sale
+  const status = 'on_sale'; // default is on_sale
   const params = new URLSearchParams({
     keyword,
     status,
     category_id: category,
-    ...(!!minPrice && {price_min: minPrice.toString()}),
-    ...(!!maxPrice && {price_max: maxPrice.toString()}),
+    ...(!!minPrice && { price_min: minPrice.toString() }),
+    ...(!!maxPrice && { price_max: maxPrice.toString() })
   });
   return `https://jp.mercari.com/search?${params.toString()}`;
 }
