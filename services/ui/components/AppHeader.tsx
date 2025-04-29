@@ -1,7 +1,9 @@
 import { dbClient } from '@/utils/db';
 import Link from 'next/link';
 
-const AppHeader = async () => {
+export const dynamic = 'force-dynamic';
+
+export const AppHeader = async () => {
   const getLatestUpdateTime = async () => {
     const latestUpdate = await dbClient.scrapeResult.findFirst({
       orderBy: {
