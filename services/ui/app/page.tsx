@@ -3,6 +3,8 @@ import { dbClient } from '@/utils/db';
 
 const LIMIT = 50;
 
+export const dynamic = 'force-dynamic';
+
 export default async function Page() {
   const initialResults = await dbClient.scrapeResult.findMany({
     orderBy: { updatedAt: 'desc' },
