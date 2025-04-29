@@ -1,11 +1,11 @@
-import { dbClient } from '@/utils/db';
+import { prisma } from '@mercari-scraper/db';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export const AppHeader = async () => {
   const getLatestUpdateTime = async () => {
-    const latestUpdate = await dbClient.scrapeResult.findFirst({
+    const latestUpdate = await prisma.scrapeResult.findFirst({
       orderBy: {
         updatedAt: 'desc'
       },
