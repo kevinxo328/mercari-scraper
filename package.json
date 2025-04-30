@@ -17,7 +17,7 @@
     "test:report": "playwright show-report services/scraper/playwright-report",
     "dev": "next dev ./services/ui",
     "build": "next build ./services/ui",
-    "build:postinstall": "mkdir -p ./services/ui/.prisma/client && cp ./packages/db/generated/prisma/libquery_engine-*.node ./services/ui/.prisma/client",
+    "build:postinstall": "mkdir -p /var/task/services/ui/.prisma/client && cp ./packages/db/generated/prisma/libquery_engine-*.node /var/task/services/ui/.prisma/client",
     "start": "next start ./services/ui"
   },
   "devDependencies": {
