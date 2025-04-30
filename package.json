@@ -7,17 +7,20 @@
   "engines": {
     "node": ">=18"
   },
+  "prisma": {
+    "schema": "./packages/db/schema.prisma"
+  },
   "scripts": {
     "prettier": "prettier --check .",
     "prettier:write": "prettier --write .",
-    "preinstall": "prisma generate --schema=packages/db/schema.prisma",
+    "preinstall": "prisma generate",
     "test": "playwright test --config=services/scraper/playwright.config.ts",
     "test:debug": "playwright test --debug --config=services/scraper/playwright.config.ts",
     "test:ui": "playwright test --ui --config=services/scraper/playwright.config.ts",
     "test:report": "playwright show-report services/scraper/playwright-report",
     "dev": "next dev ./services/ui",
     "build": "next build ./services/ui",
-    "build:postinstall": "prisma generate --schema=packages/db/schema.prisma --no-engine",
+    "build:postinstall": "prisma generate",
     "start": "next start ./services/ui"
   },
   "devDependencies": {
