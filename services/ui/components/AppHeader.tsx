@@ -1,5 +1,6 @@
 import { prisma } from '@mercari-scraper/db';
 import Link from 'next/link';
+import { TimeDisplay } from './TimeDisplay';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,6 @@ export const AppHeader = async () => {
   };
 
   const latestUpdateTime = await getLatestUpdateTime();
-  const localeTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return (
     <header className="p-4 flex items-center sticky top-0 z-10 border-b border-gray-800 bg-gray-950/70 backdrop-blur-2xl">
@@ -48,9 +48,7 @@ export const AppHeader = async () => {
       <div className="ml-auto">
         <p className="text-right text-xs sm:text-sm text-gray-400">
           Last updated: <br className="sm:hidden" />
-          {latestUpdateTime
-            ? `${latestUpdateTime.toLocaleTimeString()} ${localeTimeZone}`
-            : 'N/A'}
+          <TimeDisplay timestamp={latestUpdateTime} />
         </p>
       </div>
     </header>
