@@ -1,12 +1,12 @@
 import { type NextRequest } from 'next/server';
-import { dbClient } from '@/utils/db';
+import { prisma } from '@mercari-scraper/db';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page');
   const limit = searchParams.get('limit');
 
-  const scrapeResults = await dbClient.scrapeResult.findMany({
+  const scrapeResults = await prisma.scrapeResult.findMany({
     orderBy: {
       updatedAt: 'desc'
     },

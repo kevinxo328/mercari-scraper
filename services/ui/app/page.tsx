@@ -1,16 +1,17 @@
 import PaginatedScrapeResults from '@/components/PaginatedScrapeResults';
-import { dbClient } from '@/utils/db';
+import { prisma } from '@mercari-scraper/db';
 
 const LIMIT = 50;
 
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const initialResults = await dbClient.scrapeResult.findMany({
-    orderBy: { updatedAt: 'desc' },
-    take: LIMIT,
-    skip: 0
-  });
+  const initialResults =
+    (await prisma.scrapeResult.findMany({
+      orderBy: { updatedAt: 'desc' },
+      take: LIMIT,
+      skip: 0
+    })) || [];
 
   return (
     <main className="mx-auto p-4 container @container">
