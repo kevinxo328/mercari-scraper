@@ -17,7 +17,7 @@
     "test:report": "playwright show-report services/scraper/playwright-report",
     "dev": "next dev ./services/ui",
     "build": "next build ./services/ui",
-    "build:postinstall": "cp packages/db/generated/prisma/libquery_engine-*.node ./node_modules/.prisma/client",
+    "build:postinstall": "cp ./packages/db/generated/prisma/libquery_engine-*.node ./node_modules/.prisma/client",
     "start": "next start ./services/ui"
   },
   "devDependencies": {
