@@ -2,7 +2,7 @@ name: Scrape Mercari
 
 on:
   schedule:
-    # Run every day at 4 AM UTC (This is 12 AM UTC+8)
+    # Run every day at 4 AM UTC (This is 12 PM UTC+8)
     - cron: '0 4 * * *'
   workflow_dispatch:
 
