@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import ScrapeResultCard from './ScrapeResultCard';
+import { Button } from './shadcn/button';
+import { Loader2 } from 'lucide-react';
 
 type ScrapeResult = {
   id: string;
@@ -68,21 +70,22 @@ const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
       </div>
 
       <div className="flex justify-center mt-4">
-        <button
-          className="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:bg-transparent"
+        <Button
           onClick={() => {
-            if (!isEndOfResults) {
-              setPage((prev) => prev + 1);
-            }
+            if (isEndOfResults) return;
+            setPage((prev) => prev + 1);
           }}
           disabled={isEndOfResults || isLoading}
+          variant={isEndOfResults ? 'ghost' : 'default'}
+          className="w-full"
         >
+          {isLoading && !isEndOfResults && <Loader2 className="animate-spin" />}
           {isLoading
             ? 'Loading...'
             : isEndOfResults
               ? 'No more results'
               : 'Load more'}
-        </button>
+        </Button>
       </div>
     </>
   );

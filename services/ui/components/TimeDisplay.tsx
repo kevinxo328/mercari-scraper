@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/utils/cn';
 import { useEffect, useState } from 'react';
 
 type Props = {
@@ -26,7 +27,7 @@ export function TimeDisplay({ timestamp, className }: Props) {
     : 'N/A';
 
   return (
-    <span className={className || ''}>
+    <span className={cn(className)}>
       {timestamp ? `${formattedTime} ${localeTimeZone}` : 'N/A'}
     </span>
   );
