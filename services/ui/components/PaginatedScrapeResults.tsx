@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import ScrapeResultCard from './ScrapeResultCard';
 import { Button } from './shadcn/button';
 import { Loader2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 type ScrapeResult = {
   id: string;
@@ -22,6 +23,11 @@ type Props = {
 const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
   const [scrapeResults, setScrapeResults] =
     useState<ScrapeResult[]>(initialResults);
+  const searchParams = useSearchParams();
+  const keywords = searchParams.get('keywords');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+
   const [isEndOfResults, setEndOfResults] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
@@ -29,12 +35,32 @@ const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
   // This is to prevent the first page from being fetched when the component mounts.
   const [page, setPage] = useState<number>(initialResults.length > 0 ? 1 : 0);
 
-  const fetchScrapeResults = async ({ page }: { page: number }) => {
+  const fetchScrapeResults = async ({
+    page,
+    keywords,
+    minPrice,
+    maxPrice
+  }: {
+    page: number;
+    keywords: string;
+    minPrice: number;
+    maxPrice: number;
+  }) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `/api/scrape/results?page=${page}&limit=${limit}`
-      );
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (keywords) {
+        params.append('keywords', keywords);
+      }
+      if (minPrice) {
+        params.append('minPrice', minPrice.toString());
+      }
+      if (maxPrice) {
+        params.append('maxPrice', maxPrice.toString());
+      }
+      const response = await fetch(`/api/scrape/results?${params.toString()}`);
       const data = await response.json();
 
       setEndOfResults(data.length < limit);
@@ -50,7 +76,12 @@ const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
     if (page === 0) {
       setPage(1); // Set page to 1 if initialResults is empty
     } else if ((page === 1 && scrapeResults.length === 0) || page > 1) {
-      fetchScrapeResults({ page });
+      fetchScrapeResults({
+        page,
+        keywords: keywords || '',
+        minPrice: Number(minPrice) || 0,
+        maxPrice: Number(maxPrice) || 0
+      });
     }
   }, [page]);
 
@@ -77,7 +108,7 @@ const PaginatedScrapeResults = ({ initialResults, limit }: Props) => {
           }}
           disabled={isEndOfResults || isLoading}
           variant={isEndOfResults ? 'ghost' : 'default'}
-          className="w-full"
+          className="w-full cursor-pointer"
         >
           {isLoading && !isEndOfResults && <Loader2 className="animate-spin" />}
           {isLoading

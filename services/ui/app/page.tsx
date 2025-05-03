@@ -1,17 +1,40 @@
 import PaginatedScrapeResults from '@/components/PaginatedScrapeResults';
+import { parseCommaSeparatedString } from '@/utils/string';
 import { prisma } from '@mercari-scraper/db';
 
 const LIMIT = 50;
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page() {
-  const initialResults =
-    (await prisma.scrapeResult.findMany({
-      orderBy: { updatedAt: 'desc' },
-      take: LIMIT,
-      skip: 0
-    })) || [];
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Page({ searchParams }: Props) {
+  const { keywords, minPrice, maxPrice } = await searchParams;
+
+  const keywordsArray = Array.isArray(keywords)
+    ? keywords
+    : parseCommaSeparatedString(keywords);
+
+  const initialResults = await prisma.scrapeResult.findMany({
+    where: {
+      keywords: {
+        some: {
+          keyword: {
+            in: keywordsArray
+          }
+        }
+      },
+      price: {
+        gte: Number(minPrice) || 0,
+        lte: Number(maxPrice) || undefined
+      }
+    },
+    orderBy: { updatedAt: 'desc' },
+    take: LIMIT,
+    skip: 0
+  });
 
   return (
     <main className="mx-auto p-4 container @container">

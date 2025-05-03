@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-dvh">
+      <body className="min-h-dvh flex flex-col">
         <AppHeader />
         {children}
       </body>
