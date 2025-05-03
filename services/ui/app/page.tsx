@@ -22,12 +22,12 @@ export default async function Page({ searchParams }: Props) {
       keywords: {
         some: {
           keyword: {
-            in: keywordsArray
+            in: keywordsArray.length > 0 ? keywordsArray : undefined
           }
         }
       },
       price: {
-        gte: Number(minPrice) || 0,
+        gte: Number(minPrice) || undefined,
         lte: Number(maxPrice) || undefined
       }
     },
