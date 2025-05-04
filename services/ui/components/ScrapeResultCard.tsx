@@ -21,7 +21,7 @@ const ScrapeResultCard = (props: Props) => {
           alt={props.title}
         />
       </div>
-      <p className="absolute bottom-2 left-0 bg-gray-950/80 py-2 px-3 text:lg sm:text-xl font-semibold text-white rounded-r-full">
+      <p className="absolute bottom-2 left-0 bg-gray-700/50 dark:bg-gray-950/80 py-2 px-3 text:lg sm:text-xl font-semibold text-white rounded-r-full">
         {props.price.toLocaleString()} {props.currency}
       </p>
     </a>
