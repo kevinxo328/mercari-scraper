@@ -10,7 +10,10 @@
     "allowJs": true,
     "noEmit": true,
     "incremental": true,
-    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "module": "esnext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "plugins": [

@@ -6,7 +6,7 @@ type Props = {
   currency: string;
 };
 
-const ScrapeResultCard = (props: Props) => {
+const ScraperResultCard = (props: Props) => {
   return (
     <a
       href={props.url}
@@ -28,4 +28,4 @@ const ScrapeResultCard = (props: Props) => {
   );
 };
 
-export default ScrapeResultCard;
+export default ScraperResultCard;

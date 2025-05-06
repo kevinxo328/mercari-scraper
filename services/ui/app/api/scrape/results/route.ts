@@ -1,6 +1,6 @@
 import { type NextRequest } from 'next/server';
 import { prisma } from '@mercari-scraper/db';
-import { parseCommaSeparatedString } from '@/utils/string';
+import { parseCommaSeparatedString } from '@/utils/utils';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
