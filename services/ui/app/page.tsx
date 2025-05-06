@@ -1,3 +1,4 @@
+import AppHeader from '@/components/AppHeader';
 import ScraperResults from '@/components/ScraperResults';
 import ScraperSheet from '@/components/ScraperSheet';
 import ScraperSidebar from '@/components/ScraperSidebar';
@@ -67,16 +68,19 @@ export default async function Page({ searchParams }: Props) {
 
   return (
     <ScraperProvider initialState={initialState}>
-      <main className="mx-auto p-4 container @container flex gap-4 relative">
-        <div className="grow-1">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-3xl font-semibold">Results</h4>
-            <ScraperSheet className="lg:hidden" />
+      <>
+        <AppHeader />
+        <main className="mx-auto p-4 container @container flex gap-4 relative">
+          <div className="grow-1">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-3xl font-semibold">Results</h4>
+              <ScraperSheet className="lg:hidden" />
+            </div>
+            <ScraperResults />
           </div>
-          <ScraperResults />
-        </div>
-        <ScraperSidebar className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4" />
-      </main>
+          <ScraperSidebar className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4" />
+        </main>
+      </>
     </ScraperProvider>
   );
 }
