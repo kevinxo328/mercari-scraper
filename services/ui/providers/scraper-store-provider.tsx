@@ -13,8 +13,7 @@ import {
   ScraperState,
   type ScraperStore
 } from '@/stores/scraper-store';
-import { deepEqual } from '@/utils/utils';
-import { redirect, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export type ScraperApi = ReturnType<typeof createScraperStore>;
 
@@ -30,45 +29,31 @@ export const ScraperProvider = ({
   initialState
 }: ScraperProviderProps) => {
   const storeRef = useRef<ScraperApi | null>(null);
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   if (!storeRef.current) {
     storeRef.current = createScraperStore(initialState);
   }
 
-  // Subscribe to the store and update the URL when the filter changes
+  // Set the initial filter state based on the URL parameters
   useEffect(() => {
-    const unsubscribe = storeRef.current?.subscribe((state, prevState) => {
-      if (!deepEqual(state.filter, prevState.filter)) {
-        const params = new URLSearchParams();
-        if (state.filter.keywords.length > 0) {
-          params.append('keywords', state.filter.keywords.join(','));
-        }
-        if (state.filter.minPrice !== undefined) {
-          params.append('minPrice', state.filter.minPrice.toString());
-        }
-        if (state.filter.maxPrice !== undefined) {
-          params.append('maxPrice', state.filter.maxPrice.toString());
-        }
+    const keywords = searchParams.get('keywords');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
 
-        router.push(`?${params.toString()}`);
-      }
-    });
-
-    return () => {
-      unsubscribe?.();
+    const filter = {
+      keywords: keywords
+        ? keywords.split(',').map((keyword) => keyword.trim())
+        : [],
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      page: 1,
+      limit: 50 // TODO - make this env variable
     };
-  }, [router]);
 
-  // If initialState is changed, reset the store
-  useEffect(() => {
-    if (initialState) {
-      const currentState = storeRef.current?.getState();
-      if (!deepEqual(currentState, initialState)) {
-        storeRef.current?.setState(initialState);
-      }
-    }
-  }, [initialState]);
+    storeRef.current?.getState().setFilter(filter);
+    storeRef.current?.getState().fetchResults();
+  }, []);
 
   return (
     <ScraperContext.Provider value={storeRef.current}>

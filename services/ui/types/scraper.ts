@@ -12,6 +12,8 @@ export type ScraperFilter = {
   keywords: string[];
   minPrice: number | undefined;
   maxPrice: number | undefined;
+  page: number;
+  limit: number;
 };
 
 export type ScraperKeyword = {

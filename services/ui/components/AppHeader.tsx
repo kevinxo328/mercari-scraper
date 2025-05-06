@@ -1,24 +1,8 @@
-import { prisma } from '@mercari-scraper/db';
 import Link from 'next/link';
-import { TimeDisplay } from './TimeDisplay';
 
 export const dynamic = 'force-dynamic';
 
 export const AppHeader = async () => {
-  const getLatestUpdateTime = async () => {
-    const latestUpdate = await prisma.scrapeResult.findFirst({
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      select: {
-        updatedAt: true
-      }
-    });
-    return latestUpdate?.updatedAt;
-  };
-
-  const latestUpdateTime = await getLatestUpdateTime();
-
   return (
     <header className="p-4 flex items-center sticky top-0 z-10 border-b darK:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
       <Link href="/" className="flex items-center gap-2">
@@ -45,12 +29,6 @@ export const AppHeader = async () => {
         </svg>
         <h1 className="text-md font-bold">Mercari Scraper</h1>
       </Link>
-      <div className="ml-auto">
-        <p className="text-right text-xs sm:text-sm dark:text-gray-400">
-          Last updated: <br className="sm:hidden" />
-          <TimeDisplay timestamp={latestUpdateTime} />
-        </p>
-      </div>
     </header>
   );
 };

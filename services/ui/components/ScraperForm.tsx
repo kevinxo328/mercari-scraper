@@ -1,8 +1,6 @@
 'use client';
 
-import { useForm, ControllerRenderProps } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { ControllerRenderProps } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -15,61 +13,54 @@ import { Input } from './shadcn/input';
 import { Checkbox } from './shadcn/checkbox';
 import { useScraperStore } from '@/providers/scraper-store-provider';
 import { Button } from './shadcn/button';
-
-const formSchema = z
-  .object({
-    keywords: z.array(z.string()),
-    minPrice: z
-      .number({ invalid_type_error: 'Invalid number' })
-      .optional()
-      .transform((val) =>
-        typeof val === 'number' && isNaN(val) ? undefined : val
-      )
-      .refine((num) => num === undefined || num >= 0, {
-        message: 'Min price must be greater than or equal to 0'
-      }),
-    maxPrice: z
-      .number({ invalid_type_error: 'Invalid number' })
-      .transform((val) => (isNaN(val) ? undefined : val))
-      .optional()
-  })
-  .refine(
-    (data) =>
-      data.minPrice === undefined ||
-      data.maxPrice === undefined ||
-      (data.maxPrice !== undefined && data.maxPrice > data.minPrice),
-    {
-      message: 'Max price must be greater than min price',
-      path: ['maxPrice']
-    }
-  );
-
-export type ScraperFormValues = z.infer<typeof formSchema>;
+import { useEffect } from 'react';
+import {
+  ScraperFormValues,
+  useScraperForm
+} from '@/providers/scraper-form-provider';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   ref?: React.Ref<HTMLFormElement>;
 };
 
 export default function ScraperForm(props: Props) {
-  const { filter, setFilter, keywordOptions } = useScraperStore(
-    (state) => state
-  );
-
-  const form = useForm<ScraperFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      keywords: filter.keywords,
-      minPrice: filter.minPrice,
-      maxPrice: filter.maxPrice
-    }
-  });
+  const {
+    setFilter,
+    keywordOptions,
+    isLoadingKeywordOptions,
+    fetchKeywordOptions,
+    fetchResults,
+    filter
+  } = useScraperStore((state) => state);
+  const form = useScraperForm();
+  const router = useRouter();
 
   const onSubmit = (data: ScraperFormValues) => {
+    // Set the filter state with the new values
+    // and reset the page to 1
     setFilter({
+      ...filter,
       keywords: data.keywords,
       minPrice: data.minPrice,
-      maxPrice: data.maxPrice
+      maxPrice: data.maxPrice,
+      page: 1
     });
+
+    fetchResults();
+
+    // Update the URL with the new filter values
+    const params = new URLSearchParams();
+    if (data.keywords.length > 0) {
+      params.append('keywords', data.keywords.join(','));
+    }
+    if (data.minPrice) {
+      params.append('minPrice', data.minPrice.toString());
+    }
+    if (data.maxPrice) {
+      params.append('maxPrice', data.maxPrice.toString());
+    }
+    router.push(`/search?${params.toString()}`);
   };
 
   // Because in the form, the value is a string even if the type is number
@@ -82,6 +73,20 @@ export default function ScraperForm(props: Props) {
     const value = e.target.value;
     field.onChange(value === '' ? undefined : Number(value));
   };
+
+  useEffect(() => {
+    if (!isLoadingKeywordOptions && keywordOptions.length === 0) {
+      fetchKeywordOptions();
+    }
+  }, []);
+
+  if (isLoadingKeywordOptions) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 dark:border-gray-100"></div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>

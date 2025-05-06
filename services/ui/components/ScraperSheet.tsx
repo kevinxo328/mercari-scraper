@@ -46,7 +46,7 @@ export default function ScraperSheet(props: Props) {
           <SheetTitle className="text-2xl font-semibold">Filter</SheetTitle>
           <ScraperForm ref={formRef} />
           <Button onClick={handleSubmit} className="mt-4">
-            Submit
+            Apply
           </Button>
         </SheetHeader>
       </SheetContent>
