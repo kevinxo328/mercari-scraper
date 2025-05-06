@@ -1,14 +1,17 @@
 name: Scrape Mercari
 
 on:
-  # schedule:
-  #   # 每日 UTC 04:00 (等同於 UTC+8 12:00) 執行
-  #   - cron: "0 4 * * *"
+  schedule:
+    # Run every day at 4 AM UTC (This is 12 PM UTC+8)
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
+    # This job will only run on the main branch for scheduled events or when manually triggered
+    if: ${{ github.event_name != 'schedule' || github.ref == 'refs/heads/main' }}
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DIRECT_URL: ${{ secrets.DIRECT_URL }}

@@ -1,12 +1,30 @@
 import { type NextRequest } from 'next/server';
-import { dbClient } from '@/utils/db';
+import { prisma } from '@mercari-scraper/db';
+import { parseCommaSeparatedString } from '@/utils/utils';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page');
   const limit = searchParams.get('limit');
+  const keywords = searchParams.get('keywords');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const keywordsArray = parseCommaSeparatedString(keywords);
 
-  const scrapeResults = await dbClient.scrapeResult.findMany({
+  const scrapeResults = await prisma.scrapeResult.findMany({
+    where: {
+      keywords: {
+        some: {
+          keyword: {
+            in: keywordsArray.length > 0 ? keywordsArray : undefined
+          }
+        }
+      },
+      price: {
+        gte: Number(minPrice) || undefined,
+        lte: Number(maxPrice) || undefined
+      }
+    },
     orderBy: {
       updatedAt: 'desc'
     },
