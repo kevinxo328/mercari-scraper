@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { getMercariUrl, MercariCategory } from '../utils/mercari';
-import { PrismaClient, type ScrapeKeyword } from '@mercari-scraper/db';
+import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/db';
 
 // Set the viewport size for the page to ensure all items are visible.
 test.use({
@@ -13,12 +13,12 @@ test.describe('Scrape Mercari', () => {
 
   const MAX_ITEM_COUNT = 100; // Maximum number of items to scrape per keyword
   const prisma = new PrismaClient();
-  let keywords: ScrapeKeyword[] = [];
+  let keywords: ScraperKeyword[] = [];
 
   test.beforeAll(async () => {
     // Fetch keywords from the database
     try {
-      keywords = await prisma.scrapeKeyword.findMany();
+      keywords = await prisma.scraperKeyword.findMany();
     } catch (e) {
       console.error(e);
     }
@@ -111,13 +111,13 @@ test.describe('Scrape Mercari', () => {
             currency: priceSource ? 'JPY' : ''
           };
 
-          const existingRecord = await prisma.scrapeResult.findFirst({
+          const existingRecord = await prisma.scraperResult.findFirst({
             where: { url: data.url },
             include: { keywords: true }
           });
 
           if (!existingRecord) {
-            await prisma.scrapeResult.create({
+            await prisma.scraperResult.create({
               data: {
                 ...data,
                 keywords: {
@@ -137,7 +137,7 @@ test.describe('Scrape Mercari', () => {
               existingRecord.url !== data.url ||
               !existingKeywordRelation
             ) {
-              await prisma.scrapeResult.update({
+              await prisma.scraperResult.update({
                 where: { id: existingRecord.id },
                 data: {
                   title: data.title,
