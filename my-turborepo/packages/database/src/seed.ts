@@ -1,29 +1,28 @@
-import { prisma } from "./client";
+import { prisma } from './client';
 
-import type { User } from "../generated/client";
+import type { ScraperKeyword } from '../generated/client';
 
-const DEFAULT_USERS = [
-  // Add your own user to pre-populate the database with
+const DEFAULT_KEYWORD = [
+  // Add your own keyword to pre-populate the database with
   {
-    name: "Tim Apple",
-    email: "tim@apple.com",
-  },
-] as Array<Partial<User>>;
+    keyword: 'ancellm'
+  }
+] as Array<ScraperKeyword>;
 
 (async () => {
   try {
     await Promise.all(
-      DEFAULT_USERS.map((user) =>
-        prisma.user.upsert({
+      DEFAULT_KEYWORD.map((item) =>
+        prisma.scraperKeyword.upsert({
           where: {
-            email: user.email!,
+            keyword: item.keyword
           },
           update: {
-            ...user,
+            ...item
           },
           create: {
-            ...user,
-          },
+            ...item
+          }
         })
       )
     );
