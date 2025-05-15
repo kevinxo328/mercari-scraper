@@ -13,6 +13,7 @@
     "format": "prisma format",
     "generate": "prisma generate",
     "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
     "prebuild": "pnpm run generate",
     "predev": "pnpm run generate",
     "studio": "prisma studio"

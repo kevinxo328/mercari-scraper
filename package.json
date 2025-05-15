@@ -15,6 +15,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
     "scraper": "turbo run scraper",
     "scraper:debug": "turbo run scraper:debug",
     "scraper:ui": "turbo run scraper:ui",

@@ -27,7 +27,9 @@
       "dependsOn": ["^generate"],
       "cache": false
     },
-    "lint": {},
+    "lint": {
+      "cache": false
+    },
     "scraper": {
       "cache": false
     },
