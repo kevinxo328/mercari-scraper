@@ -1,27 +1,27 @@
-import ScraperResultCard from "@/components/ScraperResultCard";
-import { TimeDisplay } from "@/components/TimeDisplay";
-import { prisma } from "@repo/database";
-import { Search } from "lucide-react";
-import Link from "next/link";
+import ScraperResultCard from '@/components/ScraperResultCard';
+import { TimeDisplay } from '@/components/TimeDisplay';
+import { prisma } from '@repo/database';
+import { Search } from 'lucide-react';
+import Link from 'next/link';
 
 const LIMIT = 50; // TODO: Make this an environment variable
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function Page() {
   const latestResults = await prisma.scraperResult.findMany({
-    orderBy: { updatedAt: "desc" },
+    orderBy: { updatedAt: 'desc' },
     take: LIMIT,
-    skip: 0,
+    skip: 0
   });
 
   const latestUpdateTime = await prisma.scraperResult
     .findFirst({
       orderBy: {
-        updatedAt: "desc",
+        updatedAt: 'desc'
       },
       select: {
-        updatedAt: true,
-      },
+        updatedAt: true
+      }
     })
     .then((result) => result?.updatedAt);
 

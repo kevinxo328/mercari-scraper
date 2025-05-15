@@ -1,8 +1,8 @@
-import ScraperResults from "@/components/ScraperResults";
-import ScraperSheet from "@/components/ScraperSheet";
-import ScraperSidebar from "@/components/ScraperSidebar";
-import { ScraperFormProvider } from "@/providers/scraper-form-provider";
-import { ScraperProvider } from "@/providers/scraper-store-provider";
+import ScraperResults from '@/components/ScraperResults';
+import ScraperSheet from '@/components/ScraperSheet';
+import ScraperSidebar from '@/components/ScraperSidebar';
+import { ScraperFormProvider } from '@/providers/scraper-form-provider';
+import { ScraperProvider } from '@/providers/scraper-store-provider';
 
 export default async function Page() {
   return (

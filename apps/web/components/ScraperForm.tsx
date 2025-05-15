@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { ControllerRenderProps } from "react-hook-form";
+import { ControllerRenderProps } from 'react-hook-form';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "./shadcn/form";
-import { Input } from "./shadcn/input";
-import { Checkbox } from "./shadcn/checkbox";
-import { useScraperStore } from "@/providers/scraper-store-provider";
-import { Button } from "./shadcn/button";
-import { useEffect } from "react";
+  FormMessage
+} from './shadcn/form';
+import { Input } from './shadcn/input';
+import { Checkbox } from './shadcn/checkbox';
+import { useScraperStore } from '@/providers/scraper-store-provider';
+import { Button } from './shadcn/button';
+import { useEffect } from 'react';
 import {
   ScraperFormValues,
-  useScraperForm,
-} from "@/providers/scraper-form-provider";
-import { useRouter } from "next/navigation";
+  useScraperForm
+} from '@/providers/scraper-form-provider';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   ref?: React.Ref<HTMLFormElement>;
@@ -31,7 +31,7 @@ export default function ScraperForm(props: Props) {
     isLoadingKeywordOptions,
     fetchKeywordOptions,
     fetchResults,
-    filter,
+    filter
   } = useScraperStore((state) => state);
   const form = useScraperForm();
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function ScraperForm(props: Props) {
       keywords: data.keywords,
       minPrice: data.minPrice,
       maxPrice: data.maxPrice,
-      page: 1,
+      page: 1
     });
 
     fetchResults();
@@ -52,13 +52,13 @@ export default function ScraperForm(props: Props) {
     // Update the URL with the new filter values
     const params = new URLSearchParams();
     if (data.keywords.length > 0) {
-      params.append("keywords", data.keywords.join(","));
+      params.append('keywords', data.keywords.join(','));
     }
     if (data.minPrice) {
-      params.append("minPrice", data.minPrice.toString());
+      params.append('minPrice', data.minPrice.toString());
     }
     if (data.maxPrice) {
-      params.append("maxPrice", data.maxPrice.toString());
+      params.append('maxPrice', data.maxPrice.toString());
     }
     router.push(`/search?${params.toString()}`);
   };
@@ -68,10 +68,10 @@ export default function ScraperForm(props: Props) {
   // But if the value is empty, we need to set it to undefined
   const handleChangeNumberInput = (
     field: ControllerRenderProps<any, any>,
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
-    field.onChange(value === "" ? undefined : Number(value));
+    field.onChange(value === '' ? undefined : Number(value));
   };
 
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function ScraperForm(props: Props) {
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    form.setValue("keywords", []);
+                    form.setValue('keywords', []);
                   }}
                   className="cursor-pointer"
                   size="sm"
@@ -128,7 +128,7 @@ export default function ScraperForm(props: Props) {
                               field.onChange([...(field.value || []), keyword]);
                             } else {
                               field.onChange(
-                                field.value?.filter((k) => k !== keyword),
+                                field.value?.filter((k) => k !== keyword)
                               );
                             }
                           }}
@@ -151,8 +151,8 @@ export default function ScraperForm(props: Props) {
           <Button
             variant="ghost"
             onClick={() => {
-              form.setValue("minPrice", undefined);
-              form.setValue("maxPrice", undefined);
+              form.setValue('minPrice', undefined);
+              form.setValue('maxPrice', undefined);
             }}
             className="cursor-pointer"
             size="sm"
@@ -172,7 +172,7 @@ export default function ScraperForm(props: Props) {
                     placeholder="Enter min price"
                     type="number"
                     {...field}
-                    value={field.value || ""} // Set value to empty string if undefined to avoid uncontrolled input warning
+                    value={field.value || ''} // Set value to empty string if undefined to avoid uncontrolled input warning
                     onChange={(e) => {
                       handleChangeNumberInput(field, e);
                       form.trigger(); // Trigger validation on change immediately which is useful for max price validation.
@@ -198,7 +198,7 @@ export default function ScraperForm(props: Props) {
                     placeholder="Enter max price"
                     type="number"
                     {...field}
-                    value={field.value || ""} // Set value to empty string if undefined to avoid uncontrolled input warning
+                    value={field.value || ''} // Set value to empty string if undefined to avoid uncontrolled input warning
                     onChange={(e) => {
                       handleChangeNumberInput(field, e);
                     }}

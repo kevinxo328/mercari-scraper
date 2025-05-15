@@ -1,12 +1,12 @@
-import { prisma } from "./client";
+import { prisma } from './client';
 
-import type { ScraperKeyword } from "../generated/client";
+import type { ScraperKeyword } from '../generated/client';
 
 const DEFAULT_KEYWORD = [
   // Add your own keyword to pre-populate the database with
   {
-    keyword: "ancellm",
-  },
+    keyword: 'ancellm'
+  }
 ] as Array<ScraperKeyword>;
 
 (async () => {
@@ -15,16 +15,16 @@ const DEFAULT_KEYWORD = [
       DEFAULT_KEYWORD.map((item) =>
         prisma.scraperKeyword.upsert({
           where: {
-            keyword: item.keyword,
+            keyword: item.keyword
           },
           update: {
-            ...item,
+            ...item
           },
           create: {
-            ...item,
-          },
-        }),
-      ),
+            ...item
+          }
+        })
+      )
     );
   } catch (error) {
     console.error(error);

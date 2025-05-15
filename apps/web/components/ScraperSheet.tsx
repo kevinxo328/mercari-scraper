@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
-} from "@/components/shadcn/sheet";
-import { cn } from "@/lib/utils";
-import { Button } from "./shadcn/button";
-import { Funnel } from "lucide-react";
-import ScraperForm from "./ScraperForm";
-import { useRef } from "react";
+  SheetTrigger
+} from '@/components/shadcn/sheet';
+import { cn } from '@/lib/utils';
+import { Button } from './shadcn/button';
+import { Funnel } from 'lucide-react';
+import ScraperForm from './ScraperForm';
+import { useRef } from 'react';
 
 type Props = {
   className?: string;
@@ -24,7 +24,7 @@ export default function ScraperSheet(props: Props) {
     // This makes sure that the form is submitted through react-hook-form
     // and not the default HTML form submission.
     formRef.current?.dispatchEvent(
-      new Event("submit", { cancelable: true, bubbles: true }),
+      new Event('submit', { cancelable: true, bubbles: true })
     );
   };
 
@@ -32,7 +32,7 @@ export default function ScraperSheet(props: Props) {
     <Sheet>
       <SheetTrigger asChild>
         <Button
-          className={cn("cursor-pointer", props.className)}
+          className={cn('cursor-pointer', props.className)}
           variant="outline"
           size="sm"
         >

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Button } from "./shadcn/button";
-import ScraperForm from "./ScraperForm";
-import { cn } from "@/lib/utils";
-import { useRef } from "react";
+import { Button } from './shadcn/button';
+import ScraperForm from './ScraperForm';
+import { cn } from '@/lib/utils';
+import { useRef } from 'react';
 
 type Props = {
   className?: string;
@@ -16,7 +16,7 @@ export default function ScraperSidebar(props: Props) {
     // This makes sure that the form is submitted through react-hook-form
     // and not the default HTML form submission.
     formRef.current?.dispatchEvent(
-      new Event("submit", { cancelable: true, bubbles: true }),
+      new Event('submit', { cancelable: true, bubbles: true })
     );
   };
 

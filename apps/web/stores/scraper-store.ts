@@ -1,6 +1,6 @@
-import { ScraperResult, ScraperFilter, ScraperKeyword } from "@/types/scraper";
-import { createStore } from "zustand/vanilla";
-import { devtools } from "zustand/middleware";
+import { ScraperResult, ScraperFilter, ScraperKeyword } from '@/types/scraper';
+import { createStore } from 'zustand/vanilla';
+import { devtools } from 'zustand/middleware';
 
 export type ScraperState = {
   results: {
@@ -24,7 +24,7 @@ export type ScraperStore = ScraperState & ScraperActions;
 export const defaultInitState: ScraperState = {
   results: {
     data: [],
-    ended: false,
+    ended: false
   },
   isLoadingResults: false,
   filter: {
@@ -32,14 +32,14 @@ export const defaultInitState: ScraperState = {
     minPrice: undefined,
     maxPrice: undefined,
     page: 1,
-    limit: 50, // TODO - make this env variable
+    limit: 50 // TODO - make this env variable
   },
   keywordOptions: [],
-  isLoadingKeywordOptions: false,
+  isLoadingKeywordOptions: false
 };
 
 export const createScraperStore = (
-  initState: ScraperState = defaultInitState,
+  initState: ScraperState = defaultInitState
 ) =>
   createStore<ScraperStore>()(
     devtools(
@@ -49,20 +49,20 @@ export const createScraperStore = (
           set({ isLoadingResults: true });
           const { keywords, minPrice, maxPrice, limit, page } = get().filter;
           const params = new URLSearchParams();
-          params.append("page", page.toString());
-          params.append("limit", limit.toString());
+          params.append('page', page.toString());
+          params.append('limit', limit.toString());
           if (keywords.length > 0) {
-            params.append("keywords", keywords.join(","));
+            params.append('keywords', keywords.join(','));
           }
           if (minPrice) {
-            params.append("minPrice", minPrice.toString());
+            params.append('minPrice', minPrice.toString());
           }
           if (maxPrice) {
-            params.append("maxPrice", maxPrice.toString());
+            params.append('maxPrice', maxPrice.toString());
           }
           try {
             const response = await fetch(
-              `/api/scraper/results?${params.toString()}`,
+              `/api/scraper/results?${params.toString()}`
             );
             const data = await response.json();
 
@@ -70,12 +70,12 @@ export const createScraperStore = (
               data: page === 1 ? data : [...get().results.data, ...data],
               ended: data.length < limit,
               limit,
-              currentPage: page,
+              currentPage: page
             };
 
             set({ results: { ...results } });
           } catch (error) {
-            console.error("Error fetching results:", error);
+            console.error('Error fetching results:', error);
           } finally {
             set({ isLoadingResults: false });
           }
@@ -84,16 +84,16 @@ export const createScraperStore = (
         fetchKeywordOptions: async () => {
           set({ isLoadingKeywordOptions: true });
           try {
-            const response = await fetch("/api/scraper/keywords");
+            const response = await fetch('/api/scraper/keywords');
             const data = await response.json();
             set({ keywordOptions: data });
           } catch (error) {
-            console.error("Error fetching keyword options:", error);
+            console.error('Error fetching keyword options:', error);
           } finally {
             set({ isLoadingKeywordOptions: false });
           }
-        },
+        }
       }),
-      { name: "Scraper Store" },
-    ),
+      { name: 'Scraper Store' }
+    )
   );
