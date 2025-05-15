@@ -30,15 +30,12 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - name: Install Playwright Browsers
         run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
-      - name: Debug env (masked)
-        run: echo "DATABASE_URL=${DATABASE_URL:0:3}******"
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Export env for Playwright
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
       - name: Run scraper
         run: pnpm run scraper
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
