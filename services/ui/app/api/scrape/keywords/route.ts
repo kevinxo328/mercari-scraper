@@ -1,7 +1,7 @@
 import { prisma } from '@mercari-scraper/db';
 
 export async function GET() {
-  const keywords = await prisma.scrapeKeyword.findMany({
+  const keywords = await prisma.scraperKeyword.findMany({
     orderBy: {
       updatedAt: 'desc'
     }

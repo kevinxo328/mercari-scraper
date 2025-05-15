@@ -1,0 +1,7 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Please generate a Git commit message following the rules below, based on the provided code change description. Determine the correct type, write a proper header, body, and footer.\n\nCommit message format:\n\nHeader: <type>: <subject>\n - type: Required. Use one of the following:\n   - Feat: new feature\n   - Fix: bug fix\n   - Docs: documentation only\n   - Style: formatting (no logic change)\n   - Refactor: code refactoring (no new feature or bug fix)\n   - Perf: performance improvement\n   - Test: add or update tests\n   - Chore: build or tooling changes\n   - Revert: revert a previous commit\n - subject: Required. A short summary of the change, max 50 characters, no period at the end.\n\nBody:\n - List eveything with dash (-).\n - Explain what and why the change was made.\n - Include details such as:\n   * The issue it addresses (if any)\n   * The reason for the change\n   * How it differs from the previous behavior\n\nFooter:\n - If related to a ticket or issue, include \"issue #<number>\"\n - For breaking changes, start with \"BREAKING CHANGE:\" and explain what changed and how to migrate.\n\nMake sure the output includes a blank line between the Header, Body, and Footer."
+    }
+  ]
+}

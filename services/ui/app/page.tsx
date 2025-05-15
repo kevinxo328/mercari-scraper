@@ -8,13 +8,13 @@ const LIMIT = 50; // TODO: Make this an environment variable
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const latestResults = await prisma.scrapeResult.findMany({
+  const latestResults = await prisma.scraperResult.findMany({
     orderBy: { updatedAt: 'desc' },
     take: LIMIT,
     skip: 0
   });
 
-  const latestUpdateTime = await prisma.scrapeResult
+  const latestUpdateTime = await prisma.scraperResult
     .findFirst({
       orderBy: {
         updatedAt: 'desc'

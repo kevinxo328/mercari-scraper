@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const maxPrice = searchParams.get('maxPrice');
   const keywordsArray = parseCommaSeparatedString(keywords);
 
-  const scrapeResults = await prisma.scrapeResult.findMany({
+  const scrapeResults = await prisma.scraperResult.findMany({
     where: {
       keywords: {
         some: {
