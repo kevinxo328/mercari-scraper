@@ -30,10 +30,10 @@ importers:
       '@playwright/test':
         specifier: ^1.52.0
         version: 1.52.0
+    devDependencies:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
-    devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
