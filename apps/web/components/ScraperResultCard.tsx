@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Props = {
   url: string;
   title: string;
@@ -15,7 +17,9 @@ const ScraperResultCard = (props: Props) => {
       className="group relative"
     >
       <div className="aspect-square overflow-hidden bg-gray-100 rounded-lg">
-        <img
+        <Image
+          width={300}
+          height={300}
           className="object-contain object-center  w-full h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
           src={props.imageUrl}
           alt={props.title}

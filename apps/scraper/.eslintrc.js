@@ -9,9 +9,9 @@ module.exports = {
     "turbo/no-undeclared-env-vars": [
       "error",
       {
-        allowList: ["NODE_ENV"],
+        allowList: ["NODE_ENV", "CI"],
       },
     ],
   },
-  ignorePatterns: ["dist", "generated", "prisma"],
+  ignorePatterns: ["node_modules", "playwright-report", "test-results"],
 };

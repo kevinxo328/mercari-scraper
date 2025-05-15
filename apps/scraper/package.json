@@ -6,7 +6,9 @@
     "scraper": "playwright test",
     "scraper:debug": "playwright test --debug",
     "scraper:ui": "playwright test --ui",
-    "scraper:report": "playwright show-report"
+    "scraper:report": "playwright show-report",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0"
   },
   "dependencies": {
     "@playwright/test": "^1.52.0"
