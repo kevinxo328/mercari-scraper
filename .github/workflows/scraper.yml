@@ -3,7 +3,7 @@ name: Scrape Mercari
 on:
   schedule:
     # Run every day at 4 AM UTC (This is 12 PM UTC+8)
-    - cron: '0 4 * * *'
+    - cron: "0 4 * * *"
   workflow_dispatch:
 
 jobs:
@@ -12,9 +12,6 @@ jobs:
 
     # This job will only run on the main branch for scheduled events or when manually triggered
     if: ${{ github.event_name != 'schedule' || github.ref == 'refs/heads/main' }}
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,17 +19,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm install
       - name: Generate prisma client
-        run: npm run preinstall
-      - name: Run Playwright tests
-        run: npm run test
+        run: pnpm run generate
+      - name: Install Playwright Browsers
+        run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
+      - name: Run scraper
+        run: cd apps/scraper && pnpm run scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: services/scraper/playwright-report/
+          path: apps/scraper/playwright-report/
           retention-days: 7

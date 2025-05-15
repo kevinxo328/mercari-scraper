@@ -1,9 +1,0 @@
-{
-  "name": "@mercari-scraper/scraper",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@mercari-scraper/db": "*",
-    "@playwright/test": "^1.52.0"
-  }
-}

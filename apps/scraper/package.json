@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "scraper",
+  "version": "1.0.0",
+  "scripts": {
+    "scraper": "playwright test",
+    "scraper:debug": "playwright test --debug",
+    "scraper:ui": "playwright test --ui",
+    "scraper:report": "playwright show-report"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.52.0"
+  },
+  "devDependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "typescript": "5.5.4"
+  }
+}
