@@ -13,7 +13,11 @@
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "scraper": "turbo run scraper",
+    "scraper:debug": "turbo run scraper:debug",
+    "scraper:ui": "turbo run scraper:ui",
+    "scraper:report": "turbo run scraper:report"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

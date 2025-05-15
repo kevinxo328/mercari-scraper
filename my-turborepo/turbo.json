@@ -27,6 +27,18 @@
       "dependsOn": ["^generate"],
       "cache": false
     },
-    "lint": {}
+    "lint": {},
+    "scraper": {
+      "cache": false
+    },
+    "scraper:debug": {
+      "cache": false
+    },
+    "scraper:ui": {
+      "cache": false
+    },
+    "scraper:report": {
+      "cache": false
+    }
   }
 }
