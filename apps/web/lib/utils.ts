@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export const deepEqual = (obj1: any, obj2: any): boolean => {
   if (Object.is(obj1, obj2)) return true;
 
-  if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return false;
+  if (typeof obj1 !== "object" || typeof obj2 !== "object") return false;
 
   if (obj1 === null || obj2 === null) return false;
 
@@ -44,12 +44,12 @@ export const deepEqual = (obj1: any, obj2: any): boolean => {
  * @returns []
  */
 export const parseCommaSeparatedString = (
-  str: string | undefined | null
+  str: string | undefined | null,
 ): string[] => {
   if (!str) return [];
 
   return str
-    .replaceAll(/\s+/g, '')
-    .split(',')
+    .replaceAll(/\s+/g, "")
+    .split(",")
     .filter((keyword) => keyword.length > 0);
 };

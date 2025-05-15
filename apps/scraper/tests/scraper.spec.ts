@@ -1,13 +1,13 @@
-import { test } from '@playwright/test';
-import { getMercariUrl, MercariCategory } from '../lib/utils';
-import { PrismaClient, type ScraperKeyword } from '@repo/database';
+import { test } from "@playwright/test";
+import { getMercariUrl, MercariCategory } from "../lib/utils";
+import { PrismaClient, type ScraperKeyword } from "@repo/database";
 
 // Set the viewport size for the page to ensure all items are visible.
 test.use({
-  viewport: { width: 1280, height: 72000 }
+  viewport: { width: 1280, height: 72000 },
 });
 
-test.describe('Scrape Mercari', () => {
+test.describe("Scrape Mercari", () => {
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
 
@@ -29,13 +29,13 @@ test.describe('Scrape Mercari', () => {
     await prisma.$disconnect();
   });
 
-  test('Scrape Items', async ({ page }) => {
+  test("Scrape Items", async ({ page }) => {
     for (const record of keywords) {
       // Block images to speed up the loading time.
-      await page.route('**/*', (route) => {
-        return route.request().resourceType() === 'image' ||
-          route.request().resourceType() === 'media' ||
-          route.request().resourceType() === 'font'
+      await page.route("**/*", (route) => {
+        return route.request().resourceType() === "image" ||
+          route.request().resourceType() === "media" ||
+          route.request().resourceType() === "font"
           ? route.abort()
           : route.continue();
       });
@@ -47,26 +47,26 @@ test.describe('Scrape Mercari', () => {
             category:
               MercariCategory[record.category as keyof typeof MercariCategory],
             ...(record.minPrice && { minPrice: record.minPrice }),
-            ...(record.maxPrice && { maxPrice: record.maxPrice })
-          })
+            ...(record.maxPrice && { maxPrice: record.maxPrice }),
+          }),
         )
         .catch((e) => {
           console.error(`Error navigating to URL: ${e}`);
         });
 
       // If the page has a dialog, close it
-      const modalScrim = await page.getByTestId('merModalBaseScrim');
+      const modalScrim = await page.getByTestId("merModalBaseScrim");
       await page.waitForTimeout(3000);
 
       if ((await modalScrim.count()) > 0) {
         await modalScrim.click({
           force: true,
-          timeout: 3000
+          timeout: 3000,
         });
         await page.waitForTimeout(1000);
       }
 
-      const itemCells = await page.getByTestId('item-cell');
+      const itemCells = await page.getByTestId("item-cell");
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
@@ -75,45 +75,45 @@ test.describe('Scrape Mercari', () => {
           console.log(
             `Scraping keyword: ${record.keyword} - Item ${
               i + 1
-            }/${scrapingItemCount}`
+            }/${scrapingItemCount}`,
           );
 
           const itemCell = itemCells.nth(i);
-          const mercariHost = 'https://jp.mercari.com';
+          const mercariHost = "https://jp.mercari.com";
 
           // TODO: Get the price from the aria-label attribute to ensure getting the correct yen value without Japan proxy.
           const priceSource = (
             await itemCell
-              .locator('[itemtype]')
-              .getAttribute('aria-label', { timeout: 3000 })
+              .locator("[itemtype]")
+              .getAttribute("aria-label", { timeout: 3000 })
               .catch((e) => {
                 console.error(`Error getting aria-label: ${e}`);
               })
-          )?.split(' ');
+          )?.split(" ");
 
           const data = {
             title: await itemCell
-              .getByTestId('thumbnail-item-name')
+              .getByTestId("thumbnail-item-name")
               .innerText(),
             url:
               mercariHost +
               (await itemCell
-                .getByTestId('thumbnail-link')
-                .getAttribute('href')),
-            imageUrl: (await itemCell.locator('img').getAttribute('src')) || '',
+                .getByTestId("thumbnail-link")
+                .getAttribute("href")),
+            imageUrl: (await itemCell.locator("img").getAttribute("src")) || "",
             price: priceSource
               ? parseInt(
                   priceSource[priceSource.length - 2]
-                    .replace('円', '')
-                    .replace(/,/g, '')
+                    .replace("円", "")
+                    .replace(/,/g, ""),
                 )
               : -1,
-            currency: priceSource ? 'JPY' : ''
+            currency: priceSource ? "JPY" : "",
           };
 
           const existingRecord = await prisma.scraperResult.findFirst({
             where: { url: data.url },
-            include: { keywords: true }
+            include: { keywords: true },
           });
 
           if (!existingRecord) {
@@ -121,13 +121,13 @@ test.describe('Scrape Mercari', () => {
               data: {
                 ...data,
                 keywords: {
-                  connect: [{ id: record.id }]
-                }
-              }
+                  connect: [{ id: record.id }],
+                },
+              },
             });
           } else {
             const existingKeywordRelation = existingRecord.keywords.some(
-              (k: { id: string }) => k.id === record.id
+              (k: { id: string }) => k.id === record.id,
             );
             if (
               existingRecord.price !== data.price ||
@@ -146,9 +146,9 @@ test.describe('Scrape Mercari', () => {
                   price: data.price,
                   currency: data.currency,
                   keywords: {
-                    connect: [{ id: record.id }]
-                  }
-                }
+                    connect: [{ id: record.id }],
+                  },
+                },
               });
             }
           }

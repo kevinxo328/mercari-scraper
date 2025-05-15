@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
 import {
   type ReactNode,
   createContext,
   useRef,
   useContext,
-  useEffect
-} from 'react';
-import { useStore } from 'zustand';
+  useEffect,
+} from "react";
+import { useStore } from "zustand";
 import {
   createScraperStore,
   ScraperState,
-  type ScraperStore
-} from '@/stores/scraper-store';
-import { useSearchParams } from 'next/navigation';
+  type ScraperStore,
+} from "@/stores/scraper-store";
+import { useSearchParams } from "next/navigation";
 
 export type ScraperApi = ReturnType<typeof createScraperStore>;
 
@@ -26,7 +26,7 @@ export interface ScraperProviderProps {
 
 export const ScraperProvider = ({
   children,
-  initialState
+  initialState,
 }: ScraperProviderProps) => {
   const storeRef = useRef<ScraperApi | null>(null);
   const searchParams = useSearchParams();
@@ -37,18 +37,18 @@ export const ScraperProvider = ({
 
   // Set the initial filter state based on the URL parameters
   useEffect(() => {
-    const keywords = searchParams.get('keywords');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
+    const keywords = searchParams.get("keywords");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
 
     const filter = {
       keywords: keywords
-        ? keywords.split(',').map((keyword) => keyword.trim())
+        ? keywords.split(",").map((keyword) => keyword.trim())
         : [],
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       page: 1,
-      limit: 50 // TODO - make this env variable
+      limit: 50, // TODO - make this env variable
     };
 
     storeRef.current?.getState().setFilter(filter);
@@ -63,12 +63,12 @@ export const ScraperProvider = ({
 };
 
 export const useScraperStore = <T,>(
-  selector: (state: ScraperStore) => T
+  selector: (state: ScraperStore) => T,
 ): T => {
   const store = useContext(ScraperContext);
 
   if (!store) {
-    throw new Error('useScraperStore must be used within a ScraperProvider');
+    throw new Error("useScraperStore must be used within a ScraperProvider");
   }
 
   return useStore(store, selector);

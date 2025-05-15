@@ -1,15 +1,15 @@
-import { prisma } from '@repo/database';
+import { prisma } from "@repo/database";
 
 export async function GET() {
   const keywords = await prisma.scraperKeyword.findMany({
     orderBy: {
-      updatedAt: 'desc'
-    }
+      updatedAt: "desc",
+    },
   });
 
   return new Response(JSON.stringify(keywords), {
     headers: {
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
 }

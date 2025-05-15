@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import ScraperResultCard from './ScraperResultCard';
-import { Button } from './shadcn/button';
-import { Loader2 } from 'lucide-react';
-import { useScraperStore } from '@/providers/scraper-store-provider';
-import { Skeleton } from './shadcn/skeleton';
-import { useMemo } from 'react';
+import ScraperResultCard from "./ScraperResultCard";
+import { Button } from "./shadcn/button";
+import { Loader2 } from "lucide-react";
+import { useScraperStore } from "@/providers/scraper-store-provider";
+import { Skeleton } from "./shadcn/skeleton";
+import { useMemo } from "react";
 
 const ScraperResults = () => {
   const { results, isLoadingResults, fetchResults, filter, setFilter } =
@@ -13,7 +13,7 @@ const ScraperResults = () => {
 
   const isFirstPageLoading = useMemo(
     () => isLoadingResults && filter.page === 1,
-    [isLoadingResults, filter.page]
+    [isLoadingResults, filter.page],
   );
 
   return (
@@ -41,22 +41,22 @@ const ScraperResults = () => {
               if (results.ended) return;
               setFilter({
                 ...filter,
-                page: filter.page + 1
+                page: filter.page + 1,
               });
               fetchResults();
             }}
             disabled={results.ended || isLoadingResults}
-            variant={results.ended ? 'ghost' : 'default'}
+            variant={results.ended ? "ghost" : "default"}
             className="w-full cursor-pointer"
           >
             {isLoadingResults && !results.ended && (
               <Loader2 className="animate-spin" />
             )}
             {isLoadingResults
-              ? 'Loading...'
+              ? "Loading..."
               : results.ended
-                ? 'No more results'
-                : 'Load more'}
+                ? "No more results"
+                : "Load more"}
           </Button>
         </div>
       )}

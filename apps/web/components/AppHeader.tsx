@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const AppHeader = async () => {
   return (
