@@ -26,6 +26,8 @@ jobs:
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install
+      - name: Install Playwright
+        run: pnpm install playwright
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Generate prisma client
