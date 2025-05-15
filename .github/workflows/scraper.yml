@@ -25,17 +25,13 @@ jobs:
         run: pnpm install
       - name: Generate prisma client
         run: pnpm run generate
+      - name: Install Playwright Browsers
+        run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
+      - name: Run scraper
+        run: cd apps/scraper && pnpm run scraper
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-      - name: Install Playwright Browsers
-        run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
-      - name: Export env for Playwright
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          echo "DIRECT_URL=${{ secrets.DIRECT_URL }}" >> $GITHUB_ENV
-      - name: Run scraper
-        run: pnpm run scraper
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
