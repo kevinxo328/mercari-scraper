@@ -30,6 +30,10 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - name: Install Playwright Browsers
         run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
+      - name: Debug env (masked)
+        run: echo "DATABASE_URL=${DATABASE_URL:0:3}******"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Run scraper
         run: pnpm run scraper
         env:
