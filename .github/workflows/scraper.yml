@@ -25,6 +25,9 @@ jobs:
         run: pnpm install
       - name: Generate prisma client
         run: pnpm run generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - name: Install Playwright Browsers
         run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
       - name: Run scraper
