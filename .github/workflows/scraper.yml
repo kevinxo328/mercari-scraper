@@ -12,9 +12,6 @@ jobs:
 
     # This job will only run on the main branch for scheduled events or when manually triggered
     if: ${{ github.event_name != 'schedule' || github.ref == 'refs/heads/main' }}
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,6 +29,9 @@ jobs:
         run: cd apps/scraper && pnpm exec playwright install --with-deps chromium
       - name: Run scraper
         run: pnpm run scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
