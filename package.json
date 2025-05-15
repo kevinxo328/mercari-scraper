@@ -1,33 +1,36 @@
 {
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "services/*"
-  ],
+  "prisma": {
+    "schema": "packages/database/prisma/schema.prisma",
+    "seed": "tsx packages/database/src/seed.ts"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "db:migrate:deploy": "turbo run db:migrate:deploy",
+    "db:migrate:dev": "turbo run db:migrate:dev",
+    "db:push": "turbo run db:push",
+    "db:seed": "turbo run db:seed",
+    "dev": "turbo run dev",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "generate": "turbo run generate",
+    "lint": "turbo run lint",
+    "scraper": "turbo run scraper",
+    "scraper:debug": "turbo run scraper:debug",
+    "scraper:ui": "turbo run scraper:ui",
+    "scraper:report": "turbo run scraper:report"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "prisma": "^6.7.0",
+    "tsx": "4.19.1",
+    "turbo": "^2.5.2"
+  },
   "engines": {
     "node": ">=18"
   },
-  "prisma": {
-    "schema": "./packages/db/schema.prisma"
+  "name": "with-prisma",
+  "dependencies": {
+    "@prisma/client": "^6.7.0"
   },
-  "scripts": {
-    "prettier": "prettier --check .",
-    "prettier:write": "prettier --write .",
-    "preinstall": "prisma generate",
-    "test": "playwright test --config=services/scraper/playwright.config.ts",
-    "test:debug": "playwright test --debug --config=services/scraper/playwright.config.ts",
-    "test:ui": "playwright test --ui --config=services/scraper/playwright.config.ts",
-    "test:report": "playwright show-report services/scraper/playwright-report",
-    "dev": "next dev ./services/ui",
-    "build": "next build ./services/ui",
-    "start": "next start ./services/ui"
-  },
-  "devDependencies": {
-    "@mercari-scraper/ui": "^0.1.0",
-    "@types/node": "^22.15.2",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "prettier": "3.5.3",
-    "typescript": "^5.8.3"
-  }
+  "packageManager": "pnpm@10.9.0"
 }

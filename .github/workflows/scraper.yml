@@ -3,7 +3,7 @@ name: Scrape Mercari
 on:
   schedule:
     # Run every day at 4 AM UTC (This is 12 PM UTC+8)
-    - cron: '0 4 * * *'
+    - cron: "0 4 * * *"
   workflow_dispatch:
 
 jobs:
@@ -23,16 +23,16 @@ jobs:
         with:
           node-version: lts/*
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: Generate prisma client
-        run: npm run preinstall
-      - name: Run Playwright tests
-        run: npm run test
+        run: pnpm run generate
+      - name: Run scraper
+        run: pnpm run scraper
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: services/scraper/playwright-report/
+          path: apps/scraper/playwright-report/
           retention-days: 7

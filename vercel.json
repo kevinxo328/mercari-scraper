@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install && npm run preinstall",
-  "outputDirectory": "/services/ui/.next"
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install && pnpm run generate",
+  "outputDirectory": "/apps/web/.next"
 }
