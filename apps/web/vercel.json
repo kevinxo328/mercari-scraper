@@ -3,6 +3,6 @@
   "version": 2,
   "framework": "nextjs",
   "buildCommand": "pnpm run build",
-  "installCommand": "cd ../../ pnpm install && pnpm run generate",
+  "installCommand": "cd ../../ && pnpm install && pnpm run generate",
   "outputDirectory": ".next"
 }
