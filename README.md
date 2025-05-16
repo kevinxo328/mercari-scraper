@@ -9,7 +9,7 @@ This turborepo includes the following packages/apps:
 ### Apps and packages
 
 - `web`: a [Next.js](https://nextjs.org/) app
-- `scraper`: a [Playwright] (https://playwright.dev/) scraper
+- `scraper`: a [Playwright](https://playwright.dev/) scraper
 - `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
 - `@mercari-scraper/typescript-config`: `tsconfig.json`s used throughout the monorepo
