@@ -32,9 +32,9 @@
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.3.2",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.8.0",
-    "@repo/database": "workspace:*",
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@mercari-scraper/database": "workspace:*",
+    "@mercari-scraper/eslint-config": "workspace:*",
+    "@mercari-scraper/typescript-config": "workspace:*",
     "@types/node": "^20.11.24",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",

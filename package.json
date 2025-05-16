@@ -30,7 +30,7 @@
   "engines": {
     "node": ">=18"
   },
-  "name": "with-prisma",
+  "name": "mercari-scraper",
   "dependencies": {
     "@prisma/client": "^6.7.0"
   },

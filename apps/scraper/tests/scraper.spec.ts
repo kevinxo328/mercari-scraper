@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { getMercariUrl, MercariCategory } from '../lib/utils';
-import { PrismaClient, type ScraperKeyword } from '@repo/database';
+import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
 
 // Set the viewport size for the page to ensure all items are visible.
 test.use({

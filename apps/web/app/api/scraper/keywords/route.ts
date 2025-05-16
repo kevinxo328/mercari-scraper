@@ -1,4 +1,4 @@
-import { prisma } from '@repo/database';
+import { prisma } from '@mercari-scraper/database';
 
 export async function GET() {
   const keywords = await prisma.scraperKeyword.findMany({
