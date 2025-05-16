@@ -172,6 +172,9 @@ importers:
       '@prisma/client':
         specifier: ^6.7.0
         version: 6.7.0(prisma@6.7.0(typescript@5.5.4))(typescript@5.5.4)
+      '@types/node':
+        specifier: ^20.17.47
+        version: 20.17.47
     devDependencies:
       '@mercari-scraper/eslint-config':
         specifier: workspace:*
