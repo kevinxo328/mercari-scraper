@@ -1,17 +1,17 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ["@repo/eslint-config/library.js"],
-  parser: "@typescript-eslint/parser",
+  extends: ['@mercari-scraper/eslint-config/library.js'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: true,
+    project: true
   },
   rules: {
-    "turbo/no-undeclared-env-vars": [
-      "error",
+    'turbo/no-undeclared-env-vars': [
+      'error',
       {
-        allowList: ["NODE_ENV"],
-      },
-    ],
+        allowList: ['NODE_ENV']
+      }
+    ]
   },
-  ignorePatterns: ["dist", "generated", "prisma"],
+  ignorePatterns: ['dist', 'generated', 'prisma']
 };

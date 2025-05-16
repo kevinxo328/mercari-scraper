@@ -1,9 +1,9 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ["@repo/eslint-config/next.js"],
-  parser: "@typescript-eslint/parser",
+  extends: ['@mercari-scraper/eslint-config/next.js'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: true,
+    project: true
   },
-  ignorePatterns: ["node_modules", "**.config.*"],
+  ignorePatterns: ['node_modules', '**.config.*']
 };

@@ -14,9 +14,9 @@
     "@playwright/test": "^1.52.0"
   },
   "devDependencies": {
-    "@repo/database": "workspace:*",
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@mercari-scraper/database": "workspace:*",
+    "@mercari-scraper/eslint-config": "workspace:*",
+    "@mercari-scraper/typescript-config": "workspace:*",
     "@types/node": "^20.11.24",
     "eslint": "^8.57.0",
     "typescript": "5.5.4"

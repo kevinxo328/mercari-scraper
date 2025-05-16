@@ -31,13 +31,13 @@ importers:
         specifier: ^1.52.0
         version: 1.52.0
     devDependencies:
-      '@repo/database':
+      '@mercari-scraper/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@repo/eslint-config':
+      '@mercari-scraper/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@repo/typescript-config':
+      '@mercari-scraper/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
       '@types/node':
@@ -107,21 +107,21 @@ importers:
         specifier: ^4.5.7
         version: 4.5.7(@types/react@19.1.4)(react@19.1.0)
     devDependencies:
+      '@mercari-scraper/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@mercari-scraper/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/config-eslint
+      '@mercari-scraper/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/config-typescript
       '@next/eslint-plugin-next':
         specifier: ^15.3.2
         version: 15.3.2
       '@prisma/nextjs-monorepo-workaround-plugin':
         specifier: ^6.8.0
         version: 6.8.0
-      '@repo/database':
-        specifier: workspace:*
-        version: link:../../packages/database
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/config-eslint
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/config-typescript
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.47
@@ -173,10 +173,10 @@ importers:
         specifier: ^6.7.0
         version: 6.7.0(prisma@6.7.0(typescript@5.5.4))(typescript@5.5.4)
     devDependencies:
-      '@repo/eslint-config':
+      '@mercari-scraper/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@repo/typescript-config':
+      '@mercari-scraper/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       eslint:
@@ -4795,7 +4795,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.4.1
+      debug: 4.4.0
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.1

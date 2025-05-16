@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { prisma } from '@repo/database';
+import { prisma } from '@mercari-scraper/database';
 import { parseCommaSeparatedString } from '@/lib/utils';
 
 export async function GET(request: NextRequest) {
