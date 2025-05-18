@@ -1,42 +1,46 @@
-const {resolve} = require("node:path");
+const { resolve } = require('node:path');
 
-const project = resolve(process.cwd(), "tsconfig.json");
+const project = resolve(process.cwd(), 'tsconfig.json');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: [
-    "eslint:recommended",
-    "prettier",
-    require.resolve("@vercel/style-guide/eslint/next"),
-    "turbo",
+    'eslint:recommended',
+    'prettier',
+    require.resolve('@vercel/style-guide/eslint/next'),
+    'turbo'
   ],
   globals: {
     React: true,
-    JSX: true,
+    JSX: true
   },
   env: {
-    node: true,
+    node: true
   },
-  plugins: ["only-warn", "@typescript-eslint"],
+  plugins: ['only-warn', '@typescript-eslint'],
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       typescript: {
-        project,
-      },
-    },
+        project
+      }
+    }
   },
   ignorePatterns: [
     // Ignore dotfiles
-    ".*.js",
-    "node_modules/",
+    '.*.js',
+    'node_modules/',
+    'coverage/',
+    'dist/',
+    'build/',
+    'out/'
   ],
   overrides: [
     {
-      files: ["*.js?(x)", "*.ts?(x)"],
+      files: ['*.js?(x)', '*.ts?(x)'],
       rules: {
-        "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": "warn",
-      },
-    },
-  ],
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'warn'
+      }
+    }
+  ]
 };
