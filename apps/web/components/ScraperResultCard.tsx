@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-type Props = {
+export type Props = {
   url: string;
   title: string;
   imageUrl: string;

@@ -1,5 +1,5 @@
 import ScraperResultCard from '@/components/ScraperResultCard';
-import { TimeDisplay } from '@/components/TimeDisplay';
+import TimeDisplay from '@/components/TimeDisplay';
 import { prisma } from '@mercari-scraper/database';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
