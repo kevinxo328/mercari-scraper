@@ -3,6 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
+// TODO: Resolve TypeScript errors.  Currently using ⁠@jest/types as a workaround; see: https://github.com/vercel/next.js/discussions/73894.
+// Further investigation into the error details is needed to find a better solution.
 import type { Config } from '@jest/types';
 import nextJest from 'next/jest.js';
 
