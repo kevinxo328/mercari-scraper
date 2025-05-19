@@ -14,6 +14,10 @@ import {
   type ScraperStore
 } from '@/stores/scraper-store';
 import { useSearchParams } from 'next/navigation';
+import { initMocks } from '@/mocks';
+
+// Initialize MSW mocks
+initMocks();
 
 export type ScraperApi = ReturnType<typeof createScraperStore>;
 

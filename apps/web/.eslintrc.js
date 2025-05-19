@@ -5,5 +5,5 @@ module.exports = {
   parserOptions: {
     project: true
   },
-  ignorePatterns: ['node_modules', '**.config.*', '**.spec.**']
+  ignorePatterns: ['node_modules', '**.config.*', '**.spec.**', 'public']
 };
