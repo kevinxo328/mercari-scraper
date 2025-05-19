@@ -1,6 +1,7 @@
 import { ScraperResult, ScraperFilter, ScraperKeyword } from '@/types/scraper';
 import { createStore } from 'zustand/vanilla';
 import { devtools } from 'zustand/middleware';
+import { API } from '@/lib/api';
 
 export type ScraperState = {
   results: {
@@ -48,23 +49,17 @@ export const createScraperStore = (
         fetchResults: async () => {
           set({ isLoadingResults: true });
           const { keywords, minPrice, maxPrice, limit, page } = get().filter;
-          const params = new URLSearchParams();
-          params.append('page', page.toString());
-          params.append('limit', limit.toString());
-          if (keywords.length > 0) {
-            params.append('keywords', keywords.join(','));
-          }
-          if (minPrice) {
-            params.append('minPrice', minPrice.toString());
-          }
-          if (maxPrice) {
-            params.append('maxPrice', maxPrice.toString());
-          }
           try {
             const response = await fetch(
-              `/api/scraper/results?${params.toString()}`
+              API.scraperResults.get({
+                page,
+                limit,
+                keywords,
+                minPrice,
+                maxPrice
+              }).endpoint
             );
-            const data = await response.json();
+            const data: ScraperResult[] = await response.json();
 
             const results = {
               data: page === 1 ? data : [...get().results.data, ...data],
@@ -84,8 +79,10 @@ export const createScraperStore = (
         fetchKeywordOptions: async () => {
           set({ isLoadingKeywordOptions: true });
           try {
-            const response = await fetch('/api/scraper/keywords');
-            const data = await response.json();
+            const response: Response = await fetch(
+              API.scraperKeywords.get().endpoint
+            );
+            const data: ScraperKeyword[] = await response.json();
             set({ keywordOptions: data });
           } catch (error) {
             console.error('Error fetching keyword options:', error);

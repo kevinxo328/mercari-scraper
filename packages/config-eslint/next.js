@@ -15,7 +15,8 @@ module.exports = {
     JSX: true
   },
   env: {
-    node: true
+    node: true,
+    es6: true
   },
   plugins: ['only-warn', '@typescript-eslint'],
   settings: {
