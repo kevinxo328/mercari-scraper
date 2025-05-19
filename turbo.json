@@ -25,7 +25,8 @@
     },
     "dev:mock": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": ["MSW_ENABLED", "NEXT_PUBLIC_MSW_ENABLED"]
     },
     "generate": {
       "dependsOn": ["^generate"],
