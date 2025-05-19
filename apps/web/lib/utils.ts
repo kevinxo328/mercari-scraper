@@ -49,7 +49,7 @@ export const parseCommaSeparatedString = (
   if (!str) return [];
 
   return str
-    .replaceAll(/\s+/g, '')
     .split(',')
-    .filter((keyword) => keyword.length > 0);
+    .filter((keyword) => keyword.length > 0)
+    .map((keyword) => keyword.trim());
 };
