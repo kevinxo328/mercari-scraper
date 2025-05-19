@@ -33,6 +33,7 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@jest/types": "^29.6.3",
     "@mercari-scraper/database": "workspace:*",
     "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
