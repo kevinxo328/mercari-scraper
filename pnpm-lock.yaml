@@ -161,6 +161,9 @@ importers:
       msw:
         specifier: ^2.8.4
         version: 2.8.4(@types/node@20.17.47)(typescript@5.5.4)
+      next-router-mock:
+        specifier: ^1.0.2
+        version: 1.0.2(next@15.3.2(@babel/core@7.26.10)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.17.47)(typescript@5.5.4)
@@ -3780,6 +3783,12 @@ packages:
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
+
+  next-router-mock@1.0.2:
+    resolution: {integrity: sha512-9bEA4Sytj1N6xp7UlE4L++QmuU2ZcNTs33Fx8ypNToMlIA7zEotNc0RP0POPP+C3PHWz61U66V6qRDqUg0b3Lg==}
+    peerDependencies:
+      next: '>=10.0.0'
+      react: '>=17.0.0'
 
   next@15.3.2:
     resolution: {integrity: sha512-CA3BatMyHkxZ48sgOCLdVHjFU36N7TF1HhqAHLFOkV6buwZnvMI84Cug8xD56B9mCuKrqXnLn94417GrZ/jjCQ==}
@@ -8640,6 +8649,11 @@ snapshots:
   napi-postinstall@0.2.3: {}
 
   natural-compare@1.4.0: {}
+
+  next-router-mock@1.0.2(next@15.3.2(@babel/core@7.26.10)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
+    dependencies:
+      next: 15.3.2(@babel/core@7.26.10)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react: 19.1.0
 
   next@15.3.2(@babel/core@7.26.10)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
