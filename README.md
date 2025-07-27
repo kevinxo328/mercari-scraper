@@ -1,6 +1,6 @@
 # Mercari Scraper
 
-This project is an automated scraper tool, specifically designed for periodically crawling product information on the Mercari platform. Its main function is to regularly check and extract newly listed products, assisting users in immediately grasping the latest product trends.
+This project is an automated scraper tool for personal use, specifically designed for periodically crawling product information on the Mercari platform. Its main function is to regularly check and extract newly listed products, assisting users in immediately grasping the latest product trends.
 
 ## What's inside?
 
