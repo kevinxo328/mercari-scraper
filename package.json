@@ -6,12 +6,12 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "vercel-build": "cd apps/web && pnpm build",
     "db:migrate:deploy": "turbo run db:migrate:deploy",
     "db:migrate:dev": "turbo run db:migrate:dev",
     "db:push": "turbo run db:push",
     "db:seed": "turbo run db:seed",
     "dev": "turbo run dev",
+    "dev:mock": "turbo run dev:mock",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
     "lint": "turbo run lint",

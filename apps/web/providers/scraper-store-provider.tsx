@@ -14,6 +14,12 @@ import {
   type ScraperStore
 } from '@/stores/scraper-store';
 import { useSearchParams } from 'next/navigation';
+import { initMocks } from '@/mocks';
+
+// TODO: Currently, there is no official best practice for integrating MSW with Next.js 15 + app router.
+// This is a temporary solution to enable API mocking in both server and client environments.
+// Reference: https://blog.stackademic.com/setting-up-msw-and-urql-with-next-js-15-cbfd374e916a
+initMocks();
 
 export type ScraperApi = ReturnType<typeof createScraperStore>;
 

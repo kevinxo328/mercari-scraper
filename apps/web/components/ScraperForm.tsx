@@ -101,7 +101,7 @@ export default function ScraperForm(props: Props) {
           render={() => (
             <FormItem className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
-                <FormLabel className="text-xl">Keywords</FormLabel>
+                <p className="text-xl font-semibold">Keywords</p>
                 <Button
                   variant="ghost"
                   onClick={() => {
@@ -147,7 +147,7 @@ export default function ScraperForm(props: Props) {
         />
         <hr />
         <div className="flex justify-between items-center">
-          <FormLabel className="text-xl">Price</FormLabel>
+          <p className="text-xl font-semibold">Price</p>
           <Button
             variant="ghost"
             onClick={() => {
@@ -181,6 +181,7 @@ export default function ScraperForm(props: Props) {
                     pattern="[0-9]*"
                     autoComplete="off"
                     autoCorrect="off"
+                    min={0}
                   />
                 </FormControl>
                 <FormMessage />
@@ -205,6 +206,7 @@ export default function ScraperForm(props: Props) {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     autoComplete="off"
+                    min={0}
                   />
                 </FormControl>
                 <FormMessage />

@@ -3,12 +3,12 @@
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
-type Props = {
+export type Props = {
   timestamp?: Date | string;
   className?: string;
 };
 
-export function TimeDisplay({ timestamp, className }: Props) {
+export default function TimeDisplay({ timestamp, className }: Props) {
   const [isClient, setIsClient] = useState(false);
   const localeTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
