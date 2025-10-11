@@ -17,7 +17,8 @@ export const scraperRouter = router({
         maxPrice: z.number().min(0).optional(),
         keywords: z.array(z.string()).optional(),
         limit: z.number().min(1).max(100).default(20),
-        page: z.number().min(1).default(1)
+        skip: z.number().min(1).default(1),
+        orderby: z.enum(['asc', 'desc']).default('desc')
       })
     )
     .query(async ({ ctx, input }) => {
@@ -46,10 +47,10 @@ export const scraperRouter = router({
       }
       return await db.scraperResult.findMany({
         where,
-        skip: (input.page - 1) * input.limit,
+        skip: (input.skip - 1) * input.limit,
         take: input.limit,
         orderBy: {
-          updatedAt: 'desc'
+          updatedAt: input.orderby
         }
       });
     })

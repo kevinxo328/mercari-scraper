@@ -1,29 +1,25 @@
 import ScraperResultCard from '@/components/ScraperResultCard';
 import TimeDisplay from '@/components/TimeDisplay';
-import { prisma } from '@mercari-scraper/database';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
+import { caller } from '@/trpc/server';
 
 const LIMIT = 50; // TODO: Make this an environment variable
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-  const latestResults = await prisma.scraperResult.findMany({
-    orderBy: { updatedAt: 'desc' },
-    take: LIMIT,
-    skip: 0
+  const latestResults = await caller.scraper.getResults({
+    limit: LIMIT,
+    skip: 1
   });
 
-  const latestUpdateTime = await prisma.scraperResult
-    .findFirst({
-      orderBy: {
-        updatedAt: 'desc'
-      },
-      select: {
-        updatedAt: true
-      }
+  const latestUpdateTime = await caller.scraper
+    .getResults({
+      limit: 1,
+      skip: 1,
+      orderby: 'desc'
     })
-    .then((result) => result?.updatedAt);
+    .then((results) => results[0]?.updatedAt);
 
   return (
     <main className="mx-auto p-4 container relative">
