@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import './globals.css';
 import AppHeader from '@/components/AppHeader';
+import { TRPCReactProvider } from '@/trpc/client';
 
 export const metadata: Metadata = {
   title: 'Mercari Scraper',
@@ -17,11 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-dvh flex flex-col">
-        <AppHeader />
-        {children}
-      </body>
-    </html>
+    <TRPCReactProvider>
+      <html lang="en" className="dark">
+        <body className="min-h-dvh flex flex-col">
+          <AppHeader />
+          {children}
+        </body>
+      </html>
+    </TRPCReactProvider>
   );
 }
