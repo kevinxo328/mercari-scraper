@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'static';
 
 export const AppHeader = () => {
   return (
-    <header className="p-4 flex items-center sticky top-0 z-10 border-b darK:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
+    <header className="p-4 flex items-center sticky top-0 z-10 border-b dark:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
       <Link href="/" className="flex items-center gap-2">
         <svg
           viewBox="0 0 50 49"

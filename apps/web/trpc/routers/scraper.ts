@@ -2,22 +2,32 @@ import { publicProcedure, router } from '../setup';
 import { z } from 'zod';
 
 export const scraperRouter = router({
-  getKeywords: publicProcedure.query(async ({ ctx }) => {
-    const { db } = ctx;
-    return await db.scraperKeyword.findMany({
-      orderBy: {
-        updatedAt: 'desc'
-      }
-    });
-  }),
+  getKeywords: publicProcedure
+    .input(
+      z.object({
+        pageSize: z.number().min(1).max(100).default(20),
+        page: z.number().min(1).default(1),
+        orderby: z.enum(['asc', 'desc']).default('desc')
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { db } = ctx;
+      return await db.scraperKeyword.findMany({
+        orderBy: {
+          updatedAt: input.orderby
+        },
+        skip: (input.page - 1) * input.pageSize,
+        take: input.pageSize
+      });
+    }),
   getResults: publicProcedure
     .input(
       z.object({
         minPrice: z.number().min(0).optional(),
         maxPrice: z.number().min(0).optional(),
         keywords: z.array(z.string()).optional(),
-        limit: z.number().min(1).max(100).default(20),
-        skip: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(20),
+        page: z.number().min(1).default(1),
         orderby: z.enum(['asc', 'desc']).default('desc')
       })
     )
@@ -39,16 +49,15 @@ export const scraperRouter = router({
         where.keywords = {
           some: {
             keyword: {
-              contains: input.keywords,
-              mode: 'insensitive'
+              in: input.keywords.length > 0 ? input.keywords : undefined
             }
           }
         };
       }
       return await db.scraperResult.findMany({
         where,
-        skip: (input.skip - 1) * input.limit,
-        take: input.limit,
+        skip: (input.page - 1) * input.pageSize,
+        take: input.pageSize,
         orderBy: {
           updatedAt: input.orderby
         }
