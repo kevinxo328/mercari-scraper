@@ -7,6 +7,9 @@ import React from 'react';
 import Link from 'next/link';
 import { MoveRight } from 'lucide-react';
 import ScraperResultCard from '../ScraperResultCard';
+import { Skeleton } from '../shadcn/skeleton';
+
+const ITEMS_PER_PAGE = 12;
 
 export default function ClientIndex() {
   const trpc = useTRPC();
@@ -26,7 +29,7 @@ export default function ClientIndex() {
       keywords?.map((keyword) =>
         trpc.scraper.getResults.queryOptions({
           keywords: [keyword.keyword],
-          pageSize: 12,
+          pageSize: ITEMS_PER_PAGE,
           page: 1,
           orderby: 'desc'
         })
@@ -68,6 +71,10 @@ export default function ClientIndex() {
               </Link>
             </div>
             <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
+              {results.length === 0 &&
+                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                  <Skeleton key={i} className="aspect-square rounded-lg" />
+                ))}
               {results.map((result) => (
                 <ScraperResultCard
                   key={result.id}
