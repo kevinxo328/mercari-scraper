@@ -1,6 +1,7 @@
 'use client';
 
-import { ControllerRenderProps } from 'react-hook-form';
+import z from 'zod';
+import { Button } from '../shadcn/button';
 import {
   Form,
   FormControl,
@@ -8,60 +9,68 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from './shadcn/form';
-import { Input } from './shadcn/input';
-import { Checkbox } from './shadcn/checkbox';
-import { useScraperStore } from '@/providers/scraper-store-provider';
-import { Button } from './shadcn/button';
+} from '../shadcn/form';
+import { Input } from '../shadcn/input';
+import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
+import { ControllerRenderProps, useForm } from 'react-hook-form';
+import { Checkbox } from '../shadcn/checkbox';
 import { useEffect } from 'react';
-import {
-  ScraperFormValues,
-  useScraperForm
-} from '@/providers/scraper-form-provider';
-import { useRouter } from 'next/navigation';
+
+const formSchema = z
+  .object({
+    keywords: z.array(z.string()),
+    minPrice: z
+      .number({ invalid_type_error: 'Invalid number' })
+      .nullable()
+      .transform((val: any) => {
+        if (val === null || val === undefined || val === '') return null;
+        const n = Number(val);
+        return Number.isNaN(n) ? null : n;
+      })
+      .refine((num) => num === null || num >= 0, {
+        message: 'Min price must be greater than or equal to 0'
+      }),
+    maxPrice: z
+      .number({ invalid_type_error: 'Invalid number' })
+      .nullable()
+      .transform((val: any) => {
+        if (val === null || val === undefined || val === '') return null;
+        const n = Number(val);
+        return Number.isNaN(n) ? null : n;
+      })
+      .nullable()
+  })
+  .refine(
+    (data) =>
+      data.minPrice === null ||
+      data.maxPrice === null ||
+      (data.maxPrice !== null &&
+        data.minPrice !== null &&
+        data.maxPrice > data.minPrice),
+    {
+      message: 'Max price must be greater than min price',
+      path: ['maxPrice']
+    }
+  );
+
+export type ScraperFormValues = z.infer<typeof formSchema>;
 
 type Props = {
   ref?: React.Ref<HTMLFormElement>;
+  onSubmit?: (data: ScraperFormValues) => void;
+  keywordOptions?: { id: string; keyword: string }[];
+  defaultValues?: Partial<ScraperFormValues>;
 };
 
-export default function ScraperForm(props: Props) {
-  const {
-    setFilter,
-    keywordOptions,
-    isLoadingKeywordOptions,
-    fetchKeywordOptions,
-    fetchResults,
-    filter
-  } = useScraperStore((state) => state);
-  const form = useScraperForm();
-  const router = useRouter();
-
-  const onSubmit = (data: ScraperFormValues) => {
-    // Set the filter state with the new values
-    // and reset the page to 1
-    setFilter({
-      ...filter,
-      keywords: data.keywords,
-      minPrice: data.minPrice,
-      maxPrice: data.maxPrice,
-      page: 1
-    });
-
-    fetchResults();
-
-    // Update the URL with the new filter values
-    const params = new URLSearchParams();
-    if (data.keywords.length > 0) {
-      params.append('keywords', data.keywords.join(','));
+export default function ScraperResultForm(props: Props) {
+  const form = useForm<ScraperFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: props.defaultValues || {
+      keywords: [],
+      minPrice: null,
+      maxPrice: null
     }
-    if (data.minPrice) {
-      params.append('minPrice', data.minPrice.toString());
-    }
-    if (data.maxPrice) {
-      params.append('maxPrice', data.maxPrice.toString());
-    }
-    router.push(`/search?${params.toString()}`);
-  };
+  });
 
   // Because in the form, the value is a string even if the type is number
   // So we need to convert it to number
@@ -71,27 +80,29 @@ export default function ScraperForm(props: Props) {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
-    field.onChange(value === '' ? undefined : Number(value));
+    field.onChange(value === '' ? null : Number(value));
   };
 
   useEffect(() => {
-    if (!isLoadingKeywordOptions && keywordOptions.length === 0) {
-      fetchKeywordOptions();
+    // Remove keywords that are not in the options
+    if (props.keywordOptions) {
+      const validKeywords = props.keywordOptions.map(
+        (option) => option.keyword
+      );
+      const currentKeywords = form.getValues('keywords');
+      const filteredKeywords = currentKeywords.filter((keyword) =>
+        validKeywords.includes(keyword)
+      );
+      if (filteredKeywords.length !== currentKeywords.length) {
+        form.setValue('keywords', filteredKeywords);
+      }
     }
-  }, []);
-
-  if (isLoadingKeywordOptions) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 dark:border-gray-100"></div>
-      </div>
-    );
-  }
+  }, [props.keywordOptions, props.defaultValues]);
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(props.onSubmit ?? (() => {}))}
         className="w-full flex flex-col gap-4"
         ref={props.ref}
       >
@@ -109,11 +120,12 @@ export default function ScraperForm(props: Props) {
                   }}
                   className="cursor-pointer"
                   size="sm"
+                  type="button"
                 >
                   Clear
                 </Button>
               </div>
-              {keywordOptions.map(({ keyword, id }) => (
+              {props.keywordOptions?.map(({ keyword, id }) => (
                 <FormField
                   key={id}
                   control={form.control}
@@ -151,11 +163,12 @@ export default function ScraperForm(props: Props) {
           <Button
             variant="ghost"
             onClick={() => {
-              form.setValue('minPrice', undefined);
-              form.setValue('maxPrice', undefined);
+              form.setValue('minPrice', null);
+              form.setValue('maxPrice', null);
             }}
             className="cursor-pointer"
             size="sm"
+            type="button"
           >
             Clear
           </Button>
