@@ -48,7 +48,6 @@ export default function ClientSearch() {
     data: infiniteResults,
     fetchNextPage,
     hasNextPage,
-    isFetching,
     isFetchingNextPage,
     status
   } = useInfiniteQuery(
@@ -163,7 +162,6 @@ export default function ClientSearch() {
             </div>
           </>
         )}
-        <div>{isFetching && !isFetchingNextPage ? 'Fetching...' : null}</div>
       </div>
       <aside className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4">
         <div className="flex items-center justify-between">
