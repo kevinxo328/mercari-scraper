@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import './globals.css';
-import AppHeader from '@/components/AppHeader';
+import AppHeader from '@/components/app-header';
 import { TRPCReactProvider } from '@/trpc/client';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 export const metadata: Metadata = {
   title: 'Mercari Scraper',
@@ -18,13 +19,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <TRPCReactProvider>
-      <html lang="en" className="dark">
-        <body className="min-h-dvh flex flex-col">
-          <AppHeader />
-          {children}
-        </body>
-      </html>
-    </TRPCReactProvider>
+    <html lang="en" className="dark">
+      <body className="min-h-dvh flex flex-col">
+        <NuqsAdapter>
+          <TRPCReactProvider>
+            <AppHeader />
+            {children}
+          </TRPCReactProvider>
+        </NuqsAdapter>
+      </body>
+    </html>
   );
 }

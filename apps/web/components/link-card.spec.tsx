@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import ScraperResultCard, { Props } from './ScraperResultCard';
+import LinkCard, { Props } from './link-card';
 
 describe('ScraperResultCard', () => {
   const props: Props = {
@@ -11,7 +11,7 @@ describe('ScraperResultCard', () => {
   };
 
   it('renders link with correct href', () => {
-    render(<ScraperResultCard {...props} />);
+    render(<LinkCard {...props} />);
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', props.url);
     expect(link).toHaveAttribute('target', '_blank');
@@ -19,13 +19,13 @@ describe('ScraperResultCard', () => {
   });
 
   it('renders image with correct src and alt', () => {
-    render(<ScraperResultCard {...props} />);
+    render(<LinkCard {...props} />);
     const img = screen.getByAltText(props.title);
     expect(img).toBeInTheDocument();
   });
 
   it('renders price and currency', () => {
-    render(<ScraperResultCard {...props} />);
+    render(<LinkCard {...props} />);
     expect(screen.getByText(/12,345 JPY/)).toBeInTheDocument();
   });
 });

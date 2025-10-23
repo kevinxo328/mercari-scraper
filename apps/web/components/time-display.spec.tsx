@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import TimeDisplay from './TimeDisplay';
+import TimeDisplay from './time-display';
 import React from 'react';
 
 describe('TimeDisplay', () => {

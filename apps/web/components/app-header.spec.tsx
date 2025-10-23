@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import AppHeader from './AppHeader';
+import AppHeader from './app-header';
 
 describe('AppHeader', () => {
   it('renders the logo and title', async () => {

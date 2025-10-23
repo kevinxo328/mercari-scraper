@@ -8,7 +8,7 @@ export type Props = {
   currency: string;
 };
 
-const ScraperResultCard = (props: Props) => {
+const LinkCard = (props: Props) => {
   return (
     <a
       href={props.url}
@@ -32,4 +32,4 @@ const ScraperResultCard = (props: Props) => {
   );
 };
 
-export default ScraperResultCard;
+export default LinkCard;

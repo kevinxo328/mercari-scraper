@@ -1,12 +1,12 @@
 'use client';
 
 import { useTRPC } from '@/trpc/client';
-import TimeDisplay from '../TimeDisplay';
+import TimeDisplay from '../time-display';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import React from 'react';
 import Link from 'next/link';
 import { MoveRight } from 'lucide-react';
-import ScraperResultCard from '../ScraperResultCard';
+import LinkCard from '../link-card';
 import { Skeleton } from '../shadcn/skeleton';
 
 const ITEMS_PER_PAGE = 12;
@@ -76,7 +76,7 @@ export default function ClientIndex() {
                   <Skeleton key={i} className="aspect-square rounded-lg" />
                 ))}
               {results.map((result) => (
-                <ScraperResultCard
+                <LinkCard
                   key={result.id}
                   url={result.url}
                   title={result.title}
