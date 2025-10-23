@@ -13,7 +13,7 @@ import {
 } from 'nuqs';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useTRPC } from '@/trpc/client';
-import ScraperResultCard from '../ScraperResultCard';
+import LinkCard from '../link-card';
 import { Skeleton } from '../shadcn/skeleton';
 import {
   Sheet,
@@ -137,7 +137,7 @@ export default function ClientSearch() {
             <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
               {infiniteResults?.pages.map((page) =>
                 page.data.map((result) => (
-                  <ScraperResultCard
+                  <LinkCard
                     key={result.title + result.url}
                     url={result.url}
                     title={result.title}

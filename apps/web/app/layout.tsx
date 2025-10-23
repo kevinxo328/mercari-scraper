@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import './globals.css';
-import AppHeader from '@/components/AppHeader';
+import AppHeader from '@/components/app-header';
 import { TRPCReactProvider } from '@/trpc/client';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
