@@ -14,7 +14,7 @@ const ITEMS_PER_PAGE = 12;
 export default function ClientIndex() {
   const trpc = useTRPC();
 
-  const { data: keywords } = useQuery(
+  const { data: keywords, isPending } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
       pageSize: 5,
       page: 1,
@@ -45,11 +45,13 @@ export default function ClientIndex() {
           <span>Last Updated</span>
           <TimeDisplay timestamp={latestUpdateTime} />
         </div>
-        {/* <Link href="/search" className="flex items-center gap-2">
-          <Search className="size-4" /> Search
-        </Link> */}
       </div>
-      {latestResults.length === 0 && (
+      {isPending && (
+        <div className="flex grow-1 h-full w-full items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-gray-100"></div>
+        </div>
+      )}
+      {!isPending && latestResults.length === 0 && (
         <p className="text-center text-gray-500">No results found</p>
       )}
       {keywords &&
