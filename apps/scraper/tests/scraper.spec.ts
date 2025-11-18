@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { getMercariUrl, MercariCategory } from '../lib/utils';
+import { getMercariUrl } from '../lib/utils';
 import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
 
 // Set the viewport size for the page to ensure all items are visible.
@@ -15,10 +15,18 @@ test.describe('Scrape Mercari', () => {
   const prisma = new PrismaClient();
   let keywords: ScraperKeyword[] = [];
 
+  // Store keyword categories in a map for easy access
+  // Key: category ID, Value: category code used in Mercari URL
+  let codeMap: Record<string, string> = {};
+
   test.beforeAll(async () => {
     // Fetch keywords from the database
     try {
       keywords = await prisma.scraperKeyword.findMany();
+      const codes = await prisma.keywordCategory.findMany();
+      codes.forEach((code) => {
+        codeMap[code.id] = code.code;
+      });
     } catch (e) {
       console.error(e);
     }
@@ -40,12 +48,16 @@ test.describe('Scrape Mercari', () => {
           : route.continue();
       });
 
+      // Construct category IDs array for the URL
+      const categoryIds = record.categoryIds
+        .map((catId) => codeMap[catId])
+        .filter((code) => code !== undefined);
+
       await page
         .goto(
           getMercariUrl({
             keyword: record.keyword,
-            category:
-              MercariCategory[record.category as keyof typeof MercariCategory],
+            categoryIds,
             ...(record.minPrice && { minPrice: record.minPrice }),
             ...(record.maxPrice && { maxPrice: record.maxPrice })
           })
