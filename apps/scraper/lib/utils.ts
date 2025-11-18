@@ -1,7 +1,3 @@
-export enum MercariCategory {
-  MENFASHION = '2'
-}
-
 /**
  *
  * @param keyword
@@ -11,13 +7,13 @@ export enum MercariCategory {
  */
 export function getMercariUrl({
   keyword,
-  category = MercariCategory.MENFASHION,
+  categoryIds,
   minPrice,
   maxPrice
 }: {
   keyword: string;
   status?: string;
-  category?: MercariCategory;
+  categoryIds?: string[];
   minPrice?: number | null;
   maxPrice?: number | null;
 }) {
@@ -25,7 +21,7 @@ export function getMercariUrl({
   const params = new URLSearchParams({
     keyword,
     status,
-    category_id: category,
+    category_id: categoryIds ? categoryIds.join('&') : '',
     ...(!!minPrice && { price_min: minPrice.toString() }),
     ...(!!maxPrice && { price_max: maxPrice.toString() })
   });

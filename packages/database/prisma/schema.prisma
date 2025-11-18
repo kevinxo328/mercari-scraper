@@ -14,16 +14,13 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Category {
-  MENFASHION
-}
 
 model ScraperKeyword {
   id       String @id @default(uuid()) @db.Uuid
   keyword   String @unique @db.VarChar(255)
   minPrice Int? 
   maxPrice  Int? 
-  category Category @default(MENFASHION)
+  categoryIds String[] @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -41,4 +38,13 @@ model ScraperResult {
   updatedAt DateTime @updatedAt
 
   keywords   ScraperKeyword[]
+}
+
+model KeywordCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  parentId  String? @db.Uuid
+  name      String @unique @db.VarChar(50)
+  code String @unique @db.VarChar(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
