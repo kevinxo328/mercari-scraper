@@ -1,23 +1,16 @@
-'use client';
-
-import { useSession } from 'next-auth/react';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
-  const session = useSession();
-  if (session.status === 'loading') {
-    return <div>Loading...</div>;
-  }
-  if (session.status === 'unauthenticated') {
-    return redirect(
-      `/auth/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`
-    );
-  }
-  if (session.status === 'authenticated') return <div>{children}</div>;
+  const session = await auth();
 
-  return null;
+  if (!session) {
+    redirect('/auth/login?callbackUrl=/dashboard');
+  }
+
+  return <div>{children}</div>;
 }

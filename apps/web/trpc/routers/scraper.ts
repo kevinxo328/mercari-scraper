@@ -1,4 +1,4 @@
-import { publicProcedure, router } from '../setup';
+import { publicProcedure, protectedProcedure, router } from '../setup';
 import { z } from 'zod';
 
 export const scraperRouter = router({
@@ -209,7 +209,7 @@ export const scraperRouter = router({
         }
       });
     }),
-  deleteKeyword: publicProcedure
+  deleteKeyword: protectedProcedure
     .input(
       z.object({
         id: z.string().uuid()
@@ -228,7 +228,7 @@ export const scraperRouter = router({
       }
     });
   }),
-  createKeyword: publicProcedure
+  createKeyword: protectedProcedure
     .input(
       z.object({
         keyword: z.string().min(1).max(255),
