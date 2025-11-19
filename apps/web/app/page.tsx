@@ -10,7 +10,8 @@ export default async function Page() {
     trpc.scraper.getKeywords.queryOptions({
       pageSize: 5,
       page: 1,
-      orderby: 'desc'
+      orderby: 'desc',
+      orderByField: 'updatedAt'
     })
   );
 

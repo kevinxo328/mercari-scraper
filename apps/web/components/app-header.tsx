@@ -1,10 +1,14 @@
-import Link from 'next/link';
+'use client';
 
-export const dynamic = 'static';
+import { useSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { Button } from './shadcn/button';
 
 export const AppHeader = () => {
+  const session = useSession();
+
   return (
-    <header className="p-4 flex items-center sticky top-0 z-10 border-b dark:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
+    <header className="p-4 flex justify-between items-center sticky top-0 z-10 border-b dark:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
       <Link href="/" className="flex items-center gap-2">
         <svg
           viewBox="0 0 50 49"
@@ -29,6 +33,23 @@ export const AppHeader = () => {
         </svg>
         <h1 className="text-md font-bold">Mercari Scraper</h1>
       </Link>
+      <div className="flex items-center gap-4">
+        {session.status === 'authenticated' ? (
+          <>
+            <Link href="/dashboard">Dashboard</Link>
+            <Button
+              onClick={() => signOut()}
+              variant="link"
+              className="hover:no-underline hover:cursor-pointer text-[1rem] p-0 font-normal"
+            >
+              Logout
+            </Button>
+          </>
+        ) : null}
+        {session.status === 'unauthenticated' ? (
+          <Link href="/auth/login">Login</Link>
+        ) : null}
+      </div>
     </header>
   );
 };

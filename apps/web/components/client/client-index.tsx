@@ -14,14 +14,16 @@ const ITEMS_PER_PAGE = 12;
 export default function ClientIndex() {
   const trpc = useTRPC();
 
-  const { data: keywords, isPending } = useQuery(
+  const { data: keywordPage, isPending } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
       pageSize: 5,
       page: 1,
-      orderby: 'desc'
+      orderby: 'desc',
+      orderByField: 'updatedAt'
     })
   );
 
+  const keywords = keywordPage?.data ?? [];
   const latestUpdateTime = keywords?.[0]?.updatedAt ?? 'N/A';
 
   const resultQueries = useQueries({

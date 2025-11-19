@@ -16,12 +16,25 @@ function generateFakeData() {
     keywords: []
   };
 
-  fakeData.keywords = Array.from({ length: KEYWORD_COUNT }, () => ({
-    id: faker.string.uuid(),
-    keyword: faker.commerce.productName(),
-    createdAt: faker.date.past(),
-    updatedAt: faker.date.recent()
-  }));
+  fakeData.keywords = Array.from({ length: KEYWORD_COUNT }, () => {
+    const categories = Array.from(
+      { length: faker.number.int({ min: 0, max: 3 }) },
+      () => ({
+        id: faker.string.uuid(),
+        name: faker.commerce.department()
+      })
+    );
+    return {
+      id: faker.string.uuid(),
+      keyword: faker.commerce.productName(),
+      minPrice: faker.number.int({ min: 0, max: 10000 }),
+      maxPrice: faker.number.int({ min: 10001, max: 20000 }),
+      categoryIds: categories.map((category) => category.id),
+      categoryNames: categories.map((category) => category.name),
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.recent()
+    };
+  });
 
   fakeData.results = Array.from({ length: RESULTS_COUNT }, (_, index) => ({
     id: faker.string.uuid(),
