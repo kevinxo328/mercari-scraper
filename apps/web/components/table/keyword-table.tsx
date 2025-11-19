@@ -9,6 +9,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { useTRPC } from '@/trpc/client';
+import { XIcon } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import {
@@ -44,6 +45,7 @@ type EditingValues = {
 };
 
 const PAGE_SIZES = [10, 20, 50];
+const SEARCH_DEBOUNCE_MS = 500;
 
 const SORTABLE_COLUMNS: {
   key: SortableField;
@@ -93,6 +95,7 @@ export default function KeywordTable() {
     maxPrice: '',
     categoryIds: []
   });
+  const [isComposing, setIsComposing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const {
@@ -150,11 +153,21 @@ export default function KeywordTable() {
     }
   }, [keywordsData, page, totalPages]);
 
-  const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSearchTerm(searchInput.trim());
-    setPage(1);
-  };
+  const trimmedSearchValue = searchInput.trim();
+
+  useEffect(() => {
+    if (isComposing) return;
+    if (trimmedSearchValue === searchTerm) return;
+
+    const handler = window.setTimeout(() => {
+      setSearchTerm(trimmedSearchValue);
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(handler);
+    };
+  }, [isComposing, trimmedSearchValue, searchTerm]);
 
   const handleSort = (field: SortableField) => {
     if (sortField === field) {
@@ -184,6 +197,12 @@ export default function KeywordTable() {
   };
   const handleCategorySelection = (selectedIds: string[]) => {
     setEditingValues((prev) => ({ ...prev, categoryIds: selectedIds }));
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchTerm('');
+    setPage(1);
   };
 
   const handleSaveEdit = () => {
@@ -518,25 +537,34 @@ export default function KeywordTable() {
   return (
     <section className="mt-6 space-y-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <form
-          className="flex w-full flex-col gap-2 sm:flex-row sm:items-center"
-          onSubmit={handleSubmitSearch}
-        >
-          <Input
-            type="text"
-            placeholder="Search keywords"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            className="flex-1"
-          />
-          <Button
-            type="submit"
-            className="sm:w-32"
-            disabled={isFetching && searchTerm === searchInput.trim()}
-          >
-            Search
-          </Button>
-        </form>
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Input
+              type="text"
+              placeholder="Search keywords"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={(event) => {
+                setIsComposing(false);
+                setSearchInput(event.currentTarget.value);
+              }}
+              className="w-full pr-10"
+            />
+            {searchInput && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute inset-y-0 right-2 my-auto h-6 w-6"
+                onClick={handleClearSearch}
+              >
+                <XIcon className="h-3.5 w-3.5" />
+                <span className="sr-only">Clear search</span>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
       <div className="flex flex-wrap justify-end items-center gap-3 text-sm text-gray-500">
         <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import KeywordTable from '@/components/dashboard/keyword-table';
+import KeywordTable from '@/components/table/keyword-table';
 import AddKeywordDialog from '@/components/dialog/add-keyword-dialog';
 import { Button } from '@/components/shadcn/button';
 import { PlusIcon } from 'lucide-react';
