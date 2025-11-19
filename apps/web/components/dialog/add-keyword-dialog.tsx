@@ -32,7 +32,7 @@ const formSchema = z.object({
   keyword: z.string().min(1, 'Keyword is required').max(255),
   minPrice: z.string().optional(),
   maxPrice: z.string().optional(),
-  categoryIds: z.array(z.string()).default([])
+  categoryIds: z.array(z.string())
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -180,7 +180,9 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
                   <FormLabel>Categories</FormLabel>
                   <FormControl>
                     {isLoadingCategories ? (
-                      <p className="text-sm text-gray-500">Loading options...</p>
+                      <p className="text-sm text-gray-500">
+                        Loading options...
+                      </p>
                     ) : categoriesError ? (
                       <p className="text-sm text-red-500">
                         Failed to load categories.
