@@ -227,7 +227,37 @@ export const scraperRouter = router({
         name: 'asc'
       }
     });
-  })
+  }),
+  createKeyword: publicProcedure
+    .input(
+      z.object({
+        keyword: z.string().min(1).max(255),
+        minPrice: z.number().min(0).nullable().optional(),
+        maxPrice: z.number().min(0).nullable().optional(),
+        categoryIds: z.array(z.string().uuid()).default([])
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { keyword, minPrice, maxPrice, categoryIds } = input;
+      if (
+        minPrice !== null &&
+        maxPrice !== null &&
+        minPrice !== undefined &&
+        maxPrice !== undefined &&
+        minPrice > maxPrice
+      ) {
+        throw new Error('Min price must be less than or equal to max price');
+      }
+
+      return await ctx.db.scraperKeyword.create({
+        data: {
+          keyword,
+          minPrice: typeof minPrice === 'undefined' ? null : minPrice,
+          maxPrice: typeof maxPrice === 'undefined' ? null : maxPrice,
+          categoryIds
+        }
+      });
+    })
 });
 
 // Export type router type signature, this is used by the client.
