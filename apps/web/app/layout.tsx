@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import './globals.css';
-import AppHeader from '@/components/app-header';
 import { TRPCReactProvider } from '@/trpc/client';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { auth } from '@/lib/auth';
 import { SessionProvider } from 'next-auth/react';
 import { Toaster } from '@/components/shadcn/sonner';
 import { ThemeProvider } from '@/components/theme-provider';
+import AppHeader from './(public)/_components/app-header.client';
 
 export const metadata: Metadata = {
   title: 'Mercari Scraper',
