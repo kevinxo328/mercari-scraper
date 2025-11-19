@@ -3,8 +3,6 @@ import React from 'react';
 
 import HomePageClient from './_components/home-page.client';
 
-export const dynamic = 'force-dynamic';
-
 export default async function Page() {
   prefetch(
     trpc.scraper.getKeywords.queryOptions({
