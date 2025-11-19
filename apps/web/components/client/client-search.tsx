@@ -40,7 +40,8 @@ export default function ClientSearch() {
     trpc.scraper.getKeywords.queryOptions({
       pageSize: 5,
       page: 1,
-      orderby: 'desc'
+      orderby: 'desc',
+      orderByField: 'updatedAt'
     })
   );
 
@@ -112,7 +113,7 @@ export default function ClientSearch() {
                     minPrice,
                     maxPrice
                   }}
-                  keywordOptions={keywordOptions}
+                  keywordOptions={keywordOptions?.data ?? []}
                 />
                 <Button onClick={() => triggerSubmit()} className="mt-4">
                   Apply
@@ -184,7 +185,7 @@ export default function ClientSearch() {
             minPrice,
             maxPrice
           }}
-          keywordOptions={keywordOptions}
+          keywordOptions={keywordOptions?.data ?? []}
         />
       </aside>
     </main>
