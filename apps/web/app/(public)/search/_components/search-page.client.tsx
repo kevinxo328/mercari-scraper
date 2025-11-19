@@ -1,10 +1,10 @@
 'use client';
 
 import { useRef } from 'react';
-import { Button } from '../shadcn/button';
+import { Button } from '@/components/shadcn/button';
 import ScraperSearchForm, {
   ScraperFormValues
-} from '../form/scraper-search-form';
+} from '@/components/form/scraper-search-form';
 import {
   useQueryState,
   parseAsArrayOf,
@@ -13,18 +13,18 @@ import {
 } from 'nuqs';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useTRPC } from '@/trpc/client';
-import LinkCard from '../link-card';
-import { Skeleton } from '../shadcn/skeleton';
+import LinkCard from '@/components/link-card';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger
-} from '../shadcn/sheet';
+} from '@/components/shadcn/sheet';
 import { Funnel } from 'lucide-react';
 
-export default function ClientSearch() {
+export default function SearchPageClient() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
 

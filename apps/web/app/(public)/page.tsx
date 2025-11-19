@@ -1,7 +1,7 @@
 import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 import React from 'react';
 
-import ClientIndex from '@/components/client/client-index';
+import HomePageClient from './_components/home-page.client';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export default async function Page() {
 
   return (
     <HydrateClient>
-      <ClientIndex />
+      <HomePageClient />
     </HydrateClient>
   );
 }
