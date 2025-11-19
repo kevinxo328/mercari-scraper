@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthResult } from 'next-auth';
 import Google from 'next-auth/providers/google';
 
 const ALLOWED_EMAILS =
@@ -6,7 +6,7 @@ const ALLOWED_EMAILS =
     e.trim().toLowerCase()
   ) || [];
 
-const nextAuth = NextAuth({
+const nextAuth: NextAuthResult = NextAuth({
   pages: {
     signIn: '/auth/login'
   },

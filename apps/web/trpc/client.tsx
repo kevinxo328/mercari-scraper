@@ -8,6 +8,7 @@ import type { AppRouter } from './routers/index';
 import { transformer } from './shared/transformer';
 import { makeQueryClient } from './shared/query-client';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
 
 let browserQueryClient: QueryClient;
