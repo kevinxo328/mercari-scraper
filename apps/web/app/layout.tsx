@@ -25,9 +25,9 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <SessionProvider session={session}>
-      <html lang="en" className="dark" suppressHydrationWarning>
-        <body className="min-h-dvh flex flex-col">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="min-h-dvh flex flex-col">
+        <SessionProvider session={session}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -42,8 +42,8 @@ export default async function RootLayout({
               </TRPCReactProvider>
             </NuqsAdapter>
           </ThemeProvider>
-        </body>
-      </html>
-    </SessionProvider>
+        </SessionProvider>
+      </body>
+    </html>
   );
 }
