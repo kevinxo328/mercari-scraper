@@ -1,17 +1,17 @@
 'use client';
 
 import { useTRPC } from '@/trpc/client';
-import TimeDisplay from '../time-display';
+import TimeDisplay from '@/components/time-display';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import React from 'react';
 import Link from 'next/link';
 import { MoveRight } from 'lucide-react';
-import LinkCard from '../link-card';
-import { Skeleton } from '../shadcn/skeleton';
+import LinkCard from '@/components/link-card';
+import { Skeleton } from '@/components/shadcn/skeleton';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ClientIndex() {
+export default function HomePageClient() {
   const trpc = useTRPC();
 
   const { data: keywordPage, isPending } = useQuery(

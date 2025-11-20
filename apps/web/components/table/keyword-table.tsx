@@ -656,7 +656,7 @@ export default function KeywordTable() {
               </TableRow>
             )}
           </TableBody>
-          <TableCaption>{isFetching && 'Refreshing data...'}</TableCaption>
+          {/* <TableCaption>{isFetching && 'Refreshing data...'}</TableCaption> */}
         </Table>
       </div>
       {formError && editingKeyword && (
