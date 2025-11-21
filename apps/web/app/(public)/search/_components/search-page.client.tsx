@@ -23,6 +23,7 @@ import {
   SheetTrigger
 } from '@/components/shadcn/sheet';
 import { Funnel } from 'lucide-react';
+import InfiniteScrollTrigger from '@/components/infinite-scroll-trigger';
 
 export default function SearchPageClient() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -85,8 +86,8 @@ export default function SearchPageClient() {
   };
 
   return (
-    <main className="mx-auto p-4 container flex gap-4 relative">
-      <div className="grow-1">
+    <main className="container relative mx-auto flex gap-4 p-4 lg:h-[calc(100vh-65px)] lg:overflow-hidden">
+      <div className="grow lg:overflow-y-auto lg:pr-2">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
           <Sheet>
@@ -148,23 +149,19 @@ export default function SearchPageClient() {
                 ))
               )}
             </div>
-            <div className="mt-8">
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={!hasNextPage || isFetchingNextPage}
-                className="w-full"
-              >
-                {isFetchingNextPage
-                  ? 'Loading...'
-                  : hasNextPage
-                    ? 'Load More'
-                    : 'No More Results'}
-              </Button>
-            </div>
+            <InfiniteScrollTrigger
+              className="mt-8"
+              hasNextPage={!!hasNextPage}
+              isLoading={isFetchingNextPage}
+              onLoadMore={fetchNextPage}
+              idleContent="Scroll down to load more"
+              loadingContent="Loading…"
+              endContent="No more results"
+            />
           </>
         )}
       </div>
-      <aside className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4">
+      <aside className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4 lg:overflow-y-auto">
         <div className="flex items-center justify-between">
           <h5 className="text-xl text-gray-400 font-semibold">Filter</h5>
           <Button
