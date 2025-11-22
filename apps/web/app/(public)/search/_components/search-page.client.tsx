@@ -39,10 +39,9 @@ export default function SearchPageClient() {
 
   const { data: keywordOptions } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
-      pageSize: 5,
-      page: 1,
       orderby: 'desc',
-      orderByField: 'updatedAt'
+      orderByField: 'updatedAt',
+      hasResults: true
     })
   );
 

@@ -13,7 +13,13 @@ import {
 import { Input } from '../shadcn/input';
 import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
-import { Checkbox } from '../shadcn/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '../shadcn/select';
 import { useEffect } from 'react';
 
 const formSchema = z
@@ -109,50 +115,28 @@ export default function ScraperResultForm(props: Props) {
         <FormField
           name="keywords"
           control={form.control}
-          render={() => (
-            <FormItem className="flex flex-col gap-4">
-              <div className="flex justify-between items-center">
-                <p className="text-xl font-semibold">Keywords</p>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    form.setValue('keywords', []);
+          render={({ field }) => (
+            <FormItem className="flex flex-col gap-2">
+              <FormLabel className="text-xl font-semibold">Keyword</FormLabel>
+              <FormControl>
+                <Select
+                  defaultValue={field.value?.[0] || ''}
+                  onValueChange={(value) => {
+                    field.onChange(value ? [value] : []);
                   }}
-                  className="cursor-pointer"
-                  size="sm"
-                  type="button"
                 >
-                  Clear
-                </Button>
-              </div>
-              {props.keywordOptions?.map(({ keyword, id }) => (
-                <FormField
-                  key={id}
-                  control={form.control}
-                  name="keywords"
-                  render={({ field }) => (
-                    <FormItem key={id} className="flex items-center">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(keyword)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              field.onChange([...(field.value || []), keyword]);
-                            } else {
-                              field.onChange(
-                                field.value?.filter((k) => k !== keyword)
-                              );
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="cursor-pointer">
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a keyword" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {props.keywordOptions?.map(({ keyword, id }) => (
+                      <SelectItem key={id} value={keyword}>
                         {keyword}
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-              ))}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
