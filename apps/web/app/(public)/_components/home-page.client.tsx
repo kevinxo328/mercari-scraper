@@ -19,7 +19,8 @@ export default function HomePageClient() {
       pageSize: 5,
       page: 1,
       orderby: 'desc',
-      orderByField: 'updatedAt'
+      orderByField: 'updatedAt',
+      hasResults: true
     })
   );
 
