@@ -11,19 +11,27 @@ export const scraperRouter = router({
         orderByField: z
           .enum(['keyword', 'createdAt', 'updatedAt', 'minPrice', 'maxPrice'])
           .default('updatedAt'),
-        search: z.string().max(255).optional()
+        search: z.string().max(255).optional(),
+        hasResults: z.boolean().optional()
       })
     )
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const where = input.search
-        ? {
-            keyword: {
-              contains: input.search,
-              mode: 'insensitive' as const
-            }
-          }
-        : undefined;
+      const where: Record<string, any> = {};
+
+      if (input.search) {
+        where.keyword = {
+          contains: input.search,
+          mode: 'insensitive' as const
+        };
+      }
+
+      if (input.hasResults !== undefined) {
+        where.results = input.hasResults
+          ? { some: {} }
+          : { none: {} };
+      }
+
       const [keywords, total] = await Promise.all([
         db.scraperKeyword.findMany({
           where,
