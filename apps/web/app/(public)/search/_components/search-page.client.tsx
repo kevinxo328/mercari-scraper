@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/shadcn/button';
 import ScraperSearchForm, {
   ScraperFormValues
@@ -28,6 +28,7 @@ import InfiniteScrollTrigger from '@/components/infinite-scroll-trigger';
 export default function SearchPageClient() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const trpc = useTRPC();
   const [keywords, setKeywords] = useQueryState(
@@ -39,10 +40,9 @@ export default function SearchPageClient() {
 
   const { data: keywordOptions } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
-      pageSize: 5,
-      page: 1,
       orderby: 'desc',
-      orderByField: 'updatedAt'
+      orderByField: 'updatedAt',
+      hasResults: true
     })
   );
 
@@ -90,7 +90,7 @@ export default function SearchPageClient() {
       <div className="flex min-h-0 grow flex-col overflow-hidden lg:overflow-y-auto lg:pr-2">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
-          <Sheet>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <Button
                 className="cursor-pointer lg:hidden"
@@ -116,7 +116,10 @@ export default function SearchPageClient() {
                   }}
                   keywordOptions={keywordOptions?.data ?? []}
                 />
-                <Button onClick={() => triggerSubmit()} className="mt-4">
+                <Button onClick={() => {
+                  triggerSubmit();
+                  setIsSheetOpen(false);
+                }} className="mt-4">
                   Apply
                 </Button>
               </SheetHeader>
