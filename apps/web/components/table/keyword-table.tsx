@@ -9,7 +9,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { useTRPC } from '@/trpc/client';
-import { XIcon } from 'lucide-react';
+import { XIcon, Pencil, Trash2, Check, X } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import {
@@ -29,6 +29,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '../shadcn/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
+import { MultiSelect } from '../multi-select';
 
 type SortableField =
   | 'keyword'
@@ -311,6 +313,10 @@ export default function KeywordTable() {
         ) : (
           <span className="font-medium">{keyword.keyword}</span>
         );
+      },
+      meta: {
+        className:
+          'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
       }
     },
     {
@@ -406,28 +412,21 @@ export default function KeywordTable() {
             );
           }
           return (
-            <div className="space-y-2">
-              <select
-                multiple
-                value={editingValues.categoryIds}
-                onChange={(event) => {
-                  const selectedIds = Array.from(
-                    event.target.selectedOptions
-                  ).map((option) => option.value);
-                  handleCategorySelection(selectedIds);
-                }}
-                className="h-28 w-full rounded-md border border-gray-300 bg-background p-2 text-sm"
-              >
-                {categoryOptions.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500">
-                Hold Cmd/Ctrl to select multiple categories.
-              </p>
-            </div>
+            <MultiSelect
+              key={keyword.id}
+              options={categoryOptions.map((category) => ({
+                label: category.name,
+                value: category.id
+              }))}
+              defaultValue={editingValues.categoryIds}
+              onValueChange={handleCategorySelection}
+              placeholder="Select categories"
+              maxCount={2}
+              searchable
+              autoSize={false}
+              singleLine
+              className="w-full max-w-full"
+            />
           );
         }
         return keyword.categoryNames.length > 0 ? (
@@ -487,43 +486,79 @@ export default function KeywordTable() {
         const isRowDeleting = deletingId === keyword.id && isDeleting;
 
         return (
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             {isRowEditing ? (
               <>
-                <Button size="sm" onClick={handleSaveEdit} disabled={isSaving}>
-                  Save
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCancelEdit}
-                  disabled={isSaving}
-                >
-                  Cancel
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      onClick={handleSaveEdit}
+                      disabled={isSaving}
+                      aria-label="Save"
+                      className="h-8 w-8"
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Save</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={handleCancelEdit}
+                      disabled={isSaving}
+                      aria-label="Cancel"
+                      className="h-8 w-8"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Cancel</TooltipContent>
+                </Tooltip>
               </>
             ) : (
               <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleStartEdit(keyword)}
-                  disabled={Boolean(editingId) || isRowDeleting}
-                >
-                  Edit
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDelete(keyword)}
-                  disabled={isRowDeleting || Boolean(editingId)}
-                >
-                  {isRowDeleting ? 'Deleting...' : 'Delete'}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => handleStartEdit(keyword)}
+                      disabled={Boolean(editingId) || isRowDeleting}
+                      aria-label="Edit"
+                      className="h-8 w-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={() => handleDelete(keyword)}
+                      disabled={isRowDeleting || Boolean(editingId)}
+                      aria-label="Delete"
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Delete</TooltipContent>
+                </Tooltip>
               </>
             )}
           </div>
         );
+      },
+      meta: {
+        className:
+          'sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]'
       }
     }
   ];
@@ -597,21 +632,29 @@ export default function KeywordTable() {
           </Button>
         </div>
       </div>
-      <div className="overflow-hidden rounded-md border border-gray-200 dark:border-gray-800">
-        <Table>
+      <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800">
+        <Table className="min-w-[900px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="align-middle">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const meta = header.column.columnDef.meta as
+                    | { className?: string }
+                    | undefined;
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={`align-middle ${meta?.className || ''}`}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -635,14 +678,22 @@ export default function KeywordTable() {
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="align-middle">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const meta = cell.column.columnDef.meta as
+                      | { className?: string }
+                      | undefined;
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={`align-middle ${meta?.className || ''}`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (
