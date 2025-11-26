@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,25 +27,42 @@ import {
 } from '@/components/shadcn/form';
 import { Input } from '@/components/shadcn/input';
 import { Button } from '@/components/shadcn/button';
+import { Switch } from '@/components/shadcn/switch';
 import { MultiSelect } from '@/components/multi-select';
+import { ScraperKeyword } from '@/types/scraper';
 
 const formSchema = z.object({
   keyword: z.string().min(1, 'Keyword is required').max(255),
   minPrice: z.string().optional(),
   maxPrice: z.string().optional(),
-  categoryIds: z.array(z.string())
+  categoryIds: z.array(z.string()),
+  isPinned: z.boolean().default(false)
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.input<typeof formSchema>;
 
 interface AddKeywordDialogProps {
   children?: React.ReactNode;
+  keywordToEdit?: ScraperKeyword;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
-  const [open, setOpen] = useState(false);
+export default function AddKeywordDialog({
+  children,
+  keywordToEdit,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange
+}: AddKeywordDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? controlledOnOpenChange! : setInternalOpen;
+
+  const isEditMode = Boolean(keywordToEdit);
 
   const {
     data: categories,
@@ -59,9 +76,30 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
       keyword: '',
       minPrice: '',
       maxPrice: '',
-      categoryIds: []
+      categoryIds: [],
+      isPinned: false
     }
   });
+
+  useEffect(() => {
+    if (keywordToEdit) {
+      form.reset({
+        keyword: keywordToEdit.keyword,
+        minPrice: keywordToEdit.minPrice?.toString() ?? '',
+        maxPrice: keywordToEdit.maxPrice?.toString() ?? '',
+        categoryIds: keywordToEdit.categoryIds,
+        isPinned: keywordToEdit.isPinned
+      });
+    } else {
+      form.reset({
+        keyword: '',
+        minPrice: '',
+        maxPrice: '',
+        categoryIds: [],
+        isPinned: false
+      });
+    }
+  }, [keywordToEdit, form]);
 
   const createMutation = useMutation(
     trpc.scraper.createKeyword.mutationOptions({
@@ -79,11 +117,28 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
     })
   );
 
+  const updateMutation = useMutation(
+    trpc.scraper.updateKeyword.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.scraper.getKeywords.pathFilter()
+        );
+        toast.success('Keyword updated successfully');
+        setOpen(false);
+        form.reset();
+      },
+      onError: (error) => {
+        toast.error(`Failed to update keyword: ${error.message}`);
+      }
+    })
+  );
+
   const onSubmit = (values: FormValues) => {
     const minPriceValue =
       values.minPrice?.trim() === '' ? null : Number(values.minPrice);
     const maxPriceValue =
       values.maxPrice?.trim() === '' ? null : Number(values.maxPrice);
+    const isPinnedValue = values.isPinned ?? false;
 
     if (
       (minPriceValue !== null && Number.isNaN(minPriceValue)) ||
@@ -102,24 +157,38 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
       return;
     }
 
-    createMutation.mutate({
-      keyword: values.keyword.trim(),
-      minPrice: minPriceValue,
-      maxPrice: maxPriceValue,
-      categoryIds: values.categoryIds
-    });
+    if (isEditMode && keywordToEdit) {
+      updateMutation.mutate({
+        id: keywordToEdit.id,
+        keyword: values.keyword.trim(),
+        minPrice: minPriceValue,
+        maxPrice: maxPriceValue,
+        categoryIds: values.categoryIds,
+        isPinned: isPinnedValue
+      });
+    } else {
+      createMutation.mutate({
+        keyword: values.keyword.trim(),
+        minPrice: minPriceValue,
+        maxPrice: maxPriceValue,
+        categoryIds: values.categoryIds,
+        isPinned: isPinnedValue
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children || <Button>Add Keyword</Button>}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Search Keyword</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? 'Edit Search Keyword' : 'Add Search Keyword'}
+          </DialogTitle>
           <DialogDescription>
-            Create a new keyword to track Mercari listings.
+            {isEditMode
+              ? 'Update the keyword details.'
+              : 'Create a new keyword to track Mercari listings.'}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -213,17 +282,46 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="isPinned"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>Pin to Homepage</FormLabel>
+                    <FormDescription>
+                      Show this keyword on the homepage
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
-                disabled={createMutation.isPending}
+                disabled={createMutation.isPending || updateMutation.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Creating...' : 'Create'}
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {isEditMode
+                  ? updateMutation.isPending
+                    ? 'Updating...'
+                    : 'Update'
+                  : createMutation.isPending
+                    ? 'Creating...'
+                    : 'Create'}
               </Button>
             </DialogFooter>
           </form>

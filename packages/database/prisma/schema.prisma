@@ -21,6 +21,7 @@ model ScraperKeyword {
   minPrice Int? 
   maxPrice  Int? 
   categoryIds String[] @db.Uuid
+  isPinned Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
