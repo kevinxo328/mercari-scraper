@@ -39,7 +39,7 @@ const formSchema = z.object({
   isPinned: z.boolean().default(false)
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.input<typeof formSchema>;
 
 interface AddKeywordDialogProps {
   children?: React.ReactNode;
@@ -138,6 +138,7 @@ export default function AddKeywordDialog({
       values.minPrice?.trim() === '' ? null : Number(values.minPrice);
     const maxPriceValue =
       values.maxPrice?.trim() === '' ? null : Number(values.maxPrice);
+    const isPinnedValue = values.isPinned ?? false;
 
     if (
       (minPriceValue !== null && Number.isNaN(minPriceValue)) ||
@@ -163,7 +164,7 @@ export default function AddKeywordDialog({
         minPrice: minPriceValue,
         maxPrice: maxPriceValue,
         categoryIds: values.categoryIds,
-        isPinned: values.isPinned
+        isPinned: isPinnedValue
       });
     } else {
       createMutation.mutate({
@@ -171,7 +172,7 @@ export default function AddKeywordDialog({
         minPrice: minPriceValue,
         maxPrice: maxPriceValue,
         categoryIds: values.categoryIds,
-        isPinned: values.isPinned
+        isPinned: isPinnedValue
       });
     }
   };

@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import {
@@ -316,7 +317,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
       animationConfig,
       maxCount = 3,
       modalPopover = false,
-      asChild = false,
+      asChild = true,
       className,
       hideSelectAll = false,
       searchable = true,
@@ -432,9 +433,11 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
     >('desktop');
 
     React.useEffect(() => {
-      if (typeof window === 'undefined') return;
       const handleResize = () => {
-        const width = window.innerWidth;
+        const width =
+          typeof window !== 'undefined' && typeof window.innerWidth === 'number'
+            ? window.innerWidth
+            : 0;
         if (width < 640) {
           setScreenSize('mobile');
         } else if (width < 1024) {
@@ -444,9 +447,11 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
         }
       };
       handleResize();
-      window.addEventListener('resize', handleResize);
+      if (typeof window !== 'undefined' && window.addEventListener) {
+        window.addEventListener('resize', handleResize);
+      }
       return () => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && window.removeEventListener) {
           window.removeEventListener('resize', handleResize);
         }
       };
@@ -792,7 +797,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
                   .join(', ')}`}
           </div>
 
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild={asChild}>
             <Button
               ref={buttonRef}
               {...props}

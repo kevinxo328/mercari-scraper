@@ -1,4 +1,5 @@
 'use client';
+/* eslint-env browser */
 
 import { useRef, useState } from 'react';
 import { Button } from '@/components/shadcn/button';
@@ -68,15 +69,20 @@ export default function SearchPageClient() {
   );
 
   const triggerSubmit = () => {
+    const width =
+      typeof window !== 'undefined' && typeof window.innerWidth === 'number'
+        ? window.innerWidth
+        : undefined;
+    const targetForm =
+      width !== undefined && width < 1024
+        ? mobileFormRef.current
+        : formRef.current;
+
     // This makes sure that the form is submitted through react-hook-form
     // and not the default HTML form submission.
-    window.innerWidth < 1024
-      ? mobileFormRef.current?.dispatchEvent(
-          new Event('submit', { cancelable: true, bubbles: true })
-        )
-      : formRef.current?.dispatchEvent(
-          new Event('submit', { cancelable: true, bubbles: true })
-        );
+    targetForm?.dispatchEvent(
+      new Event('submit', { cancelable: true, bubbles: true })
+    );
   };
 
   const handleSubmit = (data: ScraperFormValues) => {

@@ -1,4 +1,5 @@
 'use client';
+/* eslint-env browser */
 
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -137,13 +138,13 @@ export default function KeywordTable() {
     if (isComposing) return;
     if (trimmedSearchValue === searchTerm) return;
 
-    const handler = window.setTimeout(() => {
+    const handler = setTimeout(() => {
       setSearchTerm(trimmedSearchValue);
       setPage(1);
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {
-      window.clearTimeout(handler);
+      clearTimeout(handler);
     };
   }, [isComposing, trimmedSearchValue, searchTerm]);
 
@@ -168,9 +169,14 @@ export default function KeywordTable() {
   };
 
   const handleDelete = (keyword: ScraperKeyword) => {
-    if (
-      !window.confirm(`Delete "${keyword.keyword}"? This cannot be undone.`)
-    ) {
+    const shouldDelete =
+      typeof window !== 'undefined' && typeof window.confirm === 'function'
+        ? window.confirm(
+            `Delete "${keyword.keyword}"? This cannot be undone.`
+          )
+        : true;
+
+    if (!shouldDelete) {
       return;
     }
     setDeletingId(keyword.id);
