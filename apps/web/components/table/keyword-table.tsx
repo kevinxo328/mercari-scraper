@@ -29,11 +29,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '../shadcn/select';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '../shadcn/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
+import { MultiSelect } from '../multi-select';
 
 type SortableField =
   | 'keyword'
@@ -318,7 +315,8 @@ export default function KeywordTable() {
         );
       },
       meta: {
-        className: 'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
+        className:
+          'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
       }
     },
     {
@@ -414,41 +412,21 @@ export default function KeywordTable() {
             );
           }
           return (
-            <div className="space-y-2">
-              <div className="max-h-40 overflow-y-auto rounded-md border border-gray-300 bg-background p-2">
-                <div className="space-y-2">
-                  {categoryOptions.map((category) => {
-                    const isSelected = editingValues.categoryIds.includes(
-                      category.id
-                    );
-                    return (
-                      <label
-                        key={category.id}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={(event) => {
-                            const newIds = event.target.checked
-                              ? [...editingValues.categoryIds, category.id]
-                              : editingValues.categoryIds.filter(
-                                  (id) => id !== category.id
-                                );
-                            handleCategorySelection(newIds);
-                          }}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary"
-                        />
-                        <span className="text-sm">{category.name}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-              <p className="text-xs text-gray-500">
-                Select multiple categories using checkboxes.
-              </p>
-            </div>
+            <MultiSelect
+              key={keyword.id}
+              options={categoryOptions.map((category) => ({
+                label: category.name,
+                value: category.id
+              }))}
+              defaultValue={editingValues.categoryIds}
+              onValueChange={handleCategorySelection}
+              placeholder="Select categories"
+              maxCount={2}
+              searchable
+              autoSize={false}
+              singleLine
+              className="w-full max-w-full"
+            />
           );
         }
         return keyword.categoryNames.length > 0 ? (
@@ -579,7 +557,8 @@ export default function KeywordTable() {
         );
       },
       meta: {
-        className: 'sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]'
+        className:
+          'sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]'
       }
     }
   ];

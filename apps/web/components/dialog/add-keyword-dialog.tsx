@@ -27,6 +27,7 @@ import {
 } from '@/components/shadcn/form';
 import { Input } from '@/components/shadcn/input';
 import { Button } from '@/components/shadcn/button';
+import { MultiSelect } from '@/components/multi-select';
 
 const formSchema = z.object({
   keyword: z.string().min(1, 'Keyword is required').max(255),
@@ -192,27 +193,21 @@ export default function AddKeywordDialog({ children }: AddKeywordDialogProps) {
                         No categories available.
                       </p>
                     ) : (
-                      <select
-                        multiple
-                        value={field.value}
-                        onChange={(e) => {
-                          const selectedIds = Array.from(
-                            e.target.selectedOptions
-                          ).map((option) => option.value);
-                          field.onChange(selectedIds);
-                        }}
-                        className="h-32 w-full rounded-md border border-input bg-background p-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                      >
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
+                      <MultiSelect
+                        options={categories.map((category) => ({
+                          label: category.name,
+                          value: category.id
+                        }))}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Select categories"
+                        searchable
+                        className="w-full"
+                      />
                     )}
                   </FormControl>
                   <FormDescription>
-                    Hold Cmd/Ctrl to select multiple categories.
+                    Select one or more categories.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
