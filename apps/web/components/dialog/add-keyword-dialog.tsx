@@ -27,6 +27,7 @@ import {
 } from '@/components/shadcn/form';
 import { Input } from '@/components/shadcn/input';
 import { Button } from '@/components/shadcn/button';
+import { Switch } from '@/components/shadcn/switch';
 import { MultiSelect } from '@/components/multi-select';
 import { ScraperKeyword } from '@/types/scraper';
 
@@ -34,7 +35,8 @@ const formSchema = z.object({
   keyword: z.string().min(1, 'Keyword is required').max(255),
   minPrice: z.string().optional(),
   maxPrice: z.string().optional(),
-  categoryIds: z.array(z.string())
+  categoryIds: z.array(z.string()),
+  isPinned: z.boolean().default(false)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -74,7 +76,8 @@ export default function AddKeywordDialog({
       keyword: '',
       minPrice: '',
       maxPrice: '',
-      categoryIds: []
+      categoryIds: [],
+      isPinned: false
     }
   });
 
@@ -84,14 +87,16 @@ export default function AddKeywordDialog({
         keyword: keywordToEdit.keyword,
         minPrice: keywordToEdit.minPrice?.toString() ?? '',
         maxPrice: keywordToEdit.maxPrice?.toString() ?? '',
-        categoryIds: keywordToEdit.categoryIds
+        categoryIds: keywordToEdit.categoryIds,
+        isPinned: keywordToEdit.isPinned
       });
     } else {
       form.reset({
         keyword: '',
         minPrice: '',
         maxPrice: '',
-        categoryIds: []
+        categoryIds: [],
+        isPinned: false
       });
     }
   }, [keywordToEdit, form]);
@@ -157,23 +162,23 @@ export default function AddKeywordDialog({
         keyword: values.keyword.trim(),
         minPrice: minPriceValue,
         maxPrice: maxPriceValue,
-        categoryIds: values.categoryIds
+        categoryIds: values.categoryIds,
+        isPinned: values.isPinned
       });
     } else {
       createMutation.mutate({
         keyword: values.keyword.trim(),
         minPrice: minPriceValue,
         maxPrice: maxPriceValue,
-        categoryIds: values.categoryIds
+        categoryIds: values.categoryIds,
+        isPinned: values.isPinned
       });
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children || <Button>Add Keyword</Button>}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -273,6 +278,26 @@ export default function AddKeywordDialog({
                     Select one or more categories.
                   </FormDescription>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isPinned"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>Pin to Homepage</FormLabel>
+                    <FormDescription>
+                      Show this keyword on the homepage
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

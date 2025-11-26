@@ -23,6 +23,7 @@ export type ScraperKeyword = {
   maxPrice: number | null;
   categoryIds: string[];
   categoryNames: string[];
+  isPinned: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

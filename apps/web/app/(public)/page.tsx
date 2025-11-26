@@ -9,7 +9,8 @@ export default async function Page() {
       pageSize: 5,
       page: 1,
       orderby: 'desc',
-      orderByField: 'updatedAt'
+      orderByField: 'updatedAt',
+      pinnedFirst: true
     })
   );
 

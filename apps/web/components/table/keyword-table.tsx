@@ -9,7 +9,7 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { useTRPC } from '@/trpc/client';
-import { XIcon, Pencil, Trash2 } from 'lucide-react';
+import { XIcon, Pencil, Trash2, Star } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import {
@@ -108,6 +108,16 @@ export default function KeywordTable() {
     })
   );
 
+  const togglePinMutation = useMutation(
+    trpc.scraper.togglePinKeyword.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.scraper.getKeywords.pathFilter()
+        );
+      }
+    })
+  );
+
   const keywords = keywordsData?.data ?? [];
   const total = keywordsData?.total ?? 0;
   const totalPages =
@@ -172,6 +182,13 @@ export default function KeywordTable() {
     );
   };
 
+  const handleTogglePin = (keyword: ScraperKeyword) => {
+    togglePinMutation.mutate({
+      id: keyword.id,
+      isPinned: !keyword.isPinned
+    });
+  };
+
   const isDeleting = deleteMutation.isPending;
 
   const columns: ColumnDef<ScraperKeyword>[] = [
@@ -195,6 +212,42 @@ export default function KeywordTable() {
       meta: {
         className:
           'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
+      }
+    },
+    {
+      id: 'pin',
+      header: () => <div className="text-center">Pin</div>,
+      cell: ({ row }) => {
+        const keyword = row.original;
+        const isPinning = togglePinMutation.isPending;
+
+        return (
+          <div className="flex items-center justify-center">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleTogglePin(keyword)}
+                  disabled={isPinning}
+                  aria-label={keyword.isPinned ? 'Unpin' : 'Pin'}
+                  className="h-8 w-8"
+                >
+                  <Star
+                    className={`h-4 w-4 ${
+                      keyword.isPinned
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-400'
+                    }`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {keyword.isPinned ? 'Unpin from homepage' : 'Pin to homepage'}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        );
       }
     },
     {
