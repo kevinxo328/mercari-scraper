@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnDef,
@@ -9,19 +9,18 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import { useTRPC } from '@/trpc/client';
-import { XIcon, Pencil, Trash2, Check, X } from 'lucide-react';
+import { XIcon, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow
 } from '@/components/shadcn/table';
-import { KeywordCategory, ScraperKeyword } from '@/types/scraper';
+import { ScraperKeyword } from '@/types/scraper';
 import {
   Select,
   SelectContent,
@@ -30,7 +29,7 @@ import {
   SelectValue
 } from '../shadcn/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
-import { MultiSelect } from '../multi-select';
+import AddKeywordDialog from '../dialog/add-keyword-dialog';
 
 type SortableField =
   | 'keyword'
@@ -38,13 +37,6 @@ type SortableField =
   | 'updatedAt'
   | 'minPrice'
   | 'maxPrice';
-
-type EditingValues = {
-  keyword: string;
-  minPrice: string;
-  maxPrice: string;
-  categoryIds: string[];
-};
 
 const PAGE_SIZES = [10, 20, 50];
 const SEARCH_DEBOUNCE_MS = 500;
@@ -74,13 +66,6 @@ const formatPrice = (value: number | null) => {
   return value.toLocaleString();
 };
 
-const getInitialEditingValues = (keyword: ScraperKeyword): EditingValues => ({
-  keyword: keyword.keyword,
-  minPrice: keyword.minPrice?.toString() ?? '',
-  maxPrice: keyword.maxPrice?.toString() ?? '',
-  categoryIds: keyword.categoryIds
-});
-
 export default function KeywordTable() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -90,21 +75,12 @@ export default function KeywordTable() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<EditingValues>({
-    keyword: '',
-    minPrice: '',
-    maxPrice: '',
-    categoryIds: []
-  });
   const [isComposing, setIsComposing] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const {
-    data: categoryOptions,
-    isPending: isLoadingCategories,
-    isError: categoryError
-  } = useQuery(trpc.scraper.getCategories.queryOptions());
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [keywordToEdit, setKeywordToEdit] = useState<ScraperKeyword | null>(
+    null
+  );
 
   const keywordQueryOptions = trpc.scraper.getKeywords.queryOptions({
     page,
@@ -121,16 +97,6 @@ export default function KeywordTable() {
     isError,
     error
   } = useQuery(keywordQueryOptions);
-
-  const updateMutation = useMutation(
-    trpc.scraper.updateKeyword.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(
-          trpc.scraper.getKeywords.pathFilter()
-        );
-      }
-    })
-  );
 
   const deleteMutation = useMutation(
     trpc.scraper.deleteKeyword.mutationOptions({
@@ -180,86 +146,15 @@ export default function KeywordTable() {
     }
   };
 
-  const handleStartEdit = (keyword: ScraperKeyword) => {
-    setEditingId(keyword.id);
-    setEditingValues(getInitialEditingValues(keyword));
-    setFormError(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setFormError(null);
-  };
-
-  const handleEditingChange = (
-    field: Exclude<keyof EditingValues, 'categoryIds'>,
-    value: string
-  ) => {
-    setEditingValues((prev) => ({ ...prev, [field]: value }));
-  };
-  const handleCategorySelection = (selectedIds: string[]) => {
-    setEditingValues((prev) => ({ ...prev, categoryIds: selectedIds }));
+  const handleEdit = (keyword: ScraperKeyword) => {
+    setKeywordToEdit(keyword);
+    setEditDialogOpen(true);
   };
 
   const handleClearSearch = () => {
     setSearchInput('');
     setSearchTerm('');
     setPage(1);
-  };
-
-  const handleSaveEdit = () => {
-    if (!editingId) return;
-    setFormError(null);
-    const trimmedKeyword = editingValues.keyword.trim();
-    if (!trimmedKeyword) {
-      setFormError('Keyword is required.');
-      return;
-    }
-
-    const minPriceValue =
-      editingValues.minPrice.trim() === ''
-        ? null
-        : Number(editingValues.minPrice);
-    const maxPriceValue =
-      editingValues.maxPrice.trim() === ''
-        ? null
-        : Number(editingValues.maxPrice);
-
-    if (
-      (minPriceValue !== null && Number.isNaN(minPriceValue)) ||
-      (maxPriceValue !== null && Number.isNaN(maxPriceValue))
-    ) {
-      setFormError('Prices must be numeric.');
-      return;
-    }
-
-    if (
-      minPriceValue !== null &&
-      maxPriceValue !== null &&
-      minPriceValue > maxPriceValue
-    ) {
-      setFormError('Min price must be less than or equal to max price.');
-      return;
-    }
-
-    updateMutation.mutate(
-      {
-        id: editingId,
-        keyword: trimmedKeyword,
-        minPrice: minPriceValue,
-        maxPrice: maxPriceValue,
-        categoryIds: editingValues.categoryIds
-      },
-      {
-        onSuccess: () => {
-          setEditingId(null);
-          setFormError(null);
-        },
-        onError: (mutationError) => {
-          setFormError(mutationError.message);
-        }
-      }
-    );
   };
 
   const handleDelete = (keyword: ScraperKeyword) => {
@@ -277,12 +172,6 @@ export default function KeywordTable() {
     );
   };
 
-  const editingKeyword = useMemo(() => {
-    if (!editingId) return null;
-    return keywords.find((item) => item.id === editingId) ?? null;
-  }, [editingId, keywords]);
-
-  const isSaving = updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
 
   const columns: ColumnDef<ScraperKeyword>[] = [
@@ -300,20 +189,9 @@ export default function KeywordTable() {
           )}
         </button>
       ),
-      cell: ({ row }) => {
-        const keyword = row.original;
-        const isRowEditing = editingId === keyword.id;
-        return isRowEditing ? (
-          <Input
-            value={editingValues.keyword}
-            onChange={(event) =>
-              handleEditingChange('keyword', event.target.value)
-            }
-          />
-        ) : (
-          <span className="font-medium">{keyword.keyword}</span>
-        );
-      },
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.keyword}</span>
+      ),
       meta: {
         className:
           'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
@@ -333,26 +211,9 @@ export default function KeywordTable() {
           )}
         </button>
       ),
-      cell: ({ row }) => {
-        const keyword = row.original;
-        const isRowEditing = editingId === keyword.id;
-        return (
-          <div className="text-right">
-            {isRowEditing ? (
-              <Input
-                value={editingValues.minPrice}
-                onChange={(event) =>
-                  handleEditingChange('minPrice', event.target.value)
-                }
-                type="number"
-                min={0}
-              />
-            ) : (
-              formatPrice(keyword.minPrice)
-            )}
-          </div>
-        );
-      }
+      cell: ({ row }) => (
+        <div className="text-right">{formatPrice(row.original.minPrice)}</div>
+      )
     },
     {
       accessorKey: 'maxPrice',
@@ -368,67 +229,15 @@ export default function KeywordTable() {
           )}
         </button>
       ),
-      cell: ({ row }) => {
-        const keyword = row.original;
-        const isRowEditing = editingId === keyword.id;
-        return (
-          <div className="text-right">
-            {isRowEditing ? (
-              <Input
-                value={editingValues.maxPrice}
-                onChange={(event) =>
-                  handleEditingChange('maxPrice', event.target.value)
-                }
-                type="number"
-                min={0}
-              />
-            ) : (
-              formatPrice(keyword.maxPrice)
-            )}
-          </div>
-        );
-      }
+      cell: ({ row }) => (
+        <div className="text-right">{formatPrice(row.original.maxPrice)}</div>
+      )
     },
     {
       accessorKey: 'categoryNames',
       header: () => <span>Categories</span>,
       cell: ({ row }) => {
         const keyword = row.original;
-        const isRowEditing = editingId === keyword.id;
-        if (isRowEditing) {
-          if (isLoadingCategories) {
-            return <p className="text-sm text-gray-500">Loading options...</p>;
-          }
-          if (categoryError) {
-            return (
-              <p className="text-sm text-red-500">Failed to load categories.</p>
-            );
-          }
-          if (!categoryOptions || categoryOptions.length === 0) {
-            return (
-              <p className="text-sm text-gray-500">
-                No categories available yet.
-              </p>
-            );
-          }
-          return (
-            <MultiSelect
-              key={keyword.id}
-              options={categoryOptions.map((category) => ({
-                label: category.name,
-                value: category.id
-              }))}
-              defaultValue={editingValues.categoryIds}
-              onValueChange={handleCategorySelection}
-              placeholder="Select categories"
-              maxCount={2}
-              searchable
-              autoSize={false}
-              singleLine
-              className="w-full max-w-full"
-            />
-          );
-        }
         return keyword.categoryNames.length > 0 ? (
           <div className="flex flex-wrap gap-1 text-xs">
             {keyword.categoryNames.map((name) => (
@@ -482,77 +291,40 @@ export default function KeywordTable() {
       header: () => <div className="text-center">Actions</div>,
       cell: ({ row }) => {
         const keyword = row.original;
-        const isRowEditing = editingId === keyword.id;
         const isRowDeleting = deletingId === keyword.id && isDeleting;
 
         return (
           <div className="flex items-center justify-center gap-2">
-            {isRowEditing ? (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      onClick={handleSaveEdit}
-                      disabled={isSaving}
-                      aria-label="Save"
-                      className="h-8 w-8"
-                    >
-                      <Check className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Save</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={handleCancelEdit}
-                      disabled={isSaving}
-                      aria-label="Cancel"
-                      className="h-8 w-8"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Cancel</TooltipContent>
-                </Tooltip>
-              </>
-            ) : (
-              <>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleStartEdit(keyword)}
-                      disabled={Boolean(editingId) || isRowDeleting}
-                      aria-label="Edit"
-                      className="h-8 w-8"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Edit</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={() => handleDelete(keyword)}
-                      disabled={isRowDeleting || Boolean(editingId)}
-                      aria-label="Delete"
-                      className="h-8 w-8"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete</TooltipContent>
-                </Tooltip>
-              </>
-            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => handleEdit(keyword)}
+                  disabled={isRowDeleting}
+                  aria-label="Edit"
+                  className="h-8 w-8"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={() => handleDelete(keyword)}
+                  disabled={isRowDeleting}
+                  aria-label="Delete"
+                  className="h-8 w-8"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete</TooltipContent>
+            </Tooltip>
           </div>
         );
       },
@@ -710,11 +482,6 @@ export default function KeywordTable() {
           {/* <TableCaption>{isFetching && 'Refreshing data...'}</TableCaption> */}
         </Table>
       </div>
-      {formError && editingKeyword && (
-        <p className="text-sm text-destructive">
-          Failed to update {editingKeyword.keyword}: {formError}
-        </p>
-      )}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-4 items-center">
           <div className="flex items-center gap-2">
@@ -761,6 +528,16 @@ export default function KeywordTable() {
           </Button>
         </div>
       </div>
+      <AddKeywordDialog
+        keywordToEdit={keywordToEdit ?? undefined}
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) {
+            setKeywordToEdit(null);
+          }
+        }}
+      />
     </section>
   );
 }
