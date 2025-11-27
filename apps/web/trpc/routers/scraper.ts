@@ -192,6 +192,18 @@ export const scraperRouter = router({
         nextCursor
       };
     }),
+  deleteResult: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.scraperResult.delete({
+        where: { id: input.id }
+      });
+      return { success: true };
+    }),
   updateKeyword: publicProcedure
     .input(
       z.object({
