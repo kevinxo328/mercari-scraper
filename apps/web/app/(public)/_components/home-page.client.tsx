@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTRPC } from '@/trpc/client';
 import TimeDisplay from '@/components/time-display';
 import { useQuery, useQueries } from '@tanstack/react-query';
@@ -8,11 +9,16 @@ import Link from 'next/link';
 import { MoveRight } from 'lucide-react';
 import LinkCard from '@/components/link-card';
 import { Skeleton } from '@/components/shadcn/skeleton';
+import { useSession } from 'next-auth/react';
+import { useDeleteResult } from '@/hooks/use-delete-result';
 
 const ITEMS_PER_PAGE = 12;
 
 export default function HomePageClient() {
   const trpc = useTRPC();
+  const session = useSession();
+  const { deleteResult, isDeleting } = useDeleteResult();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data: keywordPage, isPending } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
@@ -40,6 +46,23 @@ export default function HomePageClient() {
   });
 
   const latestResults = resultQueries.map((query) => query.data || []);
+  const isAuthenticated = session.status === 'authenticated';
+
+  const handleDelete = async (id: string) => {
+    const shouldDelete =
+      typeof window !== 'undefined' && typeof window.confirm === 'function'
+        ? window.confirm('Are you sure you want to delete this item?')
+        : true;
+
+    if (!shouldDelete) return;
+
+    setDeletingId(id);
+    try {
+      await deleteResult(id);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <main className="mx-auto p-4 container relative">
@@ -83,6 +106,9 @@ export default function HomePageClient() {
               {results.map((result) => (
                 <LinkCard
                   key={result.id}
+                  showDelete={isAuthenticated}
+                  isDeleting={deletingId === result.id && isDeleting}
+                  onDelete={() => handleDelete(result.id)}
                   url={result.url}
                   title={result.title}
                   imageUrl={result.imageUrl}

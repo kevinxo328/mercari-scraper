@@ -25,11 +25,14 @@ import {
 } from '@/components/shadcn/sheet';
 import { Funnel } from 'lucide-react';
 import InfiniteScrollTrigger from '@/components/infinite-scroll-trigger';
+import { useSession } from 'next-auth/react';
+import { useDeleteResult } from '@/hooks/use-delete-result';
 
 export default function SearchPageClient() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const session = useSession();
 
   const trpc = useTRPC();
   const [keywords, setKeywords] = useQueryState(
@@ -52,7 +55,7 @@ export default function SearchPageClient() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    status
+    status: resultsStatus
   } = useInfiniteQuery(
     trpc.scraper.infiniteResults.infiniteQueryOptions(
       {
@@ -67,6 +70,10 @@ export default function SearchPageClient() {
       }
     )
   );
+  const { deleteResult, isDeleting } = useDeleteResult();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const isAuthenticated = session.status === 'authenticated';
 
   const triggerSubmit = () => {
     const width =
@@ -89,6 +96,22 @@ export default function SearchPageClient() {
     setKeywords(data.keywords);
     setMinPrice(data.minPrice);
     setMaxPrice(data.maxPrice);
+  };
+
+  const handleDelete = async (id: string) => {
+    const shouldDelete =
+      typeof window !== 'undefined' && typeof window.confirm === 'function'
+        ? window.confirm('Are you sure you want to delete this item?')
+        : true;
+
+    if (!shouldDelete) return;
+
+    setDeletingId(id);
+    try {
+      await deleteResult(id);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -133,13 +156,13 @@ export default function SearchPageClient() {
           </Sheet>
         </div>
         <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-visible">
-          {status === 'pending' ? (
+          {resultsStatus === 'pending' ? (
             <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
               {Array.from({ length: 24 }).map((_, index) => (
                 <Skeleton key={index} className="aspect-square rounded-lg" />
               ))}
             </div>
-          ) : status === 'error' ? (
+          ) : resultsStatus === 'error' ? (
             <p className="col-span-full text-center text-red-500">
               Error loading results.
             </p>
@@ -149,7 +172,10 @@ export default function SearchPageClient() {
                 {infiniteResults?.pages.map((page) =>
                   page.data.map((result) => (
                     <LinkCard
-                      key={result.title + result.url}
+                      key={result.id ?? result.title + result.url}
+                      showDelete={isAuthenticated}
+                      isDeleting={deletingId === result.id && isDeleting}
+                      onDelete={() => handleDelete(result.id)}
                       url={result.url}
                       title={result.title}
                       imageUrl={result.imageUrl}
