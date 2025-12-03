@@ -115,7 +115,7 @@ export default function SearchPageClient() {
   };
 
   return (
-    <main className="container relative mx-auto flex gap-4 p-4 h-[calc(100vh-65px)] overflow-hidden lg:overflow-hidden">
+    <main className="container relative mx-auto flex gap-4 p-4 overflow-hidden lg:overflow-hidden">
       <div className="flex min-h-0 grow flex-col overflow-hidden lg:overflow-y-auto lg:pr-2">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
@@ -145,10 +145,13 @@ export default function SearchPageClient() {
                   }}
                   keywordOptions={keywordOptions?.data ?? []}
                 />
-                <Button onClick={() => {
-                  triggerSubmit();
-                  setIsSheetOpen(false);
-                }} className="mt-4">
+                <Button
+                  onClick={() => {
+                    triggerSubmit();
+                    setIsSheetOpen(false);
+                  }}
+                  className="mt-4"
+                >
                   Apply
                 </Button>
               </SheetHeader>
