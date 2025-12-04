@@ -3,7 +3,7 @@ const { PrismaPlugin } = require('@prisma/nextjs-monorepo-workaround-plugin');
 /**
  * @type {import('next').NextConfig}
  */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
     if (isServer) {
@@ -27,3 +27,9 @@ module.exports = {
     ]
   }
 };
+
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true'
+});
+
+module.exports = withBundleAnalyzer(nextConfig);
