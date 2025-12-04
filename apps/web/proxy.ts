@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 // Define protected routes that require authentication
 const PROTECTED_ROUTES = ['/dashboard'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Check if the route is protected
