@@ -26,7 +26,8 @@ export default function HomePageClient() {
       page: 1,
       orderby: 'desc',
       orderByField: 'updatedAt',
-      hasResults: true
+      hasResults: true,
+      pinnedFirst: true
     })
   );
 
