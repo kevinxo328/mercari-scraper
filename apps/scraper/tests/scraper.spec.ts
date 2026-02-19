@@ -38,6 +38,8 @@ test.describe('Scrape Mercari', () => {
   });
 
   test('Scrape Items', async ({ page }) => {
+    let createdCount = 0;
+
     for (const record of keywords) {
       // Block images to speed up the loading time.
       await page.route('**/*', (route) => {
@@ -137,6 +139,7 @@ test.describe('Scrape Mercari', () => {
                 }
               }
             });
+            createdCount++;
           } else {
             const existingKeywordRelation = existingRecord.keywords.some(
               (k: { id: string }) => k.id === record.id
@@ -169,5 +172,9 @@ test.describe('Scrape Mercari', () => {
         console.log(`No items found for keyword: ${record.keyword}`);
       }
     }
+
+    await prisma.scraperRun.create({
+      data: { completedAt: new Date(), createdCount }
+    });
   });
 });

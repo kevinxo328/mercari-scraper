@@ -31,8 +31,10 @@ export default function HomePageClient() {
     })
   );
 
+  const { data: lastRun } = useQuery(trpc.scraper.getLastRun.queryOptions());
+
   const keywords = keywordPage?.data ?? [];
-  const latestUpdateTime = keywords?.[0]?.updatedAt ?? 'N/A';
+  const latestUpdateTime = lastRun?.completedAt ?? 'N/A';
 
   const resultQueries = useQueries({
     queries:

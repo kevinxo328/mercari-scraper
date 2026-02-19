@@ -270,6 +270,11 @@ export const scraperRouter = router({
       }
     });
   }),
+  getLastRun: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.scraperRun.findFirst({
+      orderBy: { completedAt: 'desc' }
+    });
+  }),
   createKeyword: protectedProcedure
     .input(
       z.object({
