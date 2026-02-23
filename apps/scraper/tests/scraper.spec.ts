@@ -1,5 +1,6 @@
 import { test } from '@playwright/test';
 import { getMercariUrl } from '../lib/utils';
+import { notifySlack } from '../lib/slack';
 import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
 
 // Set the viewport size for the page to ensure all items are visible.
@@ -176,5 +177,7 @@ test.describe('Scrape Mercari', () => {
     await prisma.scraperRun.create({
       data: { completedAt: new Date(), createdCount }
     });
+
+    await notifySlack({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
   });
 });
