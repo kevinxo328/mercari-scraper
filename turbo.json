@@ -2,25 +2,17 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
         "NODE_ENV",
         "AUTH_ALLOW_EMAILS",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
         "SLACK_WEBHOOK_URL",
-        "NEXT_PUBLIC_APP_URL"
+        "NEXT_PUBLIC_APP_URL",
+        "VERCEL_URL"
       ]
     },
     "db:migrate:dev": {
@@ -43,15 +35,10 @@
     "dev:mock": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "MSW_ENABLED",
-        "NEXT_PUBLIC_MSW_ENABLED"
-      ]
+      "env": ["MSW_ENABLED", "NEXT_PUBLIC_MSW_ENABLED"]
     },
     "generate": {
-      "dependsOn": [
-        "^generate"
-      ],
+      "dependsOn": ["^generate"],
       "cache": false
     },
     "lint": {
