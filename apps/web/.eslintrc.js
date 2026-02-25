@@ -5,5 +5,16 @@ module.exports = {
   parserOptions: {
     project: true
   },
-  ignorePatterns: ['node_modules', '**.config.*', '**.spec.**', 'public']
+  ignorePatterns: ['node_modules', '**.config.*', '**.spec.**', 'public'],
+  env: {
+    browser: true
+  },
+  overrides: [
+    {
+      files: ['**/__test__/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
+      env: {
+        jest: true
+      }
+    }
+  ]
 };
