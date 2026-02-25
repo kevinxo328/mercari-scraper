@@ -28,9 +28,7 @@ export const scraperRouter = router({
       }
 
       if (input.hasResults !== undefined) {
-        where.results = input.hasResults
-          ? { some: {} }
-          : { none: {} };
+        where.results = input.hasResults ? { some: {} } : { none: {} };
       }
 
       // Build orderBy clause - prioritize pinned keywords if requested

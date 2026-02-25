@@ -1,6 +1,10 @@
 'use client';
 
-import { useMutation, useQueryClient, InfiniteData } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  InfiniteData
+} from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTRPC } from '@/trpc/client';
 

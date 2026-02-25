@@ -178,6 +178,9 @@ test.describe('Scrape Mercari', () => {
       data: { completedAt: new Date(), createdCount }
     });
 
-    await notifySlack({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
+    await notifySlack({
+      createdCount,
+      appUrl: process.env.NEXT_PUBLIC_APP_URL
+    });
   });
 });

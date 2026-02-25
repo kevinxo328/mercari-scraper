@@ -171,9 +171,7 @@ export default function KeywordTable() {
   const handleDelete = (keyword: ScraperKeyword) => {
     const shouldDelete =
       typeof window !== 'undefined' && typeof window.confirm === 'function'
-        ? window.confirm(
-            `Delete "${keyword.keyword}"? This cannot be undone.`
-          )
+        ? window.confirm(`Delete "${keyword.keyword}"? This cannot be undone.`)
         : true;
 
     if (!shouldDelete) {
