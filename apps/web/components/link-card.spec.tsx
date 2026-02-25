@@ -40,13 +40,7 @@ describe('ScraperResultCard', () => {
     const user = userEvent.setup();
     const handleDelete = vi.fn();
 
-    render(
-      <LinkCard
-        {...props}
-        showDelete
-        onDelete={handleDelete}
-      />
-    );
+    render(<LinkCard {...props} showDelete onDelete={handleDelete} />);
 
     const deleteButton = screen.getByRole('button', { name: /delete item/i });
     await user.click(deleteButton);
@@ -55,14 +49,7 @@ describe('ScraperResultCard', () => {
   });
 
   it('disables delete button when deleting', () => {
-    render(
-      <LinkCard
-        {...props}
-        showDelete
-        isDeleting
-        onDelete={() => {}}
-      />
-    );
+    render(<LinkCard {...props} showDelete isDeleting onDelete={() => {}} />);
 
     const deleteButton = screen.getByRole('button', { name: /delete item/i });
     expect(deleteButton).toBeDisabled();

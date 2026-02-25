@@ -13,7 +13,8 @@ export type Props = {
 };
 
 const LinkCard = (props: Props) => {
-  const shouldShowDelete = props.showDelete && typeof props.onDelete === 'function';
+  const shouldShowDelete =
+    props.showDelete && typeof props.onDelete === 'function';
 
   return (
     <a

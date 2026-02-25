@@ -9,7 +9,10 @@
         "NODE_ENV",
         "AUTH_ALLOW_EMAILS",
         "AUTH_GOOGLE_ID",
-        "AUTH_GOOGLE_SECRET"
+        "AUTH_GOOGLE_SECRET",
+        "SLACK_WEBHOOK_URL",
+        "NEXT_PUBLIC_APP_URL",
+        "VERCEL_URL"
       ]
     },
     "db:migrate:dev": {
