@@ -10,7 +10,7 @@
           },
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs pnpm eslint --fix 2>/dev/null || true"
+            "command": "jq -r '.tool_input.file_path' | xargs pnpm exec eslint --fix 2>/dev/null || true"
           }
         ]
       }
