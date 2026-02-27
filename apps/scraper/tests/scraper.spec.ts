@@ -81,7 +81,10 @@ test.describe('Scrape Mercari', () => {
         await page.waitForTimeout(1000);
       }
 
-      const itemCells = await page.getByTestId('item-cell');
+      // Only select item-cell elements that contain actual items (not skeleton placeholders)
+      const itemCells = page.locator(
+        '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])'
+      );
       const itemCount = await itemCells.count();
 
       if (itemCount > 0) {
@@ -118,7 +121,7 @@ test.describe('Scrape Mercari', () => {
             imageUrl: (await itemCell.locator('img').getAttribute('src')) || '',
             price: priceSource
               ? parseInt(
-                  priceSource[priceSource.length - 2]
+                  priceSource[priceSource.length - 1]
                     .replace('円', '')
                     .replace(/,/g, '')
                 )
