@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { getMercariUrl } from '../lib/utils';
-import { notifySlack } from '../lib/slack';
+import { notifySlack, notifySlackError } from '../lib/slack';
 import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
 
 // Set the viewport size for the page to ensure all items are visible.
@@ -41,146 +41,155 @@ test.describe('Scrape Mercari', () => {
   test('Scrape Items', async ({ page }) => {
     let createdCount = 0;
 
-    for (const record of keywords) {
-      // Block images to speed up the loading time.
-      await page.route('**/*', (route) => {
-        return route.request().resourceType() === 'image' ||
-          route.request().resourceType() === 'media' ||
-          route.request().resourceType() === 'font'
-          ? route.abort()
-          : route.continue();
-      });
-
-      // Construct category IDs array for the URL
-      const categoryIds = record.categoryIds
-        .map((catId) => codeMap[catId])
-        .filter((code) => code !== undefined);
-
-      await page
-        .goto(
-          getMercariUrl({
-            keyword: record.keyword,
-            categoryIds,
-            ...(record.minPrice && { minPrice: record.minPrice }),
-            ...(record.maxPrice && { maxPrice: record.maxPrice })
-          })
-        )
-        .catch((e) => {
-          console.error(`Error navigating to URL: ${e}`);
+    try {
+      for (const record of keywords) {
+        // Block images to speed up the loading time.
+        await page.route('**/*', (route) => {
+          return route.request().resourceType() === 'image' ||
+            route.request().resourceType() === 'media' ||
+            route.request().resourceType() === 'font'
+            ? route.abort()
+            : route.continue();
         });
 
-      // If the page has a dialog, close it
-      const modalScrim = await page.getByTestId('merModalBaseScrim');
-      await page.waitForTimeout(3000);
+        // Construct category IDs array for the URL
+        const categoryIds = record.categoryIds
+          .map((catId) => codeMap[catId])
+          .filter((code) => code !== undefined);
 
-      if ((await modalScrim.count()) > 0) {
-        await modalScrim.click({
-          force: true,
-          timeout: 3000
-        });
-        await page.waitForTimeout(1000);
-      }
-
-      const itemCells = await page.getByTestId('item-cell');
-      const itemCount = await itemCells.count();
-
-      if (itemCount > 0) {
-        const scrapingItemCount = Math.min(itemCount, MAX_ITEM_COUNT);
-        for (let i = 0; i <= scrapingItemCount - 1; i++) {
-          console.log(
-            `Scraping keyword: ${record.keyword} - Item ${
-              i + 1
-            }/${scrapingItemCount}`
-          );
-
-          const itemCell = itemCells.nth(i);
-          const mercariHost = 'https://jp.mercari.com';
-
-          // TODO: Get the price from the aria-label attribute to ensure getting the correct yen value without Japan proxy.
-          const priceSource = (
-            await itemCell
-              .locator('[itemtype]')
-              .getAttribute('aria-label', { timeout: 3000 })
-              .catch((e) => {
-                console.error(`Error getting aria-label: ${e}`);
-              })
-          )?.split(' ');
-
-          const data = {
-            title: await itemCell
-              .getByTestId('thumbnail-item-name')
-              .innerText(),
-            url:
-              mercariHost +
-              (await itemCell
-                .getByTestId('thumbnail-link')
-                .getAttribute('href')),
-            imageUrl: (await itemCell.locator('img').getAttribute('src')) || '',
-            price: priceSource
-              ? parseInt(
-                  priceSource[priceSource.length - 2]
-                    .replace('円', '')
-                    .replace(/,/g, '')
-                )
-              : -1,
-            currency: priceSource ? 'JPY' : ''
-          };
-
-          const existingRecord = await prisma.scraperResult.findFirst({
-            where: { url: data.url },
-            include: { keywords: true }
+        await page
+          .goto(
+            getMercariUrl({
+              keyword: record.keyword,
+              categoryIds,
+              ...(record.minPrice && { minPrice: record.minPrice }),
+              ...(record.maxPrice && { maxPrice: record.maxPrice })
+            })
+          )
+          .catch((e) => {
+            console.error(`Error navigating to URL: ${e}`);
           });
 
-          if (!existingRecord) {
-            await prisma.scraperResult.create({
-              data: {
-                ...data,
-                keywords: {
-                  connect: [{ id: record.id }]
-                }
-              }
-            });
-            createdCount++;
-          } else {
-            const existingKeywordRelation = existingRecord.keywords.some(
-              (k: { id: string }) => k.id === record.id
+        // If the page has a dialog, close it
+        const modalScrim = await page.getByTestId('merModalBaseScrim');
+        await page.waitForTimeout(3000);
+
+        if ((await modalScrim.count()) > 0) {
+          await modalScrim.click({
+            force: true,
+            timeout: 3000
+          });
+          await page.waitForTimeout(1000);
+        }
+
+        // Only select item-cell elements that contain actual items (not skeleton placeholders)
+        const itemCells = page.locator(
+          '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])'
+        );
+        const itemCount = await itemCells.count();
+
+        if (itemCount > 0) {
+          const scrapingItemCount = Math.min(itemCount, MAX_ITEM_COUNT);
+          for (let i = 0; i <= scrapingItemCount - 1; i++) {
+            console.log(
+              `Scraping keyword: ${record.keyword} - Item ${
+                i + 1
+              }/${scrapingItemCount}`
             );
-            if (
-              existingRecord.price !== data.price ||
-              existingRecord.imageUrl !== data.imageUrl ||
-              existingRecord.title !== data.title ||
-              existingRecord.currency !== data.currency ||
-              existingRecord.url !== data.url ||
-              !existingKeywordRelation
-            ) {
-              await prisma.scraperResult.update({
-                where: { id: existingRecord.id },
+
+            const itemCell = itemCells.nth(i);
+            const mercariHost = 'https://jp.mercari.com';
+
+            // TODO: Get the price from the aria-label attribute to ensure getting the correct yen value without Japan proxy.
+            const priceSource = (
+              await itemCell
+                .locator('[itemtype]')
+                .getAttribute('aria-label', { timeout: 3000 })
+                .catch((e) => {
+                  console.error(`Error getting aria-label: ${e}`);
+                })
+            )?.split(' ');
+
+            const data = {
+              title: await itemCell
+                .getByTestId('thumbnail-item-name')
+                .innerText(),
+              url:
+                mercariHost +
+                (await itemCell
+                  .getByTestId('thumbnail-link')
+                  .getAttribute('href')),
+              imageUrl:
+                (await itemCell.locator('img').getAttribute('src')) || '',
+              price: priceSource
+                ? parseInt(
+                    priceSource[priceSource.length - 1]
+                      .replace('円', '')
+                      .replace(/,/g, '')
+                  )
+                : -1,
+              currency: priceSource ? 'JPY' : ''
+            };
+
+            const existingRecord = await prisma.scraperResult.findFirst({
+              where: { url: data.url },
+              include: { keywords: true }
+            });
+
+            if (!existingRecord) {
+              await prisma.scraperResult.create({
                 data: {
-                  title: data.title,
-                  url: data.url,
-                  imageUrl: data.imageUrl,
-                  price: data.price,
-                  currency: data.currency,
+                  ...data,
                   keywords: {
                     connect: [{ id: record.id }]
                   }
                 }
               });
+              createdCount++;
+            } else {
+              const existingKeywordRelation = existingRecord.keywords.some(
+                (k: { id: string }) => k.id === record.id
+              );
+              if (
+                existingRecord.price !== data.price ||
+                existingRecord.imageUrl !== data.imageUrl ||
+                existingRecord.title !== data.title ||
+                existingRecord.currency !== data.currency ||
+                existingRecord.url !== data.url ||
+                !existingKeywordRelation
+              ) {
+                await prisma.scraperResult.update({
+                  where: { id: existingRecord.id },
+                  data: {
+                    title: data.title,
+                    url: data.url,
+                    imageUrl: data.imageUrl,
+                    price: data.price,
+                    currency: data.currency,
+                    keywords: {
+                      connect: [{ id: record.id }]
+                    }
+                  }
+                });
+              }
             }
           }
+        } else {
+          console.log(`No items found for keyword: ${record.keyword}`);
         }
-      } else {
-        console.log(`No items found for keyword: ${record.keyword}`);
       }
+
+      await prisma.scraperRun.create({
+        data: { completedAt: new Date(), createdCount }
+      });
+
+      await notifySlack({
+        createdCount,
+        appUrl: process.env.NEXT_PUBLIC_APP_URL
+      });
+    } catch (e) {
+      await notifySlackError(e);
+      throw e;
     }
-
-    await prisma.scraperRun.create({
-      data: { completedAt: new Date(), createdCount }
-    });
-
-    await notifySlack({
-      createdCount,
-      appUrl: process.env.NEXT_PUBLIC_APP_URL
-    });
   });
 });
