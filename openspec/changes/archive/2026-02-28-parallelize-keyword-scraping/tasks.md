@@ -13,5 +13,5 @@
 ## 3. Validate and Test
 
 - [x] 3.1 Run scraper locally with `pnpm run scraper` and confirm all keywords complete successfully
-- [ ] 3.2 Trigger `workflow_dispatch` on CI and record the new execution time
-- [ ] 3.3 Confirm Slack notification reports the correct `createdCount`
+- [x] 3.2 Trigger `workflow_dispatch` on CI and record the new execution time
+- [x] 3.3 Confirm Slack notification reports the correct `createdCount`
