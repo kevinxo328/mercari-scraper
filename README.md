@@ -116,8 +116,22 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
     - `DATABASE_URL`
     - `DIRECT_URL`
+    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
     - Any other required environment variables
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
+
+#### Resource Monitoring
+
+Every scraper run automatically samples CPU and RAM usage every 10 seconds via Node.js built-ins (no extra dependencies). After the run completes:
+
+- **Console** — a summary table is printed (duration, peak RAM, avg CPU, etc.)
+- **GitHub Actions** — the summary is also written to the [Job Summary](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary) page
+- **Slack** — if `SLACK_WEBHOOK_URL` is configured, a single message is sent combining the scrape result and resource stats:
+
+  ```
+  ✅ Mercari scraper completed. 42 new items found. View results
+  📊 3m 40s | RAM peak 1.84 GB | CPU avg 20.7% peak 37.9%
+  ```
 
 ---
 

@@ -1,8 +1,28 @@
 import { test, type Page } from '@playwright/test';
+import { writeFileSync, existsSync, readFileSync } from 'fs';
+import os from 'os';
+import path from 'path';
 import pLimit from 'p-limit';
 import { getMercariUrl } from '../lib/utils';
-import { notifySlack, notifySlackError } from '../lib/slack';
 import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
+
+function writeResults(data: {
+  createdCount?: number;
+  appUrl?: string;
+  error?: string;
+}) {
+  try {
+    const metaFile = path.join(
+      os.tmpdir(),
+      'mercari-scraper-monitor-meta.json'
+    );
+    if (!existsSync(metaFile)) return;
+    const { resultsFile } = JSON.parse(readFileSync(metaFile, 'utf-8'));
+    writeFileSync(resultsFile, JSON.stringify(data));
+  } catch {
+    // non-critical, ignore
+  }
+}
 
 const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
@@ -208,12 +228,10 @@ test.describe('Scrape Mercari', () => {
         data: { completedAt: new Date(), createdCount }
       });
 
-      await notifySlack({
-        createdCount,
-        appUrl: process.env.NEXT_PUBLIC_APP_URL
-      });
+      writeResults({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
     } catch (e) {
-      await notifySlackError(e);
+      const message = e instanceof Error ? e.message : String(e);
+      writeResults({ error: message });
       throw e;
     }
   });
