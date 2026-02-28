@@ -11,7 +11,8 @@
     "lint:fix": "eslint . --fix --max-warnings 0"
   },
   "dependencies": {
-    "@playwright/test": "^1.52.0"
+    "@playwright/test": "^1.52.0",
+    "p-limit": "^7.3.0"
   },
   "devDependencies": {
     "@mercari-scraper/database": "workspace:*",
