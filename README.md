@@ -1,5 +1,7 @@
 # Mercari Scraper
 
+[![Scrape Mercari](https://github.com/kevinxo328/mercari-scraper/actions/workflows/scraper.yml/badge.svg?branch=main)](https://github.com/kevinxo328/mercari-scraper/actions/workflows/scraper.yml)
+
 This project is an automated scraper tool for personal use, specifically designed for periodically crawling product information on the Mercari platform. Its main function is to regularly check and extract newly listed products, assisting users in immediately grasping the latest product trends.
 
 ## What's inside?
