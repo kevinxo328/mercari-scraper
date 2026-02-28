@@ -45,7 +45,8 @@
       "cache": false
     },
     "scraper": {
-      "cache": false
+      "cache": false,
+      "env": ["GITHUB_STEP_SUMMARY", "SCRAPE_CONCURRENCY"]
     },
     "scraper:debug": {
       "cache": false
