@@ -90,7 +90,7 @@ export function filterNodes(
   return results;
 }
 
-function findNode(value: string, tree: TreeNode[]): TreeNode | undefined {
+export function findNode(value: string, tree: TreeNode[]): TreeNode | undefined {
   for (const node of tree) {
     if (node.value === value) return node;
     if (node.children?.length) {
@@ -99,4 +99,23 @@ function findNode(value: string, tree: TreeNode[]): TreeNode | undefined {
     }
   }
   return undefined;
+}
+
+export function getVisibleNodes(
+  tree: TreeNode[],
+  expandedValues: Set<string>
+): TreeNode[] {
+  const result: TreeNode[] = [];
+
+  function traverse(nodes: TreeNode[]) {
+    for (const node of nodes) {
+      result.push(node);
+      if (node.children?.length && expandedValues.has(node.value)) {
+        traverse(node.children);
+      }
+    }
+  }
+
+  traverse(tree);
+  return result;
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { PopoverContent } from '@/components/shadcn/popover';
 import { cn } from '@/lib/utils';
 import { useTreeSelect } from './tree-select';
-import { filterNodes } from './utils';
+import { filterNodes, getVisibleNodes, findNode } from './utils';
 import { TreeSelectSearch } from './search';
 
 interface TreeSelectContentProps {
@@ -16,12 +16,97 @@ export function TreeSelectContent({
   children,
   className
 }: TreeSelectContentProps) {
-  const { searchQuery, flatMap, tree, selectedValues, toggleValue } =
-    useTreeSelect();
+  const {
+    searchQuery,
+    flatMap,
+    tree,
+    selectedValues,
+    toggleValue,
+    focusedValue,
+    setFocusedValue,
+    expandedValues,
+    toggleExpanded
+  } = useTreeSelect();
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const searchResults = searchQuery
     ? filterNodes(flatMap, searchQuery, tree)
     : [];
+
+  const visibleNodes = searchQuery
+    ? searchResults.map((r) => ({
+        value: r.value,
+        label: r.label,
+        children: r.children
+      }))
+    : getVisibleNodes(tree, expandedValues);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (visibleNodes.length === 0) return;
+
+    const currentIndex = focusedValue
+      ? visibleNodes.findIndex((n) => n.value === focusedValue)
+      : -1;
+
+    switch (e.key) {
+      case 'ArrowDown': {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % visibleNodes.length;
+        setFocusedValue(visibleNodes[nextIndex].value);
+        break;
+      }
+      case 'ArrowUp': {
+        e.preventDefault();
+        const prevIndex =
+          currentIndex <= 0 ? visibleNodes.length - 1 : currentIndex - 1;
+        setFocusedValue(visibleNodes[prevIndex].value);
+        break;
+      }
+      case 'ArrowRight': {
+        if (!searchQuery && focusedValue) {
+          const node = findNode(focusedValue, tree);
+          if (node?.children?.length && !expandedValues.has(focusedValue)) {
+            e.preventDefault();
+            toggleExpanded(focusedValue);
+          }
+        }
+        break;
+      }
+      case 'ArrowLeft': {
+        if (!searchQuery && focusedValue) {
+          const node = findNode(focusedValue, tree);
+          if (node?.children?.length && expandedValues.has(focusedValue)) {
+            e.preventDefault();
+            toggleExpanded(focusedValue);
+          }
+        }
+        break;
+      }
+      case 'Enter':
+      case ' ': {
+        if (focusedValue) {
+          e.preventDefault();
+          const node = findNode(focusedValue, tree);
+          if (node) {
+            toggleValue(focusedValue, node);
+          }
+        }
+        break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (focusedValue && scrollRef.current) {
+      const focusedElement = scrollRef.current.querySelector(
+        `[data-value="${focusedValue}"]`
+      );
+      if (focusedElement) {
+        focusedElement.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [focusedValue]);
 
   return (
     <PopoverContent
@@ -30,18 +115,17 @@ export function TreeSelectContent({
         'w-[--radix-popover-trigger-width] p-0 flex flex-col overflow-hidden bg-popover text-popover-foreground border shadow-md rounded-md',
         className
       )}
-      // Stop Radix or Dialog from interfering with scrolling
       onWheel={(e) => e.stopPropagation()}
+      onKeyDown={handleKeyDown}
       onEscapeKeyDown={() => void 0}
     >
-      {/* Search area */}
       <TreeSelectSearch />
 
-      {/* Main scrollable area */}
-      <div 
-        className="flex-1 overflow-y-auto overscroll-contain min-h-0 max-h-[400px] py-1 scrollbar-thin"
-        // Ensure mouse wheel events stay here and don't bubble to Dialog/Body
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto overscroll-contain min-h-0 max-h-[400px] py-1 scrollbar-thin outline-none"
         onWheel={(e) => e.stopPropagation()}
+        tabIndex={-1}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {searchQuery ? (
@@ -57,9 +141,10 @@ export function TreeSelectContent({
               searchResults.map((result) => (
                 <div
                   key={result.value}
+                  data-value={result.value}
                   role="option"
                   aria-selected={selectedValues.includes(result.value)}
-                  tabIndex={0}
+                  tabIndex={focusedValue === result.value ? 0 : -1}
                   onClick={() =>
                     toggleValue(result.value, {
                       value: result.value,
@@ -67,20 +152,16 @@ export function TreeSelectContent({
                       children: result.children
                     })
                   }
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      toggleValue(result.value, {
-                        value: result.value,
-                        label: result.label,
-                        children: result.children
-                      });
-                    }
-                  }}
-                  className="relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                  className={cn(
+                    'relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground',
+                    focusedValue === result.value &&
+                      'bg-accent text-accent-foreground'
+                  )}
                 >
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-foreground font-medium">{result.label}</span>
+                    <span className="text-foreground font-medium">
+                      {result.label}
+                    </span>
                     <span className="text-muted-foreground text-[10px] leading-tight">
                       {result.path.join(' > ')}
                     </span>
@@ -90,7 +171,9 @@ export function TreeSelectContent({
             )}
           </div>
         ) : (
-          <div className="contents">{children}</div>
+          <div role="tree" aria-label="Category tree" className="contents">
+            {children}
+          </div>
         )}
       </div>
     </PopoverContent>

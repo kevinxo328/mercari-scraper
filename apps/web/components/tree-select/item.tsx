@@ -28,11 +28,14 @@ export const TreeSelectItem = memo(function TreeSelectItem({
     toggleValue,
     expandedValues,
     toggleExpanded,
-    flatMap
+    flatMap,
+    focusedValue,
+    setFocusedValue
   } = useTreeSelect();
 
   const hasChildren = Boolean(node.children?.length);
   const isExpanded = expandedValues.has(node.value);
+  const isFocused = focusedValue === node.value;
   const isDirectlySelected = selectedValues.includes(node.value);
   const isInherited =
     !isDirectlySelected &&
@@ -69,9 +72,12 @@ export const TreeSelectItem = memo(function TreeSelectItem({
       aria-level={depth + 1}
       aria-disabled={isDisabled ? 'true' : undefined}
       data-testid={`item-${node.value}`}
+      data-value={node.value}
+      onMouseEnter={() => setFocusedValue(node.value)}
       className={cn(
         'flex items-center gap-1 py-1 px-2 rounded-sm cursor-pointer select-none',
-        'hover:bg-accent',
+        'hover:bg-accent hover:text-accent-foreground',
+        isFocused && 'bg-accent text-accent-foreground',
         isDisabled && 'opacity-60 cursor-default'
       )}
       style={{ paddingLeft: `${depth * 16 + 8}px` }}

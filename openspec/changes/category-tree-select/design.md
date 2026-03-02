@@ -5,8 +5,8 @@
 ```
 <TreeSelect value onValueChange>          ← Context provider + state
   <TreeSelectTrigger placeholder />       ← Popover trigger + badge display
-  <TreeSelectContent>                     ← Popover wrapper
-    <TreeSelectSearch />                  ← Search input (cmdk CommandInput)
+  <TreeSelectContent>                     ← Popover wrapper (custom div scrolling)
+    <TreeSelectSearch />                  ← Search input (standard Input)
     <TreeSelectGroup items />             ← Recursive tree renderer
   </TreeSelectContent>
 </TreeSelect>
@@ -20,15 +20,15 @@ Internal state (selected values, expanded nodes, search query) lives in `TreeSel
 ```
 apps/web/components/tree-select/
 ├── index.ts              ← re-exports all public symbols
-├── tree-select.tsx       ← <TreeSelect>: context + state
+├── tree-select.tsx       ← <TreeSelect>: context + state + keyboard navigation manager
 ├── trigger.tsx           ← <TreeSelectTrigger>: badge chips + popover trigger
-├── content.tsx           ← <TreeSelectContent>: popover shell
+├── content.tsx           ← <TreeSelectContent>: popover shell (scroll container)
 ├── search.tsx            ← <TreeSelectSearch>: controlled search input
 ├── group.tsx             ← <TreeSelectGroup>: renders TreeNode[] recursively
 ├── item.tsx              ← <TreeSelectItem>: single node (chevron + checkbox)
 ├── types.ts              ← TreeNode, TreeSelectContextValue
 ├── utils.ts              ← buildFlatMap(), getAncestors(), filterNodes()
-└── tree-select.test.tsx  ← TDD tests (written before implementation)
+└── tree-select.test.tsx  ← TDD tests
 ```
 
 ### Generic Data Contract
@@ -107,7 +107,7 @@ Uses `map[value].path.slice(1).join(' > ')` (drop index 0 = top-level label).
 | `rerender-lazy-state-init` | `expandedValues` initialized as `new Set()` via lazy initializer |
 | `rerender-derived-state-no-effect` | Inherited/indeterminate state derived during render from `selectedValues`, no separate effect |
 | `rendering-conditional-render` | Ternary (`searchQuery ? <SearchResults> : <TreeGroup>`) not `&&` |
-| `bundle-dynamic-imports` | `TreeSelectContent` lazy-loaded via `next/dynamic` — not needed until popover opens |
+| `event-isolation` | `onWheel` stopPropagation on scroll container to fix mouse scrolling inside Dialogs |
 | `rerender-functional-setstate` | All `setSelectedValues` calls use functional form `(prev) => ...` for stable callbacks |
 
 ### tRPC Change

@@ -34,6 +34,7 @@ export function TreeSelect({
     () => new Set()
   );
   const [searchQuery, setSearchQueryState] = useState('');
+  const [focusedValue, setFocusedValue] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleValue = (nodeValue: string, node: TreeNode) => {
@@ -42,8 +43,6 @@ export function TreeSelect({
     if (isRemoving) {
       onValueChange(value.filter((v) => v !== nodeValue));
     } else {
-      // When adding a node, remove all its descendants from the selection
-      // because parent selection implies descendant selection.
       const descendants = getDescendantValues(node);
       const newValue = value.filter((v) => !descendants.includes(v));
       onValueChange([...newValue, nodeValue]);
@@ -62,6 +61,7 @@ export function TreeSelect({
 
   const setSearchQuery = (query: string) => {
     setSearchQueryState(query);
+    setFocusedValue(null);
     if (query) {
       setExpandedValues(() => new Set());
     }
@@ -77,6 +77,8 @@ export function TreeSelect({
     setSearchQuery,
     flatMap,
     tree,
+    focusedValue,
+    setFocusedValue,
     isOpen,
     setIsOpen
   };

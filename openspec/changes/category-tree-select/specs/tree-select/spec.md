@@ -24,7 +24,7 @@ A node with one or more `children` is a **parent node**.
 ## Composition API
 
 ```tsx
-<TreeSelect value={string[]} onValueChange={(values: string[]) => void}>
+<TreeSelect value={string[]} onValueChange={(values: string[]) => void} tree={TreeNode[]}>
   <TreeSelectTrigger placeholder={string} className? />
   <TreeSelectContent>
     <TreeSelectSearch />
@@ -42,6 +42,7 @@ All sub-components are individually importable from `@/components/tree-select`.
 ### Selecting a parent node
 - Only the parent's `value` is added to `selectedValues`
 - All descendant nodes are shown as **inherited-checked** (visually checked, non-interactive)
+- When a parent is selected, any explicitly selected descendants are removed from `selectedValues`
 - Attempting to select/deselect a descendant while its ancestor is selected has no effect
 
 ### Selecting a leaf node
@@ -114,9 +115,9 @@ All sub-components are individually importable from `@/components/tree-select`.
 ## Accessibility
 
 - Trigger button: `role="combobox"`, `aria-expanded`, `aria-haspopup="tree"`
-- Popover content: `role="tree"`
-- Each node: `role="treeitem"`, `aria-expanded` (parents), `aria-checked`, `aria-level`, `aria-selected`
-- Screen reader announcements on selection change (added/removed item count)
+- Popover content: `role="tree"` (in tree mode) or `role="listbox"` (in search mode)
+- Each node: `role="treeitem"` or `role="option"`, `aria-expanded` (parents), `aria-checked`, `aria-level`, `aria-selected`
+- Uses `tabindex` and `onKeyDown` to manage focus between visible items
 
 ---
 
@@ -128,6 +129,8 @@ All sub-components are individually importable from `@/components/tree-select`.
 |---|---|---|---|
 | `value` | `string[]` | yes | Controlled selected values |
 | `onValueChange` | `(values: string[]) => void` | yes | Called on every selection change |
+| `tree` | `TreeNode[]` | yes | Full hierarchical data structure |
+| `flatMap` | `Map<string, FlatMapEntry>` | yes | Pre-computed flat map for breadcrumbs |
 | `children` | `React.ReactNode` | yes | Composable sub-components |
 
 ### `<TreeSelectTrigger>`
@@ -154,8 +157,8 @@ No required props. Reads/writes search query from context.
 
 ## Constraints
 
-- No new npm dependencies; uses Radix Popover, cmdk Command, lucide-react, shadcn primitives
-- `<TreeSelectContent>` is lazy-loaded (`next/dynamic`) to avoid bundling cmdk on initial page load
+- No new npm dependencies; uses Radix Popover, lucide-react, shadcn primitives
+- Custom scroll container with `onWheel={(e) => e.stopPropagation()}` to handle mouse scrolling inside Dialogs
 - `<TreeSelectItem>` is wrapped in `React.memo`
 - All state updates to `selectedValues` use functional `setState` form
 - Derived states (inherited, indeterminate) are computed during render, not in effects
