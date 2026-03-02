@@ -12,9 +12,12 @@ export default function LoginForm() {
   const callbackUrl = searchParams.get('callbackUrl');
   const error = searchParams.get('error');
 
-  const onClick = (provider: 'google') => {
+  const isDev = process.env.NODE_ENV === 'development';
+
+  const onClick = (provider: 'google' | 'credentials') => {
     signIn(provider, {
-      callbackUrl: callbackUrl || DEFAULT_CALLBACK_URL
+      callbackUrl: callbackUrl || DEFAULT_CALLBACK_URL,
+      ...(provider === 'credentials' && { email: 'test@example.com' })
     });
   };
 
@@ -27,10 +30,22 @@ export default function LoginForm() {
           access to this application.
         </div>
       )}
-      <Button className="w-full" onClick={() => onClick('google')}>
-        <FcGoogle className="size-6" />
-        Continue with Google
-      </Button>
+      <div className="w-full flex flex-col gap-3">
+        <Button className="w-full" onClick={() => onClick('google')}>
+          <FcGoogle className="size-6" />
+          Continue with Google
+        </Button>
+
+        {isDev && (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => onClick('credentials')}
+          >
+            Dev Login (Test User)
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
