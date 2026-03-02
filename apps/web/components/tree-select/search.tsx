@@ -9,13 +9,13 @@ export function TreeSelectSearch() {
   const { searchQuery, setSearchQuery } = useTreeSelect();
 
   return (
-    <div className="flex items-center border-b px-3 py-2 gap-2">
+    <div className="flex items-center border-b px-3 h-9 gap-2 shrink-0">
       <Search className="size-4 text-muted-foreground shrink-0" />
       <Input
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search..."
-        className="border-0 p-0 h-auto text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="border-0 p-0 h-full text-sm focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
       />
     </div>
   );

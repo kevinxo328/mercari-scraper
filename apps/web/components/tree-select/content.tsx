@@ -23,61 +23,69 @@ export function TreeSelectContent({
   return (
     <PopoverContent
       align="start"
-      className={cn('w-[--radix-popover-trigger-width] p-0', className)}
+      className={cn(
+        'w-[--radix-popover-trigger-width] p-0 flex flex-col overflow-hidden bg-popover text-popover-foreground border shadow-md rounded-md',
+        className
+      )}
+      // Stop Radix or Dialog from interfering with scrolling
+      onWheel={(e) => e.stopPropagation()}
       onEscapeKeyDown={() => void 0}
     >
-      {/* Search input — always visible, never scrolls */}
-      <div className="border-b">
-        <TreeSelectSearch />
-      </div>
+      {/* Search area */}
+      <TreeSelectSearch />
 
-      {/* Scrollable list area */}
-      <div
-        style={{ maxHeight: '300px', overflowY: 'auto' }}
-        className="overscroll-contain"
+      {/* Main scrollable area */}
+      <div 
+        className="flex-1 overflow-y-auto overscroll-contain min-h-0 max-h-[400px] py-1 scrollbar-thin"
+        // Ensure mouse wheel events stay here and don't bubble to Dialog/Body
+        onWheel={(e) => e.stopPropagation()}
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {searchQuery ? (
-          <div role="listbox" aria-label="Search results" className="py-1">
+          <div role="listbox" aria-label="Search results">
+            <div className="px-3 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Search Results
+            </div>
             {searchResults.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-muted-foreground">
+              <div className="py-6 text-center text-sm text-muted-foreground">
                 No results found.
-              </p>
+              </div>
             ) : (
-              searchResults.map((result) => {
-                const isSelected = selectedValues.includes(result.value);
-                return (
-                  <div
-                    key={result.value}
-                    role="option"
-                    aria-selected={isSelected}
-                    tabIndex={0}
-                    onClick={() =>
+              searchResults.map((result) => (
+                <div
+                  key={result.value}
+                  role="option"
+                  aria-selected={selectedValues.includes(result.value)}
+                  tabIndex={0}
+                  onClick={() =>
+                    toggleValue(result.value, {
+                      value: result.value,
+                      label: result.label
+                    })
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
                       toggleValue(result.value, {
                         value: result.value,
                         label: result.label
-                      })
+                      });
                     }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleValue(result.value, {
-                          value: result.value,
-                          label: result.label
-                        });
-                      }
-                    }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-sm hover:bg-accent cursor-pointer select-none"
-                  >
-                    <span className="text-muted-foreground text-xs">
+                  }}
+                  className="relative flex cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-foreground font-medium">{result.label}</span>
+                    <span className="text-muted-foreground text-[10px] leading-tight">
                       {result.path.join(' > ')}
                     </span>
                   </div>
-                );
-              })
+                </div>
+              ))
             )}
           </div>
         ) : (
-          <div className="py-1">{children}</div>
+          <div className="contents">{children}</div>
         )}
       </div>
     </PopoverContent>
