@@ -90,7 +90,10 @@ export function filterNodes(
   return results;
 }
 
-export function findNode(value: string, tree: TreeNode[]): TreeNode | undefined {
+export function findNode(
+  value: string,
+  tree: TreeNode[]
+): TreeNode | undefined {
   for (const node of tree) {
     if (node.value === value) return node;
     if (node.children?.length) {
