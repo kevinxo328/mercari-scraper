@@ -4,7 +4,11 @@ import os from 'os';
 import path from 'path';
 import pLimit from 'p-limit';
 import { getMercariUrl } from '../lib/utils';
-import { PrismaClient, type ScraperKeyword } from '@mercari-scraper/database';
+import {
+  PrismaClient,
+  type ScraperKeyword,
+  getCategoryByCode
+} from '@mercari-scraper/database';
 
 function writeResults(data: {
   createdCount?: number;
@@ -30,7 +34,6 @@ const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
 async function scrapeKeyword(
   page: Page,
   record: ScraperKeyword,
-  codeMap: Record<string, string>,
   prisma: PrismaClient
 ): Promise<number> {
   let createdCount = 0;
@@ -44,10 +47,14 @@ async function scrapeKeyword(
       : route.continue();
   });
 
-  // Construct category IDs array for the URL
-  const categoryIds = record.categoryIds
-    .map((catId) => codeMap[catId])
-    .filter((code) => code !== undefined);
+  // categoryIds are now direct Mercari category codes (e.g. "11", "3092")
+  const categoryIds = record.categoryIds;
+  if (categoryIds.length > 0) {
+    const names = categoryIds
+      .map((code) => getCategoryByCode(code)?.enName || code)
+      .join(', ');
+    console.log(`  Categories: ${names}`);
+  }
 
   await page
     .goto(
@@ -178,18 +185,10 @@ test.describe('Scrape Mercari', () => {
   const prisma = new PrismaClient();
   let keywords: ScraperKeyword[] = [];
 
-  // Store keyword categories in a map for easy access
-  // Key: category ID, Value: category code used in Mercari URL
-  let codeMap: Record<string, string> = {};
-
   test.beforeAll(async () => {
     // Fetch keywords from the database
     try {
       keywords = await prisma.scraperKeyword.findMany();
-      const codes = await prisma.keywordCategory.findMany();
-      codes.forEach((code) => {
-        codeMap[code.id] = code.code;
-      });
     } catch (e) {
       console.error(e);
     }
@@ -211,7 +210,7 @@ test.describe('Scrape Mercari', () => {
             const newPage = await page.context().newPage();
             await newPage.setViewportSize({ width: 1280, height: 72000 });
             try {
-              return await scrapeKeyword(newPage, record, codeMap, prisma);
+              return await scrapeKeyword(newPage, record, prisma);
             } catch (e) {
               console.error(`Error scraping keyword "${record.keyword}": ${e}`);
               return 0;
