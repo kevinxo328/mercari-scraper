@@ -52,6 +52,8 @@ export const scraperRouter = router({
         })
       ]);
 
+      console.log(mercariCategories);
+
       const data = keywords.map((keyword) => ({
         ...keyword,
         categoryNames: keyword.categoryIds
@@ -240,17 +242,44 @@ export const scraperRouter = router({
       });
     }),
   getCategories: publicProcedure.query(() => {
-    // Return a flat list of all categories from the static JSON asset.
-    // Each entry includes code (used as the value), Japanese name, and English name.
-    return Object.values(mercariCategories.map)
-      .map((cat) => ({
-        id: cat.code,
-        code: cat.code,
-        name: cat.enName || cat.name,
-        jaName: cat.name,
-        parentCode: cat.parentCode
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    type RawNode = {
+      code: string;
+      name: string;
+      enName: string;
+      children?: RawNode[];
+    };
+    type TreeNode = { value: string; label: string; children?: TreeNode[] };
+    type FlatEntry = { label: string; path: string[] };
+
+    function toTreeNode(raw: RawNode): TreeNode {
+      return {
+        value: raw.code,
+        label: raw.enName || raw.name,
+        children: raw.children?.length
+          ? raw.children.map(toTreeNode)
+          : undefined
+      };
+    }
+
+    function buildMap(
+      nodes: RawNode[],
+      ancestorPath: string[],
+      result: Record<string, FlatEntry>
+    ) {
+      for (const node of nodes) {
+        const path = [...ancestorPath, node.enName || node.name];
+        result[node.code] = { label: node.enName || node.name, path };
+        if (node.children?.length) {
+          buildMap(node.children, path, result);
+        }
+      }
+    }
+
+    const tree = (mercariCategories.tree as RawNode[]).map(toTreeNode);
+    const map: Record<string, FlatEntry> = {};
+    buildMap(mercariCategories.tree as RawNode[], [], map);
+
+    return { tree, map };
   }),
   getLastRun: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.scraperRun.findFirst({
