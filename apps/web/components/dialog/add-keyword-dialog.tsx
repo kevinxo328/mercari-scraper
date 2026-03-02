@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -28,7 +28,14 @@ import {
 import { Input } from '@/components/shadcn/input';
 import { Button } from '@/components/shadcn/button';
 import { Switch } from '@/components/shadcn/switch';
-import { MultiSelect } from '@/components/multi-select';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import {
+  TreeSelect,
+  TreeSelectTrigger,
+  TreeSelectContent,
+  TreeSelectGroup,
+  buildFlatMap
+} from '@/components/tree-select';
 import { ScraperKeyword } from '@/types/scraper';
 
 const formSchema = z.object({
@@ -64,11 +71,14 @@ export default function AddKeywordDialog({
 
   const isEditMode = Boolean(keywordToEdit);
 
-  const {
-    data: categories,
-    isPending: isLoadingCategories,
-    isError: categoriesError
-  } = useQuery(trpc.scraper.getCategories.queryOptions());
+  const { data: categoriesData, isPending: isLoadingCategories } = useQuery(
+    trpc.scraper.getCategories.queryOptions()
+  );
+
+  const categoryFlatMap = useMemo(
+    () => (categoriesData ? buildFlatMap(categoriesData.tree) : new Map()),
+    [categoriesData]
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -250,29 +260,21 @@ export default function AddKeywordDialog({
                   <FormLabel>Categories</FormLabel>
                   <FormControl>
                     {isLoadingCategories ? (
-                      <p className="text-sm text-gray-500">
-                        Loading options...
-                      </p>
-                    ) : categoriesError ? (
-                      <p className="text-sm text-red-500">
-                        Failed to load categories.
-                      </p>
-                    ) : !categories || categories.length === 0 ? (
-                      <p className="text-sm text-gray-500">
-                        No categories available.
-                      </p>
+                      <Skeleton className="h-10 w-full" />
                     ) : (
-                      <MultiSelect
-                        options={categories.map((category) => ({
-                          label: category.name,
-                          value: category.id
-                        }))}
-                        defaultValue={field.value}
+                      <TreeSelect
+                        value={field.value}
                         onValueChange={field.onChange}
-                        placeholder="Select categories"
-                        searchable
-                        className="w-full"
-                      />
+                        flatMap={categoryFlatMap}
+                      >
+                        <TreeSelectTrigger
+                          placeholder="Select categories"
+                          className="w-full"
+                        />
+                        <TreeSelectContent>
+                          <TreeSelectGroup items={categoriesData?.tree ?? []} />
+                        </TreeSelectContent>
+                      </TreeSelect>
                     )}
                   </FormControl>
                   <FormDescription>

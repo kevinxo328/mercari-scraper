@@ -38,5 +38,10 @@
   "dependencies": {
     "@prisma/client": "^6.7.0"
   },
-  "packageManager": "pnpm@10.9.0"
+  "packageManager": "pnpm@10.9.0",
+  "pnpm": {
+    "overrides": {
+      "react-dom": "19.2.2"
+    }
+  }
 }
