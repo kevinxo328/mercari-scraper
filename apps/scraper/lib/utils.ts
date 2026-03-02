@@ -1,9 +1,10 @@
 /**
- *
- * @param keyword
- * @param status default is on_sale
- * @param category_id default is 2 which means men clothing
- * @returns string
+ * Constructs a Mercari Japan search URL.
+ * @param keyword - search keyword
+ * @param categoryIds - Mercari category codes (e.g. ["11", "3092"])
+ * @param minPrice - optional minimum price filter
+ * @param maxPrice - optional maximum price filter
+ * @returns full Mercari search URL
  */
 export function getMercariUrl({
   keyword,

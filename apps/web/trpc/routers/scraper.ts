@@ -1,5 +1,6 @@
 import { publicProcedure, protectedProcedure, router } from '../setup';
 import { z } from 'zod';
+import { mercariCategories } from '@mercari-scraper/database';
 
 export const scraperRouter = router({
   getKeywords: publicProcedure
@@ -51,39 +52,16 @@ export const scraperRouter = router({
         })
       ]);
 
-      const categoryIds = Array.from(
-        new Set(
-          keywords.flatMap((keyword) => keyword.categoryIds).filter(Boolean)
-        )
-      );
-
-      const categoryMap =
-        categoryIds.length > 0
-          ? await db.keywordCategory.findMany({
-              where: {
-                id: {
-                  in: categoryIds
-                }
-              },
-              select: {
-                id: true,
-                name: true
-              }
-            })
-          : [];
-      const categoryNameMap = categoryMap.reduce(
-        (acc, category) => {
-          acc[category.id] = category.name;
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-
       const data = keywords.map((keyword) => ({
         ...keyword,
         categoryNames: keyword.categoryIds
-          .map((id) => categoryNameMap[id])
-          .filter((name): name is string => Boolean(name))
+          .map(
+            (code) =>
+              mercariCategories.map[code]?.enName ||
+              mercariCategories.map[code]?.name ||
+              code
+          )
+          .filter(Boolean)
       }));
 
       return {
@@ -209,7 +187,7 @@ export const scraperRouter = router({
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string().uuid()).default([]),
+        categoryIds: z.array(z.string()).default([]),
         isPinned: z.boolean().optional()
       })
     )
@@ -261,12 +239,18 @@ export const scraperRouter = router({
         data: { isPinned: input.isPinned }
       });
     }),
-  getCategories: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.keywordCategory.findMany({
-      orderBy: {
-        name: 'asc'
-      }
-    });
+  getCategories: publicProcedure.query(() => {
+    // Return a flat list of all categories from the static JSON asset.
+    // Each entry includes code (used as the value), Japanese name, and English name.
+    return Object.values(mercariCategories.map)
+      .map((cat) => ({
+        id: cat.code,
+        code: cat.code,
+        name: cat.enName || cat.name,
+        jaName: cat.name,
+        parentCode: cat.parentCode
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }),
   getLastRun: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.scraperRun.findFirst({
@@ -279,7 +263,7 @@ export const scraperRouter = router({
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string().uuid()).default([]),
+        categoryIds: z.array(z.string()).default([]),
         isPinned: z.boolean().default(false)
       })
     )

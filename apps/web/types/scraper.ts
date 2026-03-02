@@ -35,9 +35,3 @@ export type ScraperKeywordPage = {
   page: number;
   pageSize: number;
 };
-
-export type KeywordCategory = {
-  id: string;
-  name: string;
-  parentId: string | null;
-};
