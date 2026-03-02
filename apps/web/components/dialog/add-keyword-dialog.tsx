@@ -266,6 +266,7 @@ export default function AddKeywordDialog({
                         value={field.value}
                         onValueChange={field.onChange}
                         flatMap={categoryFlatMap}
+                        tree={categoriesData?.tree ?? []}
                       >
                         <TreeSelectTrigger
                           placeholder="Select categories"

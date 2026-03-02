@@ -65,18 +65,26 @@ export interface FilterResult {
   value: string;
   label: string;
   path: string[];
+  children?: TreeNode[];
 }
 
 export function filterNodes(
   flatMap: Map<string, FlatMapEntry>,
-  query: string
+  query: string,
+  tree: TreeNode[]
 ): FilterResult[] {
   if (!query) return [];
   const lower = query.toLowerCase();
   const results: FilterResult[] = [];
   for (const [value, entry] of flatMap) {
     if (entry.label.toLowerCase().includes(lower)) {
-      results.push({ value, label: entry.label, path: entry.path });
+      const node = findNode(value, tree);
+      results.push({
+        value,
+        label: entry.label,
+        path: entry.path,
+        children: node?.children
+      });
     }
   }
   return results;

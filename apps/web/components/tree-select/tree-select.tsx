@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Popover } from '@/components/shadcn/popover';
 import { FlatMapEntry, TreeNode, TreeSelectContextValue } from './types';
+import { getDescendantValues } from './utils';
 
 export const TreeSelectContext = createContext<TreeSelectContextValue | null>(
   null
@@ -18,6 +19,7 @@ export interface TreeSelectProps {
   value: string[];
   onValueChange: (values: string[]) => void;
   flatMap: Map<string, FlatMapEntry>;
+  tree?: TreeNode[]; // original tree for traversing descendants
   children: React.ReactNode;
 }
 
@@ -25,6 +27,7 @@ export function TreeSelect({
   value,
   onValueChange,
   flatMap,
+  tree = [],
   children
 }: TreeSelectProps) {
   const [expandedValues, setExpandedValues] = useState<Set<string>>(
@@ -34,12 +37,17 @@ export function TreeSelect({
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleValue = (nodeValue: string, node: TreeNode) => {
-    onValueChange(
-      value.includes(nodeValue)
-        ? value.filter((v) => v !== nodeValue)
-        : [...value, nodeValue]
-    );
-    void node;
+    const isRemoving = value.includes(nodeValue);
+
+    if (isRemoving) {
+      onValueChange(value.filter((v) => v !== nodeValue));
+    } else {
+      // When adding a node, remove all its descendants from the selection
+      // because parent selection implies descendant selection.
+      const descendants = getDescendantValues(node);
+      const newValue = value.filter((v) => !descendants.includes(v));
+      onValueChange([...newValue, nodeValue]);
+    }
   };
 
   const clearAll = () => onValueChange([]);
@@ -68,6 +76,7 @@ export function TreeSelect({
     searchQuery,
     setSearchQuery,
     flatMap,
+    tree,
     isOpen,
     setIsOpen
   };

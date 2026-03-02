@@ -18,6 +18,7 @@ export interface TreeSelectContextValue {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   flatMap: Map<string, FlatMapEntry>;
+  tree: TreeNode[];
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }

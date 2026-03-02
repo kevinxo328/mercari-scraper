@@ -137,7 +137,7 @@ describe('filterNodes', () => {
   const map = buildFlatMap(FIXTURE_TREE);
 
   it('returns matching entries (case-insensitive)', () => {
-    const results = filterNodes(map, 'leaf');
+    const results = filterNodes(map, 'leaf', FIXTURE_TREE);
     const values = results.map((r) => r.value);
     expect(values).toContain('leaf-a1x');
     expect(values).toContain('leaf-a1y');
@@ -145,18 +145,18 @@ describe('filterNodes', () => {
   });
 
   it('matches by label substring', () => {
-    const results = filterNodes(map, 'A1X');
+    const results = filterNodes(map, 'A1X', FIXTURE_TREE);
     expect(results).toHaveLength(1);
     expect(results[0].value).toBe('leaf-a1x');
   });
 
   it('returns empty array for no matches', () => {
-    expect(filterNodes(map, 'zzz')).toEqual([]);
+    expect(filterNodes(map, 'zzz', FIXTURE_TREE)).toEqual([]);
   });
 
   it('is case-insensitive', () => {
-    const lower = filterNodes(map, 'root a');
-    const upper = filterNodes(map, 'ROOT A');
+    const lower = filterNodes(map, 'root a', FIXTURE_TREE);
+    const upper = filterNodes(map, 'ROOT A', FIXTURE_TREE);
     expect(lower.map((r) => r.value)).toEqual(upper.map((r) => r.value));
   });
 });
@@ -167,7 +167,12 @@ const flatMap = buildFlatMap(FIXTURE_TREE);
 
 function renderTreeSelect(value: string[] = [], onValueChange = jest.fn()) {
   return render(
-    <TreeSelect value={value} onValueChange={onValueChange} flatMap={flatMap}>
+    <TreeSelect
+      value={value}
+      onValueChange={onValueChange}
+      flatMap={flatMap}
+      tree={FIXTURE_TREE}
+    >
       <TreeSelectTrigger placeholder="Select categories" />
       <TreeSelectContent>
         <TreeSelectGroup items={FIXTURE_TREE} />
@@ -270,6 +275,18 @@ describe('TreeSelectGroup / TreeSelectItem', () => {
       'aria-checked',
       'mixed'
     );
+  });
+
+  it('selecting a parent removes all its descendant nodes from selection', () => {
+    const onChange = jest.fn();
+    // Start with children already selected
+    renderTreeSelect(['leaf-a1x', 'leaf-a1y'], onChange);
+    fireEvent.click(screen.getByRole('combobox'));
+    // Select the mid-a1 parent (ancestor of leaf-a1x and leaf-a1y)
+    fireEvent.click(screen.getByTestId('expand-root-a'));
+    fireEvent.click(screen.getByTestId('checkbox-mid-a1'));
+    // Expect descendants to be removed, and only mid-a1 to be selected
+    expect(onChange).toHaveBeenCalledWith(['mid-a1']);
   });
 });
 

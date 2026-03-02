@@ -16,9 +16,12 @@ export function TreeSelectContent({
   children,
   className
 }: TreeSelectContentProps) {
-  const { searchQuery, flatMap, selectedValues, toggleValue } = useTreeSelect();
+  const { searchQuery, flatMap, tree, selectedValues, toggleValue } =
+    useTreeSelect();
 
-  const searchResults = searchQuery ? filterNodes(flatMap, searchQuery) : [];
+  const searchResults = searchQuery
+    ? filterNodes(flatMap, searchQuery, tree)
+    : [];
 
   return (
     <PopoverContent
@@ -60,7 +63,8 @@ export function TreeSelectContent({
                   onClick={() =>
                     toggleValue(result.value, {
                       value: result.value,
-                      label: result.label
+                      label: result.label,
+                      children: result.children
                     })
                   }
                   onKeyDown={(e) => {
@@ -68,7 +72,8 @@ export function TreeSelectContent({
                       e.preventDefault();
                       toggleValue(result.value, {
                         value: result.value,
-                        label: result.label
+                        label: result.label,
+                        children: result.children
                       });
                     }
                   }}
