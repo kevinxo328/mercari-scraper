@@ -112,7 +112,7 @@ export function TreeSelectContent({
     <PopoverContent
       align="start"
       className={cn(
-        'w-[--radix-popover-trigger-width] p-0 flex flex-col overflow-hidden bg-popover text-popover-foreground border shadow-md rounded-md',
+        'w-[--radix-popover-trigger-width] p-0 flex flex-col overflow-hidden bg-popover text-popover-foreground border shadow-md rounded-md max-h-[var(--radix-popover-content-available-height)]',
         className
       )}
       onWheel={(e) => e.stopPropagation()}
@@ -123,7 +123,7 @@ export function TreeSelectContent({
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain min-h-0 max-h-[400px] py-1 scrollbar-thin outline-none"
+        className="flex-1 overflow-y-auto overscroll-contain min-h-0 max-h-[min(400px,var(--radix-popover-content-available-height)-5rem)] py-1 scrollbar-thin outline-none"
         onWheel={(e) => e.stopPropagation()}
         tabIndex={-1}
         style={{ WebkitOverflowScrolling: 'touch' }}
