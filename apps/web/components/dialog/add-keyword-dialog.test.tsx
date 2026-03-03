@@ -10,7 +10,6 @@ global.ResizeObserver = class ResizeObserver {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AddKeywordDialog from './add-keyword-dialog';
 import { useTRPC } from '@/trpc/client';
-import { fireEvent } from '@testing-library/react';
 
 // Mock trpc client
 jest.mock('@/trpc/client', () => ({
