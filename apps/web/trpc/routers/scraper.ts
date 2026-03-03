@@ -35,9 +35,9 @@ export const scraperRouter = router({
       // Build orderBy clause - prioritize pinned keywords if requested
       const orderBy = input.pinnedFirst
         ? [
-            { isPinned: 'desc' as const },
-            { [input.orderByField]: input.orderby }
-          ]
+          { isPinned: 'desc' as const },
+          { [input.orderByField]: input.orderby }
+        ]
         : { [input.orderByField]: input.orderby };
 
       const [keywords, total] = await Promise.all([
@@ -51,8 +51,6 @@ export const scraperRouter = router({
           where
         })
       ]);
-
-      console.log(mercariCategories);
 
       const data = keywords.map((keyword) => ({
         ...keyword,
