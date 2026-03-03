@@ -16,7 +16,7 @@ export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
   return (
     <header
       className={cn(
-        'sticky top-0 z-10 border-b transition-all duration-300 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70',
+        'sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70',
         isScrolled ? 'p-2' : 'p-4'
       )}
     >
