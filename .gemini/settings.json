@@ -1,8 +1,15 @@
 {
+  "context": {
+    "fileName": [
+      "GEMINI.md",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
+  },
   "hooks": {
-    "PostToolUse": [
+    "AfterTool": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "replace|write_file",
         "hooks": [
           {
             "type": "command",
@@ -15,8 +22,5 @@
         ]
       }
     ]
-  },
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
   }
 }

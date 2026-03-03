@@ -1,21 +1,35 @@
+'use client';
+
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { useScroll } from '@/hooks/use-scroll';
 
 type Props = {
   children?: React.ReactNode;
+  isScrolled?: boolean;
 };
 
-export const NavBar = ({ children }: Props) => {
+export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
+  const internalIsScrolled = useScroll();
+  const isScrolled = propIsScrolled ?? internalIsScrolled;
+
   return (
-    <header className="p-4 sticky top-0 z-10 border-b dark:border-gray-800 dark:bg-gray-950/70 backdrop-blur-2xl">
+    <header
+      className={cn(
+        'sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70',
+        isScrolled ? 'p-2' : 'p-4'
+      )}
+    >
       <div className="container flex justify-between items-center mx-auto">
         <Link href="/" className="flex items-center gap-2">
           <svg
             viewBox="0 0 50 49"
-            width="30"
-            height="30"
+            width={isScrolled ? '24' : '30'}
+            height={isScrolled ? '24' : '30'}
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
             role="img"
+            className="transition-all duration-300"
           >
             <g id="mercari-logo">
               <path
@@ -30,7 +44,14 @@ export const NavBar = ({ children }: Props) => {
               ></path>
             </g>
           </svg>
-          <h1 className="text-md font-bold">Mercari Scraper</h1>
+          <h1
+            className={cn(
+              'font-bold transition-all duration-300',
+              isScrolled ? 'text-sm' : 'text-md'
+            )}
+          >
+            Mercari Scraper
+          </h1>
         </Link>
         <div className="flex items-center gap-4">{children}</div>
       </div>

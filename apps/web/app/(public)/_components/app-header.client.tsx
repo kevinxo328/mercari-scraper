@@ -15,19 +15,27 @@ import {
   DropdownMenuTrigger
 } from '@/components/shadcn/dropdown-menu';
 import { redirect } from 'next/navigation';
+import { useScroll } from '@/hooks/use-scroll';
+import { cn } from '@/lib/utils';
 
 export default function AppHeader() {
   const session = useSession();
+  const isScrolled = useScroll();
 
   return (
-    <NavBar>
+    <NavBar isScrolled={isScrolled}>
       {session.status === 'authenticated' ? (
         <>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Avatar>
+              <Avatar
+                className={cn(
+                  'transition-all duration-300',
+                  isScrolled ? 'size-6' : 'size-8'
+                )}
+              >
                 <AvatarImage src={session.data.user?.image || undefined} />
-                <AvatarFallback>
+                <AvatarFallback className={isScrolled ? 'text-xs' : 'text-sm'}>
                   {session.data.user?.name
                     ? session.data.user.name.charAt(0)
                     : 'U'}
