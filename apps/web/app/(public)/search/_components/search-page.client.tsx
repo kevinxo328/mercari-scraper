@@ -193,6 +193,7 @@ export default function SearchPageClient() {
                 hasNextPage={!!hasNextPage}
                 isLoading={isFetchingNextPage}
                 onLoadMore={fetchNextPage}
+                rootMargin="500px 0px"
                 idleContent="Scroll down to load more"
                 loadingContent="Loading…"
                 endContent="No more results"
