@@ -1,0 +1,26 @@
+{
+  "extends": "@mercari-scraper/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    // TODO: Temporarily disable declaration files until we figure out a solution for Next.js
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
