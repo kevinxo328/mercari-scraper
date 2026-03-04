@@ -52,7 +52,7 @@ export function getIndeterminate(
   value: string,
   selectedValues: string[],
   tree: TreeNode[],
-  flatMap: Map<string, FlatMapEntry>
+  _flatMap: Map<string, FlatMapEntry>
 ): boolean {
   if (selectedValues.includes(value)) return false;
   const node = findNode(value, tree);

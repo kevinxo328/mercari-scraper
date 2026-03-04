@@ -71,6 +71,12 @@ You’ll be prompted to name the migration. Once you provide a name, Prisma will
 
 For production environments, always push schema changes to your database using the [`prisma migrate deploy` command](https://www.prisma.io/docs/orm/prisma-client/deployment/deploy-database-changes-with-prisma-migrate). You can find an example `db:migrate:deploy` script in the [`package.json` file](/packages/database/package.json) of the `database` package.
 
+> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error, use `prisma migrate deploy` instead, which applies existing migration files directly without requiring a shadow database:
+>
+> ```bash
+> cd packages/database && pnpm prisma migrate deploy
+> ```
+
 ### 5. Seed your database
 
 To populate your database with initial or fake data, use [Prisma's seeding functionality](https://www.prisma.io/docs/guides/database/seed-database).
@@ -114,10 +120,10 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 1. Make sure the file `.github/workflows/scraper.yml` exists in the project root directory. This file is configured with a schedule (e.g., cron).
 2. To adjust the schedule frequency, edit the `schedule` block inside [`.github/workflows/scraper.yml`](.github/workflows/scraper.yml).
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
-    - `DATABASE_URL`
-    - `DIRECT_URL`
-    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
-    - Any other required environment variables
+   - `DATABASE_URL`
+   - `DIRECT_URL`
+   - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
+   - Any other required environment variables
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
 
 #### Resource Monitoring
@@ -143,13 +149,12 @@ You can deploy the `web` frontend to [Vercel](https://vercel.com/).
 
 1. Log in to Vercel and create a new project connected to your GitHub repository.
 2. In the Vercel project settings, add the following environment variables:
-    - `DATABASE_URL`
-    - `DIRECT_URL`
-    - Any other required environment variables
+   - `DATABASE_URL`
+   - `DIRECT_URL`
+   - Any other required environment variables
 3. Set the `Root Directory` in Vercel to `apps/web`.
 4. Save the settings and deploy. Vercel will automatically detect the Next.js app and complete the deployment.
 
 ---
 
 For more details on automation and deployment, refer to the official documentation of each platform.
-

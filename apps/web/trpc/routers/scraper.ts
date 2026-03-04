@@ -52,8 +52,6 @@ export const scraperRouter = router({
         })
       ]);
 
-      console.log(mercariCategories);
-
       const data = keywords.map((keyword) => ({
         ...keyword,
         categoryNames: keyword.categoryIds
@@ -122,6 +120,7 @@ export const scraperRouter = router({
         minPrice: z.number().min(0).nullish(),
         maxPrice: z.number().min(0).nullish(),
         keywords: z.array(z.string()).optional(),
+        updatedSince: z.date().optional(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().nullish(),
         orderby: z.enum(['asc', 'desc']).default('desc')
@@ -148,6 +147,9 @@ export const scraperRouter = router({
             }
           }
         };
+      }
+      if (input.updatedSince) {
+        where.updatedAt = { gte: input.updatedSince };
       }
 
       const results = await db.scraperResult.findMany({
@@ -282,9 +284,14 @@ export const scraperRouter = router({
     return { tree, map };
   }),
   getLastRun: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.scraperRun.findFirst({
-      orderBy: { completedAt: 'desc' }
+    const runs = await ctx.db.scraperRun.findMany({
+      where: { completedAt: { not: null } },
+      orderBy: { completedAt: 'desc' },
+      take: 2
     });
+    const lastRun = runs[0] ?? null;
+    const sinceDate = runs[1]?.completedAt ?? null;
+    return lastRun ? { ...lastRun, sinceDate } : null;
   }),
   createKeyword: protectedProcedure
     .input(

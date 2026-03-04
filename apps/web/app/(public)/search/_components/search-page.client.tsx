@@ -1,7 +1,7 @@
 'use client';
 /* eslint-env browser */
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/shadcn/button';
 import ScraperSearchForm, {
   ScraperFormValues
@@ -24,15 +24,36 @@ import {
   SheetTrigger
 } from '@/components/shadcn/sheet';
 import { Funnel } from 'lucide-react';
-import InfiniteScrollTrigger from '@/components/infinite-scroll-trigger';
 import { useSession } from 'next-auth/react';
 import { useDeleteResult } from '@/hooks/use-delete-result';
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+function useColCount() {
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    function update() {
+      const w = window.innerWidth;
+      if (w >= 1280) setCols(6);
+      else if (w >= 768) setCols(4);
+      else if (w >= 400) setCols(3);
+      else setCols(2);
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return cols;
+}
 
 export default function SearchPageClient() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const session = useSession();
+  const colCount = useColCount();
 
   const trpc = useTRPC();
   const [keywords, setKeywords] = useQueryState(
@@ -75,6 +96,26 @@ export default function SearchPageClient() {
 
   const isAuthenticated = session.status === 'authenticated';
 
+  const allItems = infiniteResults?.pages.flatMap((p) => p.data) ?? [];
+  const rowCount = Math.ceil(allItems.length / colCount);
+
+  const virtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 220,
+    overscan: 4
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const last = virtualItems[virtualItems.length - 1];
+    if (last && last.index >= rowCount - 4) {
+      fetchNextPage();
+    }
+  }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const triggerSubmit = () => {
     const width =
       typeof window !== 'undefined' && typeof window.innerWidth === 'number'
@@ -85,8 +126,6 @@ export default function SearchPageClient() {
         ? mobileFormRef.current
         : formRef.current;
 
-    // This makes sure that the form is submitted through react-hook-form
-    // and not the default HTML form submission.
     targetForm?.dispatchEvent(
       new Event('submit', { cancelable: true, bubbles: true })
     );
@@ -116,7 +155,7 @@ export default function SearchPageClient() {
 
   return (
     <main className="container relative mx-auto flex gap-4 p-4 overflow-hidden lg:overflow-hidden">
-      <div className="flex min-h-0 grow flex-col overflow-hidden lg:overflow-y-auto lg:pr-2">
+      <div className="flex min-h-0 grow flex-col overflow-hidden lg:pr-2">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -158,46 +197,79 @@ export default function SearchPageClient() {
             </SheetContent>
           </Sheet>
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-visible">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
           {resultsStatus === 'pending' ? (
             <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-              {Array.from({ length: 24 }).map((_, index) => (
-                <Skeleton key={index} className="aspect-square rounded-lg" />
+              {Array.from({ length: 24 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-square rounded-lg" />
               ))}
             </div>
           ) : resultsStatus === 'error' ? (
-            <p className="col-span-full text-center text-red-500">
-              Error loading results.
-            </p>
+            <p className="text-center text-red-500">Error loading results.</p>
           ) : (
             <>
-              <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-                {infiniteResults?.pages.map((page) =>
-                  page.data.map((result) => (
-                    <LinkCard
-                      key={result.id ?? result.title + result.url}
-                      showDelete={isAuthenticated}
-                      isDeleting={deletingId === result.id && isDeleting}
-                      onDelete={() => handleDelete(result.id)}
-                      url={result.url}
-                      title={result.title}
-                      imageUrl={result.imageUrl}
-                      price={result.price}
-                      currency={result.currency}
-                    />
-                  ))
-                )}
-              </div>
-              <InfiniteScrollTrigger
-                className="mt-8"
-                hasNextPage={!!hasNextPage}
-                isLoading={isFetchingNextPage}
-                onLoadMore={fetchNextPage}
-                rootMargin="500px 0px"
-                idleContent="Scroll down to load more"
-                loadingContent="Loading…"
-                endContent="No more results"
-              />
+              {allItems.length === 0 && (
+                <p className="text-center text-gray-500">No results found</p>
+              )}
+              {allItems.length > 0 && (
+                <div
+                  style={{
+                    height: virtualizer.getTotalSize(),
+                    position: 'relative'
+                  }}
+                >
+                  {virtualItems.map((vRow) => {
+                    const startIdx = vRow.index * colCount;
+                    const rowItems = allItems.slice(
+                      startIdx,
+                      startIdx + colCount
+                    );
+
+                    return (
+                      <div
+                        key={vRow.key}
+                        data-index={vRow.index}
+                        ref={virtualizer.measureElement}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          transform: `translateY(${vRow.start}px)`
+                        }}
+                      >
+                        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
+                          {rowItems.map((result) => (
+                            <LinkCard
+                              key={result.id ?? result.title + result.url}
+                              showDelete={isAuthenticated}
+                              isDeleting={
+                                deletingId === result.id && isDeleting
+                              }
+                              onDelete={() => handleDelete(result.id)}
+                              url={result.url}
+                              title={result.title}
+                              imageUrl={result.imageUrl}
+                              price={result.price}
+                              currency={result.currency}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {isFetchingNextPage && (
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  Loading…
+                </p>
+              )}
+              {!hasNextPage && allItems.length > 0 && (
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  No more results
+                </p>
+              )}
             </>
           )}
         </div>

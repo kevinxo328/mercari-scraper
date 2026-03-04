@@ -6,10 +6,15 @@ import { useScroll } from '@/hooks/use-scroll';
 
 type Props = {
   children?: React.ReactNode;
+  centerSlot?: React.ReactNode;
   isScrolled?: boolean;
 };
 
-export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
+export const NavBar = ({
+  children,
+  centerSlot,
+  isScrolled: propIsScrolled
+}: Props) => {
   const internalIsScrolled = useScroll();
   const isScrolled = propIsScrolled ?? internalIsScrolled;
 
@@ -20,8 +25,8 @@ export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
         isScrolled ? 'p-2' : 'p-4'
       )}
     >
-      <div className="container flex justify-between items-center mx-auto">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="container flex items-center gap-4 mx-auto">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
             width={isScrolled ? '24' : '30'}
@@ -53,7 +58,12 @@ export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
             Mercari Scraper
           </h1>
         </Link>
-        <div className="flex items-center gap-4">{children}</div>
+        {centerSlot && (
+          <div className="flex-1 flex justify-center">{centerSlot}</div>
+        )}
+        <div className="flex items-center gap-4 shrink-0 ml-auto">
+          {children}
+        </div>
       </div>
     </header>
   );

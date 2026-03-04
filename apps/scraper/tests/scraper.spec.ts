@@ -184,13 +184,20 @@ test.describe('Scrape Mercari', () => {
 
   const prisma = new PrismaClient();
   let keywords: ScraperKeyword[] = [];
+  let scraperRunId: string | null = null;
 
   test.beforeAll(async () => {
-    // Fetch keywords from the database
     try {
       keywords = await prisma.scraperKeyword.findMany();
     } catch (e) {
       console.error(e);
+    }
+
+    try {
+      const run = await prisma.scraperRun.create({ data: {} });
+      scraperRunId = run.id;
+    } catch (e) {
+      console.error('Failed to create ScraperRun:', e);
     }
   });
 
@@ -223,9 +230,16 @@ test.describe('Scrape Mercari', () => {
 
       const createdCount = counts.reduce((sum, n) => sum + n, 0);
 
-      await prisma.scraperRun.create({
-        data: { completedAt: new Date(), createdCount }
-      });
+      if (scraperRunId) {
+        await prisma.scraperRun.update({
+          where: { id: scraperRunId },
+          data: { completedAt: new Date(), createdCount }
+        });
+      } else {
+        await prisma.scraperRun.create({
+          data: { completedAt: new Date(), createdCount }
+        });
+      }
 
       writeResults({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
     } catch (e) {
