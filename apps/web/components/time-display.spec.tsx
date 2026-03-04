@@ -28,6 +28,11 @@ describe('TimeDisplay', () => {
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
 
+  it('renders N/A when timestamp is "N/A"', () => {
+    render(<TimeDisplay timestamp="N/A" />);
+    expect(screen.getByText('N/A')).toBeInTheDocument();
+  });
+
   it('applies custom className', () => {
     render(<TimeDisplay className="custom-class" />);
     expect(screen.getByText('N/A')).toHaveClass('custom-class');

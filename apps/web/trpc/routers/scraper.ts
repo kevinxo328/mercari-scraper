@@ -13,8 +13,7 @@ export const scraperRouter = router({
           .enum(['keyword', 'createdAt', 'updatedAt', 'minPrice', 'maxPrice'])
           .default('updatedAt'),
         search: z.string().max(255).optional(),
-        hasResults: z.boolean().optional(),
-        pinnedFirst: z.boolean().optional()
+        hasResults: z.boolean().optional()
       })
     )
     .query(async ({ ctx, input }) => {
@@ -32,13 +31,8 @@ export const scraperRouter = router({
         where.results = input.hasResults ? { some: {} } : { none: {} };
       }
 
-      // Build orderBy clause - prioritize pinned keywords if requested
-      const orderBy = input.pinnedFirst
-        ? [
-            { isPinned: 'desc' as const },
-            { [input.orderByField]: input.orderby }
-          ]
-        : { [input.orderByField]: input.orderby };
+      // Build orderBy clause
+      const orderBy = { [input.orderByField]: input.orderby };
 
       const [keywords, total] = await Promise.all([
         db.scraperKeyword.findMany({
@@ -191,12 +185,11 @@ export const scraperRouter = router({
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string()).default([]),
-        isPinned: z.boolean().optional()
+        categoryIds: z.array(z.string()).default([])
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, keyword, minPrice, maxPrice, categoryIds, isPinned } = input;
+      const { id, keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&
         maxPrice !== null &&
@@ -213,8 +206,7 @@ export const scraperRouter = router({
           keyword,
           minPrice: typeof minPrice === 'undefined' ? null : minPrice,
           maxPrice: typeof maxPrice === 'undefined' ? null : maxPrice,
-          categoryIds,
-          ...(typeof isPinned !== 'undefined' && { isPinned })
+          categoryIds
         }
       });
     }),
@@ -229,19 +221,6 @@ export const scraperRouter = router({
         where: { id: input.id }
       });
       return { success: true };
-    }),
-  togglePinKeyword: publicProcedure
-    .input(
-      z.object({
-        id: z.string().uuid(),
-        isPinned: z.boolean()
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      return await ctx.db.scraperKeyword.update({
-        where: { id: input.id },
-        data: { isPinned: input.isPinned }
-      });
     }),
   getCategories: publicProcedure.query(() => {
     type RawNode = {
@@ -299,12 +278,11 @@ export const scraperRouter = router({
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string()).default([]),
-        isPinned: z.boolean().default(false)
+        categoryIds: z.array(z.string()).default([])
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { keyword, minPrice, maxPrice, categoryIds, isPinned } = input;
+      const { keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&
         maxPrice !== null &&
@@ -320,8 +298,7 @@ export const scraperRouter = router({
           keyword,
           minPrice: typeof minPrice === 'undefined' ? null : minPrice,
           maxPrice: typeof maxPrice === 'undefined' ? null : maxPrice,
-          categoryIds,
-          isPinned
+          categoryIds
         }
       });
     })

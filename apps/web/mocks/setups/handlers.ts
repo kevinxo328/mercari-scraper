@@ -31,7 +31,6 @@ function generateFakeData() {
       maxPrice: faker.number.int({ min: 10001, max: 20000 }),
       categoryIds: categories.map((category) => category.id),
       categoryNames: categories.map((category) => category.name),
-      isPinned: faker.datatype.boolean(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.recent()
     };

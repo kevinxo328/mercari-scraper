@@ -79,7 +79,7 @@ export default function HomePageClient() {
   }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const isAuthenticated = session.status === 'authenticated';
-  const latestUpdateTime = lastRun?.completedAt ?? 'N/A';
+  const latestUpdateTime = lastRun?.completedAt;
 
   const handleDelete = async (id: string) => {
     const shouldDelete =

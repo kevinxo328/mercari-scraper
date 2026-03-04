@@ -100,7 +100,6 @@ describe('AddKeywordDialog with TreeSelect', () => {
       minPrice: null,
       maxPrice: null,
       categoryIds: ['root-b'],
-      isPinned: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
