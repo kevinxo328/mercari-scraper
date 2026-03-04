@@ -35,9 +35,9 @@ export const scraperRouter = router({
       // Build orderBy clause - prioritize pinned keywords if requested
       const orderBy = input.pinnedFirst
         ? [
-          { isPinned: 'desc' as const },
-          { [input.orderByField]: input.orderby }
-        ]
+            { isPinned: 'desc' as const },
+            { [input.orderByField]: input.orderby }
+          ]
         : { [input.orderByField]: input.orderby };
 
       const [keywords, total] = await Promise.all([
@@ -120,6 +120,7 @@ export const scraperRouter = router({
         minPrice: z.number().min(0).nullish(),
         maxPrice: z.number().min(0).nullish(),
         keywords: z.array(z.string()).optional(),
+        updatedSince: z.date().optional(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().nullish(),
         orderby: z.enum(['asc', 'desc']).default('desc')
@@ -146,6 +147,9 @@ export const scraperRouter = router({
             }
           }
         };
+      }
+      if (input.updatedSince) {
+        where.updatedAt = { gte: input.updatedSince };
       }
 
       const results = await db.scraperResult.findMany({
@@ -280,9 +284,13 @@ export const scraperRouter = router({
     return { tree, map };
   }),
   getLastRun: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.scraperRun.findFirst({
-      orderBy: { completedAt: 'desc' }
+    const runs = await ctx.db.scraperRun.findMany({
+      orderBy: { completedAt: 'desc' },
+      take: 2
     });
+    const lastRun = runs[0] ?? null;
+    const sinceDate = runs[1]?.completedAt ?? null;
+    return lastRun ? { ...lastRun, sinceDate } : null;
   }),
   createKeyword: protectedProcedure
     .input(

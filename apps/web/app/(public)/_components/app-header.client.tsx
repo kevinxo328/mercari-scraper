@@ -1,6 +1,7 @@
 'use client';
 
 import NavBar from '@/components/navbar';
+import KeywordSearch from '@/components/keyword-search';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/dist/client/link';
 import {
@@ -16,14 +17,24 @@ import {
 } from '@/components/shadcn/dropdown-menu';
 import { redirect } from 'next/navigation';
 import { useScroll } from '@/hooks/use-scroll';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export default function AppHeader() {
   const session = useSession();
   const isScrolled = useScroll();
+  const pathname = usePathname();
+  const showSearch = !pathname.startsWith('/search');
 
   return (
-    <NavBar isScrolled={isScrolled}>
+    <NavBar
+      isScrolled={isScrolled}
+      centerSlot={
+        showSearch ? (
+          <KeywordSearch className="w-full max-w-[500px]" />
+        ) : undefined
+      }
+    >
       {session.status === 'authenticated' ? (
         <>
           <DropdownMenu>

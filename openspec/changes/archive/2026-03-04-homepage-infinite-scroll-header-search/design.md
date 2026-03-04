@@ -9,13 +9,15 @@ The app header currently only shows login/avatar with no navigation shortcut for
 ## Goals / Non-Goals
 
 **Goals:**
-- Single chronological feed on homepage (all keywords mixed, `updatedAt desc`)
+
+- Homepage shows only the latest scraper run's results (`updatedAt >= previousRun.completedAt`), ordered by `updatedAt desc`
 - Virtual row rendering so only visible grid rows are in the DOM
 - Infinite scroll that fetches the next page as user approaches bottom
-- Keyword search combobox in header: type-to-filter, Enter/🔍 to navigate to `/search?keywords=<value>`, × to clear
+- Keyword search combobox in header: type-to-filter from existing options only, Enter/🔍 to navigate to `/search?keywords=<selected>`, × to clear
 - Hide the header combobox on `/search` (the search page has its own full filter UI)
 
 **Non-Goals:**
+
 - Price range filtering on the homepage (use `/search` for that)
 - Changing the search page itself
 - Server-side rendering of the infinite feed (prefetch first page only)
@@ -27,6 +29,7 @@ The app header currently only shows login/avatar with no navigation shortcut for
 **Chosen**: `useWindowVirtualizer` (window-scroll mode) from `@tanstack/react-virtual`.
 
 **Alternatives considered**:
+
 - `react-window` + `react-window-infinite-loader`: requires two packages, 2D grid support is awkward for responsive grids
 - Skip virtualization (pure infinite scroll): simplest, but DOM nodes grow unbounded after many pages
 
@@ -35,6 +38,7 @@ The app header currently only shows login/avatar with no navigation shortcut for
 **Row height**: Items are square cards in a responsive grid. Row height must be estimated. Use `estimateSize` with a fixed estimate (~220px) and enable `measureElement` for accurate remeasurement after render.
 
 **Columns**: Compute from a `useBreakpoint` hook or a simple `useWindowSize` approach:
+
 - `< 400px` → 2 cols
 - `400–767px` → 3 cols
 - `768–1023px` → 4 cols
@@ -46,21 +50,26 @@ Each virtual row maps to one grid row of `colCount` items.
 
 Instead of `InfiniteScrollTrigger` (IntersectionObserver sentinel), the virtualizer's `getVirtualItems()` is checked on each render: if the last virtual item index ≥ total items − `colCount * 3`, call `fetchNextPage`. This avoids a separate DOM sentinel and works well with virtualized lists where the sentinel may not be rendered.
 
-### 3. Header combobox: custom input + Command popover (shadcn)
+### 3. Header combobox: custom input + Command popover (shadcn), selection-only navigation
 
 **Chosen**: `<Command>` from shadcn/ui (Radix `cmdk`) in a `<Popover>`, with a controlled text input and a magnifying glass submit button.
 
 **Alternatives considered**:
+
 - Native `<select>`: no type-to-filter, poor UX
 - `<Combobox>` from Radix directly: more boilerplate than `cmdk`
 
-**Rationale**: shadcn `<Command>` is already installed and provides filtering out of the box. Wrap in a `<Popover>` to control open/close state. The visible input is a plain `<input>` overlaid with the Command's search, so Enter and button click both work naturally.
+**Rationale**: cmdk (`CommandPrimitive`) is used directly rather than the shadcn `<Command>` wrapper, because the wrapper applies `overflow-hidden` which clips the absolutely-positioned dropdown. `CommandPrimitive.Input` inside `CommandPrimitive` gives full keyboard navigation (↑↓ to move, Enter to select) managed by cmdk internally. Two separate state values are maintained: `filterText` (what the user typed, drives dropdown filtering) and `selected` (the keyword actually chosen from the dropdown). Typing resets `selected` to null. Navigation uses `selected`, not `filterText`, so free-form text that doesn't match a dropdown item navigates to `/search` (all results).
+
+The dropdown list is positioned absolutely below the input (`top-full`, `z-50`) and controlled via an `open` boolean. An `onBlur` with a 150ms delay closes the dropdown while still allowing click events on items to fire. Buttons use `onMouseDown preventDefault` to prevent blur from firing before the click.
 
 **Visibility**: Use `usePathname()` in `app-header.client.tsx`; render `null` for the combobox when pathname starts with `/search`.
 
-### 4. No keyword pre-selection on homepage
+### 4. Homepage feed scope: latest scraper run via `sinceDate`
 
-The homepage feed always shows all results (`keywords` param omitted from `infiniteResults`). Keyword filtering belongs to `/search`. This keeps the homepage simple.
+`getLastRun` fetches the last 2 `ScraperRun` records and returns `sinceDate = previousRun.completedAt`. The `infiniteResults` endpoint accepts an optional `updatedSince: Date` parameter and filters `ScraperResult.updatedAt >= updatedSince`.
+
+This approach is needed because the `ScraperRun` record is created **after** all results are upserted, so `lastRun.createdAt` would always be later than the results it generated. Using the **previous** run's `completedAt` as the lower bound correctly captures all results from the latest run. If only one run exists, `sinceDate` is null and no filter is applied.
 
 ## Risks / Trade-offs
 
@@ -78,7 +87,7 @@ The homepage feed always shows all results (`keywords` param omitted from `infin
 5. Update `app-header.client.tsx` to include the combobox
 6. Manual QA: homepage feed, virtual scroll, header combobox on desktop + mobile
 
-No data migrations or API changes required. Rollback = revert the component files.
+API changes: `infiniteResults` gains optional `updatedSince: Date` param; `getLastRun` now returns `sinceDate` field. Both are backward-compatible. Rollback = revert component and router files.
 
 ## Open Questions
 

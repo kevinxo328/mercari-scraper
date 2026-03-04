@@ -1,64 +1,92 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTRPC } from '@/trpc/client';
-import TimeDisplay from '@/components/time-display';
-import { useQuery, useQueries } from '@tanstack/react-query';
-import React from 'react';
-import Link from 'next/link';
-import { MoveRight } from 'lucide-react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import LinkCard from '@/components/link-card';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { useSession } from 'next-auth/react';
 import { useDeleteResult } from '@/hooks/use-delete-result';
+import TimeDisplay from '@/components/time-display';
 
-const ITEMS_PER_PAGE = 12;
+function useColCount() {
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    function update() {
+      const w = window.innerWidth;
+      if (w >= 1280) setCols(6);
+      else if (w >= 768) setCols(4);
+      else if (w >= 400) setCols(3);
+      else setCols(2);
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return cols;
+}
 
 export default function HomePageClient() {
   const trpc = useTRPC();
   const session = useSession();
   const { deleteResult, isDeleting } = useDeleteResult();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const { data: keywordPage, isPending } = useQuery(
-    trpc.scraper.getKeywords.queryOptions({
-      pageSize: 5,
-      page: 1,
-      orderby: 'desc',
-      orderByField: 'updatedAt',
-      hasResults: true,
-      pinnedFirst: true
-    })
-  );
+  const colCount = useColCount();
 
   const { data: lastRun } = useQuery(trpc.scraper.getLastRun.queryOptions());
 
-  const keywords = keywordPage?.data ?? [];
-  const latestUpdateTime = lastRun?.completedAt ?? 'N/A';
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status
+  } = useInfiniteQuery(
+    trpc.scraper.infiniteResults.infiniteQueryOptions(
+      {
+        limit: 48,
+        orderby: 'desc',
+        updatedSince: lastRun?.sinceDate ?? undefined
+      },
+      { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    )
+  );
 
-  const resultQueries = useQueries({
-    queries:
-      keywords?.map((keyword) =>
-        trpc.scraper.getResults.queryOptions({
-          keywords: [keyword.keyword],
-          pageSize: ITEMS_PER_PAGE,
-          page: 1,
-          orderby: 'desc'
-        })
-      ) || []
+  const allItems = infiniteData?.pages.flatMap((p) => p.data) ?? [];
+  const rowCount = Math.ceil(allItems.length / colCount);
+
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useWindowVirtualizer({
+    count: rowCount,
+    estimateSize: () => 220,
+    overscan: 4,
+    scrollMargin: listRef.current?.offsetTop ?? 0
   });
 
-  const latestResults = resultQueries.map((query) => query.data || []);
+  const virtualItems = virtualizer.getVirtualItems();
+
+  // Trigger next page when near the end
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const last = virtualItems[virtualItems.length - 1];
+    if (last && last.index >= rowCount - 4) {
+      fetchNextPage();
+    }
+  }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   const isAuthenticated = session.status === 'authenticated';
+  const latestUpdateTime = lastRun?.completedAt ?? 'N/A';
 
   const handleDelete = async (id: string) => {
     const shouldDelete =
       typeof window !== 'undefined' && typeof window.confirm === 'function'
         ? window.confirm('Are you sure you want to delete this item?')
         : true;
-
     if (!shouldDelete) return;
-
     setDeletingId(id);
     try {
       await deleteResult(id);
@@ -75,53 +103,76 @@ export default function HomePageClient() {
           <TimeDisplay timestamp={latestUpdateTime} />
         </div>
       </div>
-      {isPending && (
-        <div className="flex grow-1 h-full w-full items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-gray-100"></div>
+
+      {status === 'pending' && (
+        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
+          {Array.from({ length: 24 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-square rounded-lg" />
+          ))}
         </div>
       )}
-      {!isPending && latestResults.length === 0 && (
+
+      {status === 'error' && (
+        <p className="text-center text-red-500">Error loading results.</p>
+      )}
+
+      {status === 'success' && allItems.length === 0 && (
         <p className="text-center text-gray-500">No results found</p>
       )}
-      {keywords &&
-        latestResults.length > 0 &&
-        latestResults.map((results, index) => (
-          <React.Fragment key={index}>
-            <div className="flex justify-between align-baseline mt-8 mb-2">
-              <h5 className="text-xl font-semibold">
-                {keywords[index]?.keyword}
-              </h5>
-              <Link
-                href={`/search?keywords=${encodeURIComponent(
-                  keywords[index]?.keyword ?? ''
-                )}`}
-                className="text-sm flex items-center gap-1"
+
+      {status === 'success' && allItems.length > 0 && (
+        <div
+          ref={listRef}
+          style={{ height: virtualizer.getTotalSize(), position: 'relative' }}
+        >
+          {virtualItems.map((vRow) => {
+            const startIdx = vRow.index * colCount;
+            const rowItems = allItems.slice(startIdx, startIdx + colCount);
+
+            return (
+              <div
+                key={vRow.key}
+                data-index={vRow.index}
+                ref={virtualizer.measureElement}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`
+                }}
               >
-                View More
-                <MoveRight className="size-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-              {results.length === 0 &&
-                Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-                  <Skeleton key={i} className="aspect-square rounded-lg" />
-                ))}
-              {results.map((result) => (
-                <LinkCard
-                  key={result.id}
-                  showDelete={isAuthenticated}
-                  isDeleting={deletingId === result.id && isDeleting}
-                  onDelete={() => handleDelete(result.id)}
-                  url={result.url}
-                  title={result.title}
-                  imageUrl={result.imageUrl}
-                  price={result.price}
-                  currency={result.currency}
-                />
-              ))}
-            </div>
-          </React.Fragment>
-        ))}
+                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
+                  {rowItems.map((result) => (
+                    <LinkCard
+                      key={result.id}
+                      showDelete={isAuthenticated}
+                      isDeleting={deletingId === result.id && isDeleting}
+                      onDelete={() => handleDelete(result.id)}
+                      url={result.url}
+                      title={result.title}
+                      imageUrl={result.imageUrl}
+                      price={result.price}
+                      currency={result.currency}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {isFetchingNextPage && (
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          Loading…
+        </p>
+      )}
+      {!hasNextPage && allItems.length > 0 && (
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          No more results
+        </p>
+      )}
     </main>
   );
 }
