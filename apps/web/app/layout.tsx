@@ -26,7 +26,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="min-h-dvh flex flex-col">
+      <body className="h-dvh flex flex-col overflow-hidden">
         <SessionProvider session={session}>
           <ThemeProvider
             attribute="class"
