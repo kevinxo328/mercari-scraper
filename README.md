@@ -71,13 +71,11 @@ You’ll be prompted to name the migration. Once you provide a name, Prisma will
 
 For production environments, always push schema changes to your database using the [`prisma migrate deploy` command](https://www.prisma.io/docs/orm/prisma-client/deployment/deploy-database-changes-with-prisma-migrate). You can find an example `db:migrate:deploy` script in the [`package.json` file](/packages/database/package.json) of the `database` package.
 
-> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error related to collation version mismatch, run the following in the Supabase SQL Editor, then retry:
+> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error, use `prisma migrate deploy` instead, which applies existing migration files directly without requiring a shadow database:
 >
-> ```sql
-> ALTER DATABASE template1 REFRESH COLLATION VERSION;
+> ```bash
+> cd packages/database && pnpm prisma migrate deploy
 > ```
->
-> Alternatively, use `prisma migrate deploy` directly, which skips the shadow database step.
 
 ### 5. Seed your database
 
