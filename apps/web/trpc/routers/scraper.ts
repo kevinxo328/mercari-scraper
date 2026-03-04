@@ -285,6 +285,7 @@ export const scraperRouter = router({
   }),
   getLastRun: publicProcedure.query(async ({ ctx }) => {
     const runs = await ctx.db.scraperRun.findMany({
+      where: { completedAt: { not: null } },
       orderBy: { completedAt: 'desc' },
       take: 2
     });
