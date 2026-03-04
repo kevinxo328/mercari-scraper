@@ -81,7 +81,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
             }
           }}
           placeholder="Search keywords…"
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
+          className="flex-1 bg-transparent text-base md:text-sm outline-none placeholder:text-muted-foreground min-w-0"
         />
         {filterText && (
           <button
@@ -104,7 +104,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
       </div>
 
       {open && filtered.length > 0 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-md border bg-popover shadow-md">
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-md border bg-popover shadow-md overscroll-contain">
           <CommandList>
             <CommandEmpty>No keywords found</CommandEmpty>
             {filtered.map((k) => (
