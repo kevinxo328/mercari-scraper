@@ -15,9 +15,11 @@ describe('TimeDisplay', () => {
 
   it('renders formatted time and timezone when timestamp is provided', () => {
     render(<TimeDisplay timestamp="2024-01-01T12:34:56Z" />);
-    // 只檢查有顯示時區字串
+    // Check YYYY-MM-DD HH:mm <timezone> format
     expect(
-      screen.getByText((content) => /GMT|Asia|UTC/.test(content))
+      screen.getByText((content) =>
+        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \S+$/.test(content)
+      )
     ).toBeInTheDocument();
   });
 
