@@ -51,7 +51,7 @@ export const NavBar = ({
           </svg>
           <h1
             className={cn(
-              'font-bold transition-all duration-300',
+              'font-bold transition-all duration-300 hidden md:block',
               isScrolled ? 'text-sm' : 'text-md'
             )}
           >
