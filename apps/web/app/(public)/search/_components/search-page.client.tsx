@@ -154,9 +154,9 @@ export default function SearchPageClient() {
   };
 
   return (
-    <main className="container relative mx-auto flex flex-1 gap-4 p-4 min-h-0 overflow-hidden">
+    <main className="container relative mx-auto flex gap-4 p-4 overflow-hidden lg:overflow-hidden">
       <div className="flex min-h-0 grow flex-col overflow-hidden lg:pr-2">
-        <div className="flex items-center justify-between py-2 mb-2 md:mb-4 bg-background">
+        <div className="mb-4 flex items-center justify-between">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
@@ -197,10 +197,7 @@ export default function SearchPageClient() {
             </SheetContent>
           </Sheet>
         </div>
-        <div
-          ref={scrollRef}
-          className="flex-1 min-h-0 overflow-y-auto pr-2 [scrollbar-gutter:stable]"
-        >
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
           {resultsStatus === 'pending' ? (
             <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
               {Array.from({ length: 24 }).map((_, i) => (
@@ -277,7 +274,7 @@ export default function SearchPageClient() {
           )}
         </div>
       </div>
-      <aside className="w-[300px] h-full shrink-0 grow-0 hidden lg:flex flex-col gap-4 overflow-y-auto">
+      <aside className="w-[300px] shrink-0 grow-0 hidden lg:flex flex-col gap-4 lg:overflow-y-auto">
         <div className="flex items-center justify-between">
           <h5 className="text-xl text-gray-400 font-semibold">Filter</h5>
           <Button
