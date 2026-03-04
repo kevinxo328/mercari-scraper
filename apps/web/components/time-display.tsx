@@ -4,11 +4,15 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 export type Props = {
-  timestamp?: Date | string;
+  timestamp?: Date | string | null;
   className?: string;
 };
 
-function formatTimestamp(timestamp: Date | string, timeZone: string): string {
+function formatTimestamp(
+  timestamp: Date | string | null,
+  timeZone: string
+): string {
+  if (!timestamp) return 'N/A';
   const date = new Date(timestamp);
   if (isNaN(date.getTime())) {
     return 'N/A';
