@@ -200,9 +200,6 @@ importers:
         specifier: ^4.5.7
         version: 4.5.7(@types/react@19.2.7)(react@19.2.2)
     devDependencies:
-      '@faker-js/faker':
-        specifier: ^9.9.0
-        version: 9.9.0
       '@jest/types':
         specifier: ^29.6.3
         version: 29.6.3
@@ -251,9 +248,6 @@ importers:
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
-      msw:
-        specifier: ^2.11.4
-        version: 2.12.4(@types/node@20.19.26)(typescript@5.7.2)
       next-router-mock:
         specifier: ^1.0.2
         version: 1.0.4(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
@@ -362,6 +356,9 @@ importers:
       lucide-react:
         specifier: ^0.510.0
         version: 0.510.0(react@19.2.2)
+      next-themes:
+        specifier: ^0.4.6
+        version: 0.4.6(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
       nuqs:
         specifier: ^2.7.1
         version: 2.8.5(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
@@ -1286,10 +1283,6 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
-
-  '@faker-js/faker@9.9.0':
-    resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
-    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
   '@floating-ui/core@1.7.3':
     resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
@@ -7632,8 +7625,6 @@ snapshots:
     optionalDependencies:
       '@noble/hashes': 2.0.1
 
-  '@faker-js/faker@9.9.0': {}
-
   '@floating-ui/core@1.7.3':
     dependencies:
       '@floating-ui/utils': 0.2.10
@@ -7757,7 +7748,8 @@ snapshots:
   '@img/sharp-win32-x64@0.34.4':
     optional: true
 
-  '@inquirer/ansi@1.0.0': {}
+  '@inquirer/ansi@1.0.0':
+    optional: true
 
   '@inquirer/confirm@5.1.18(@types/node@20.19.26)':
     dependencies:
@@ -7765,6 +7757,7 @@ snapshots:
       '@inquirer/type': 3.0.8(@types/node@20.19.26)
     optionalDependencies:
       '@types/node': 20.19.26
+    optional: true
 
   '@inquirer/core@10.2.2(@types/node@20.19.26)':
     dependencies:
@@ -7778,12 +7771,15 @@ snapshots:
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
       '@types/node': 20.19.26
+    optional: true
 
-  '@inquirer/figures@1.0.13': {}
+  '@inquirer/figures@1.0.13':
+    optional: true
 
   '@inquirer/type@3.0.8(@types/node@20.19.26)':
     optionalDependencies:
       '@types/node': 20.19.26
+    optional: true
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -8022,6 +8018,7 @@ snapshots:
       is-node-process: 1.2.0
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
+    optional: true
 
   '@napi-rs/wasm-runtime@0.2.9':
     dependencies:
@@ -8111,14 +8108,17 @@ snapshots:
 
   '@oozcitak/util@10.0.0': {}
 
-  '@open-draft/deferred-promise@2.2.0': {}
+  '@open-draft/deferred-promise@2.2.0':
+    optional: true
 
   '@open-draft/logger@0.3.0':
     dependencies:
       is-node-process: 1.2.0
       outvariant: 1.4.3
+    optional: true
 
-  '@open-draft/until@2.1.0': {}
+  '@open-draft/until@2.1.0':
+    optional: true
 
   '@panva/hkdf@1.2.1': {}
 
@@ -9364,7 +9364,8 @@ snapshots:
 
   '@types/stack-utils@2.0.3': {}
 
-  '@types/statuses@2.0.6': {}
+  '@types/statuses@2.0.6':
+    optional: true
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -10339,7 +10340,8 @@ snapshots:
     dependencies:
       escape-string-regexp: 1.0.5
 
-  cli-width@4.1.0: {}
+  cli-width@4.1.0:
+    optional: true
 
   client-only@0.0.1: {}
 
@@ -10393,7 +10395,8 @@ snapshots:
 
   cookie-es@2.0.0: {}
 
-  cookie@1.0.2: {}
+  cookie@1.0.2:
+    optional: true
 
   copy-anything@4.0.5:
     dependencies:
@@ -10603,7 +10606,7 @@ snapshots:
 
   effect@3.18.4:
     dependencies:
-      '@standard-schema/spec': 1.0.0
+      '@standard-schema/spec': 1.1.0
       fast-check: 3.23.2
 
   electron-to-chromium@1.5.144: {}
@@ -11346,7 +11349,8 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  graphql@16.12.0: {}
+  graphql@16.12.0:
+    optional: true
 
   gzip-size@6.0.0:
     dependencies:
@@ -11379,7 +11383,8 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  headers-polyfill@4.0.3: {}
+  headers-polyfill@4.0.3:
+    optional: true
 
   hosted-git-info@2.8.9: {}
 
@@ -11543,7 +11548,8 @@ snapshots:
 
   is-map@2.0.3: {}
 
-  is-node-process@1.2.0: {}
+  is-node-process@1.2.0:
+    optional: true
 
   is-number-object@1.1.1:
     dependencies:
@@ -12365,8 +12371,10 @@ snapshots:
       typescript: 5.7.2
     transitivePeerDependencies:
       - '@types/node'
+    optional: true
 
-  mute-stream@2.0.0: {}
+  mute-stream@2.0.0:
+    optional: true
 
   mz@2.7.0:
     dependencies:
@@ -12564,7 +12572,8 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  outvariant@1.4.3: {}
+  outvariant@1.4.3:
+    optional: true
 
   own-keys@1.0.1:
     dependencies:
@@ -12637,7 +12646,8 @@ snapshots:
       lru-cache: 10.4.3
       minipass: 7.1.2
 
-  path-to-regexp@6.3.0: {}
+  path-to-regexp@6.3.0:
+    optional: true
 
   path-type@4.0.0: {}
 
@@ -12921,7 +12931,8 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
-  rettime@0.7.0: {}
+  rettime@0.7.0:
+    optional: true
 
   reusify@1.1.0: {}
 
@@ -13194,11 +13205,13 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  statuses@2.0.2: {}
+  statuses@2.0.2:
+    optional: true
 
   std-env@3.10.0: {}
 
-  strict-event-emitter@0.5.1: {}
+  strict-event-emitter@0.5.1:
+    optional: true
 
   string-length@4.0.2:
     dependencies:
@@ -13332,7 +13345,8 @@ snapshots:
       '@pkgr/core': 0.1.2
       tslib: 2.8.1
 
-  tagged-tag@1.0.0: {}
+  tagged-tag@1.0.0:
+    optional: true
 
   tailwind-merge@3.4.0: {}
 
@@ -13559,6 +13573,7 @@ snapshots:
   type-fest@5.3.1:
     dependencies:
       tagged-tag: 1.0.0
+    optional: true
 
   typed-array-buffer@1.0.3:
     dependencies:
@@ -13643,7 +13658,8 @@ snapshots:
       '@unrs/resolver-binding-win32-ia32-msvc': 1.7.2
       '@unrs/resolver-binding-win32-x64-msvc': 1.7.2
 
-  until-async@3.0.2: {}
+  until-async@3.0.2:
+    optional: true
 
   update-browserslist-db@1.1.3(browserslist@4.24.4):
     dependencies:
@@ -13886,6 +13902,7 @@ snapshots:
       ansi-styles: 4.3.0
       string-width: 4.2.3
       strip-ansi: 6.0.1
+    optional: true
 
   wrap-ansi@7.0.0:
     dependencies:
@@ -13945,7 +13962,8 @@ snapshots:
 
   yocto-queue@1.2.2: {}
 
-  yoctocolors-cjs@2.1.3: {}
+  yoctocolors-cjs@2.1.3:
+    optional: true
 
   zod@3.25.76: {}
 
