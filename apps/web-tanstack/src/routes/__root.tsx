@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import {
   createRootRoute,
   HeadContent,
@@ -5,6 +7,7 @@ import {
   Scripts
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { TRPCReactProvider } from '@/trpc/client';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -61,7 +64,8 @@ function RootLayout() {
             </TRPCReactProvider>
           </NuqsAdapter>
         </ThemeProvider>
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position="bottom-right" />
+        <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
       </body>
     </html>

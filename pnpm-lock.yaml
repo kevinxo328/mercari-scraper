@@ -132,7 +132,7 @@ importers:
         version: 11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2)
       '@trpc/next':
         specifier: ^11.6.0
-        version: 11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/react-query@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2)
+        version: 11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/react-query@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2)
       '@trpc/react':
         specifier: ^9.27.4
         version: 9.27.4(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react-query@3.39.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
@@ -159,16 +159,16 @@ importers:
         version: 0.510.0(react@19.2.2)
       next:
         specifier: ^16.0.7
-        version: 16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
+        version: 16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
       next-auth:
         specifier: 5.0.0-beta.30
-        version: 5.0.0-beta.30(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
+        version: 5.0.0-beta.30(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
       nuqs:
         specifier: ^2.7.1
-        version: 2.8.5(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
+        version: 2.8.5(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
       postcss:
         specifier: ^8.5.6
         version: 8.5.6
@@ -259,7 +259,7 @@ importers:
         version: 2.12.4(@types/node@20.19.26)(typescript@5.7.2)
       next-router-mock:
         specifier: ^1.0.2
-        version: 1.0.4(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
+        version: 1.0.4(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.19.26)(typescript@5.7.2)
@@ -315,11 +315,14 @@ importers:
         specifier: ^5.90.2
         version: 5.90.12(react@19.2.2)
       '@tanstack/react-query-devtools':
-        specifier: ^5.90.2
+        specifier: ^5.91.1
         version: 5.91.1(@tanstack/react-query@5.90.12(react@19.2.2))(react@19.2.2)
       '@tanstack/react-router':
         specifier: ^1.163.3
         version: 1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
+      '@tanstack/react-router-ssr-query':
+        specifier: ^1.166.2
+        version: 1.166.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.2))(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(@tanstack/router-core@1.163.3)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
       '@tanstack/react-start':
         specifier: ^1.166.1
         version: 1.166.1(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(vite@7.3.1(@types/node@20.19.26)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0))
@@ -2601,6 +2604,16 @@ packages:
       '@tanstack/router-core':
         optional: true
 
+  '@tanstack/react-router-ssr-query@1.166.2':
+    resolution: {integrity: sha512-ERtz62+94ZF5kY35wlTN0pLL8hY2Enqn/AjauHaeHkvGh8WsN3dQdvPrPqI6urUWwzEjJjkC3fBDsim88HF8rQ==}
+    engines: {node: '>=20.19'}
+    peerDependencies:
+      '@tanstack/query-core': '>=5.90.0'
+      '@tanstack/react-query': '>=5.90.0'
+      '@tanstack/react-router': '>=1.127.0'
+      react: '>=18.0.0 || >=19.0.0'
+      react-dom: 19.2.2
+
   '@tanstack/react-router@1.163.3':
     resolution: {integrity: sha512-hheBbFVb+PbxtrWp8iy6+TTRTbhx3Pn6hKo8Tv/sWlG89ZMcD1xpQWzx8ukHN9K8YWbh5rdzt4kv6u8X4kB28Q==}
     engines: {node: '>=20.19'}
@@ -2687,6 +2700,13 @@ packages:
         optional: true
       webpack:
         optional: true
+
+  '@tanstack/router-ssr-query-core@1.166.2':
+    resolution: {integrity: sha512-syzrtCFtCX/TFK0sy/VqwPtRamg3TL/vr8KTbmksERnHzgRYNm+XynEc0BF9u0LZ/m3gkmY+4n2F4//PUjMG2w==}
+    engines: {node: '>=20.19'}
+    peerDependencies:
+      '@tanstack/query-core': '>=5.90.0'
+      '@tanstack/router-core': '>=1.127.0'
 
   '@tanstack/router-utils@1.161.4':
     resolution: {integrity: sha512-r8TpjyIZoqrXXaf2DDyjd44gjGBoyE+/oEaaH68yLI9ySPO1gUWmQENZ1MZnmBnpUGN24NOZxdjDLc8npK0SAw==}
@@ -8498,6 +8518,17 @@ snapshots:
     transitivePeerDependencies:
       - csstype
 
+  '@tanstack/react-router-ssr-query@1.166.2(@tanstack/query-core@5.90.12)(@tanstack/react-query@5.90.12(react@19.2.2))(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(@tanstack/router-core@1.163.3)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)':
+    dependencies:
+      '@tanstack/query-core': 5.90.12
+      '@tanstack/react-query': 5.90.12(react@19.2.2)
+      '@tanstack/react-router': 1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
+      '@tanstack/router-ssr-query-core': 1.166.2(@tanstack/query-core@5.90.12)(@tanstack/router-core@1.163.3)
+      react: 19.2.2
+      react-dom: 19.2.2(react@19.2.2)
+    transitivePeerDependencies:
+      - '@tanstack/router-core'
+
   '@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2)':
     dependencies:
       '@tanstack/history': 1.161.4
@@ -8623,6 +8654,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@tanstack/router-ssr-query-core@1.166.2(@tanstack/query-core@5.90.12)(@tanstack/router-core@1.163.3)':
+    dependencies:
+      '@tanstack/query-core': 5.90.12
+      '@tanstack/router-core': 1.163.3
+
   '@tanstack/router-utils@1.161.4':
     dependencies:
       '@babel/core': 7.29.0
@@ -8740,18 +8776,6 @@ snapshots:
     dependencies:
       '@trpc/server': 11.7.2(typescript@5.7.2)
       typescript: 5.7.2
-
-  '@trpc/next@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/react-query@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2)':
-    dependencies:
-      '@trpc/client': 11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2)
-      '@trpc/server': 11.7.2(typescript@5.7.2)
-      next: 16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
-      react: 19.2.2
-      react-dom: 19.2.2(react@19.2.2)
-      typescript: 5.7.2
-    optionalDependencies:
-      '@tanstack/react-query': 5.90.12(react@19.2.2)
-      '@trpc/react-query': 11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2)
 
   '@trpc/next@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/react-query@11.7.2(@tanstack/react-query@5.90.12(react@19.2.2))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react-dom@19.2.2(react@19.2.2))(react@19.2.2)(typescript@5.7.2)':
     dependencies:
@@ -11719,21 +11743,10 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-auth@5.0.0-beta.30(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
-    dependencies:
-      '@auth/core': 0.41.0
-      next: 16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
-      react: 19.2.2
-
   next-auth@5.0.0-beta.30(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
     dependencies:
       '@auth/core': 0.41.0
       next: 16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
-      react: 19.2.2
-
-  next-router-mock@1.0.4(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
-    dependencies:
-      next: 16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
       react: 19.2.2
 
   next-router-mock@1.0.4(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
@@ -11745,30 +11758,6 @@ snapshots:
     dependencies:
       react: 19.2.2
       react-dom: 19.2.2(react@19.2.2)
-
-  next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2):
-    dependencies:
-      '@next/env': 16.0.10
-      '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001749
-      postcss: 8.4.31
-      react: 19.2.2
-      react-dom: 19.2.2(react@19.2.2)
-      styled-jsx: 5.1.6(@babel/core@7.28.4)(react@19.2.2)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 16.0.10
-      '@next/swc-darwin-x64': 16.0.10
-      '@next/swc-linux-arm64-gnu': 16.0.10
-      '@next/swc-linux-arm64-musl': 16.0.10
-      '@next/swc-linux-x64-gnu': 16.0.10
-      '@next/swc-linux-x64-musl': 16.0.10
-      '@next/swc-win32-arm64-msvc': 16.0.10
-      '@next/swc-win32-x64-msvc': 16.0.10
-      '@playwright/test': 1.57.0
-      sharp: 0.34.4
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
 
   next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2):
     dependencies:
@@ -11818,14 +11807,6 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
-
-  nuqs@2.8.5(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(next@16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
-    dependencies:
-      '@standard-schema/spec': 1.0.0
-      react: 19.2.2
-    optionalDependencies:
-      '@tanstack/react-router': 1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
-      next: 16.0.10(@babel/core@7.28.4)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2)
 
   nuqs@2.8.5(@tanstack/react-router@1.163.3(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.2(react@19.2.2))(react@19.2.2))(react@19.2.2):
     dependencies:
@@ -12633,13 +12614,6 @@ snapshots:
       min-indent: 1.0.1
 
   strip-json-comments@3.1.1: {}
-
-  styled-jsx@5.1.6(@babel/core@7.28.4)(react@19.2.2):
-    dependencies:
-      client-only: 0.0.1
-      react: 19.2.2
-    optionalDependencies:
-      '@babel/core': 7.28.4
 
   styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.2.2):
     dependencies:
