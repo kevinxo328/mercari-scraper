@@ -396,9 +396,6 @@ importers:
         specifier: ^4.5.7
         version: 4.5.7(@types/react@19.2.7)(react@19.2.2)
     devDependencies:
-      '@faker-js/faker':
-        specifier: ^9.9.0
-        version: 9.9.0
       '@mercari-scraper/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -456,9 +453,6 @@ importers:
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0(@noble/hashes@2.0.1)
-      msw:
-        specifier: ^2.11.4
-        version: 2.12.4(@types/node@20.19.26)(typescript@5.7.2)
       tailwindcss:
         specifier: ^4.1.18
         version: 4.2.1
