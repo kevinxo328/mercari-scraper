@@ -77,7 +77,17 @@ For production environments, always push schema changes to your database using t
 > cd packages/database && pnpm prisma migrate deploy
 > ```
 
-### 5. Seed your database
+### 5. Generate Prisma Client
+
+After running migrations (or any time `prisma/schema.prisma` changes), regenerate the Prisma client:
+
+```bash
+pnpm generate
+```
+
+This runs `prisma generate` and rebuilds the generated client under `packages/database/generated/client/`. Always use `pnpm generate` from the repo root rather than running `prisma generate` directly inside the package.
+
+### 7. Seed your database
 
 To populate your database with initial or fake data, use [Prisma's seeding functionality](https://www.prisma.io/docs/guides/database/seed-database).
 
@@ -88,7 +98,7 @@ Update the seed script located at [`packages/database/src/seed.ts`](/packages/da
 pnpm run db:seed
 ```
 
-### 6. Build your application
+### 8. Build your application
 
 To build all apps and packages in the monorepo, run:
 
@@ -97,7 +107,7 @@ To build all apps and packages in the monorepo, run:
 pnpm run build
 ```
 
-### 7. Start the application
+### 9. Start the application
 
 Finally, start your application with:
 

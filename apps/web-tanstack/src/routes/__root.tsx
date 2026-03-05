@@ -8,9 +8,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { TRPCReactProvider } from '@/trpc/client';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { ThemeProvider } from '@/components/theme-provider';
 import globalsCss from '../styles/globals.css?url';
 
 export const Route = createRootRoute({
@@ -52,18 +50,9 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body className="min-h-dvh flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <NuqsAdapter>
-            <TRPCReactProvider>
-              <Outlet />
-            </TRPCReactProvider>
-          </NuqsAdapter>
-        </ThemeProvider>
+        <NuqsAdapter>
+          <Outlet />
+        </NuqsAdapter>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

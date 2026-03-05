@@ -1,25 +1,40 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Button } from '@/components/shadcn/button';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import TimeDisplay from '@/components/time-display';
+import { trpc } from '@/router';
+
+function useColCount() {
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    function update() {
+      const w = window.innerWidth;
+      if (w >= 1280) setCols(6);
+      else if (w >= 768) setCols(4);
+      else if (w >= 400) setCols(3);
+      else setCols(2);
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  return cols;
+}
 
 function Home() {
+  const { data: lastRun } = useQuery(trpc.scraper.getLastRun.queryOptions());
+  const latestUpdateTime = lastRun?.completedAt;
+
   return (
-    <main className="min-h-dvh w-screen flex items-center justify-center flex-col gap-y-4 p-4">
-      <img
-        className="max-w-sm w-full"
-        src="https://raw.githubusercontent.com/TanStack/tanstack.com/main/public/images/logos/splash-dark.png"
-        alt="TanStack Logo"
-      />
-      <h1>
-        <span className="line-through">Next.js</span> TanStack Start
-      </h1>
-      <a
-        className="bg-foreground text-background rounded-full px-4 py-1 hover:opacity-90"
-        href="https://tanstack.com/start/latest"
-        target="_blank"
-      >
-        Docs
-      </a>
-      <Button>Button</Button>
+    <main className="mx-auto p-4 container relative">
+      <div className="flex justify-end items-center mb-4">
+        <div className="flex flex-col md:flex-row md:gap-2 md:items-baseline text-xs md:text-sm dark:text-gray-400">
+          <span>Last Updated</span>
+          <TimeDisplay timestamp={latestUpdateTime} />
+        </div>
+      </div>
     </main>
   );
 }
