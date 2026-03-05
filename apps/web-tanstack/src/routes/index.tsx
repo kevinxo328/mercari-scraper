@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@/components/shadcn/button';
 
 function Home() {
   return (
@@ -18,6 +19,7 @@ function Home() {
       >
         Docs
       </a>
+      <Button>Button</Button>
     </main>
   );
 }

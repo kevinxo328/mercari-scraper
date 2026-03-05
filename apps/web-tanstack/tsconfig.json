@@ -8,7 +8,7 @@
     ],
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     },
     // TODO: Temporarily disable declaration files until we figure out a solution for Next.js
