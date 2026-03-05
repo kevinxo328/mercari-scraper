@@ -165,7 +165,7 @@ describe('filterNodes', () => {
 
 const flatMap = buildFlatMap(FIXTURE_TREE);
 
-function renderTreeSelect(value: string[] = [], onValueChange = jest.fn()) {
+function renderTreeSelect(value: string[] = [], onValueChange = vi.fn()) {
   return render(
     <TreeSelect
       value={value}
@@ -202,7 +202,7 @@ describe('TreeSelectTrigger', () => {
   });
 
   it('clicking × on badge removes that value', () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     renderTreeSelect(['leaf-a1x', 'leaf-b1'], onChange);
     const badge = screen
       .getByText('Mid A1 > Leaf A1X')
@@ -212,7 +212,7 @@ describe('TreeSelectTrigger', () => {
   });
 
   it('clear button removes all values', () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     renderTreeSelect(['leaf-a1x', 'leaf-b1'], onChange);
     fireEvent.click(screen.getByRole('button', { name: /clear all/i }));
     expect(onChange).toHaveBeenCalledWith([]);
@@ -245,7 +245,7 @@ describe('TreeSelectGroup / TreeSelectItem', () => {
   });
 
   it('selecting a node calls onValueChange', () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     renderTreeSelect([], onChange);
     fireEvent.click(screen.getByRole('combobox'));
     fireEvent.click(screen.getByTestId('checkbox-root-b'));
@@ -278,7 +278,7 @@ describe('TreeSelectGroup / TreeSelectItem', () => {
   });
 
   it('selecting a parent removes all its descendant nodes from selection', () => {
-    const onChange = jest.fn();
+    const onChange = vi.fn();
     // Start with children already selected
     renderTreeSelect(['leaf-a1x', 'leaf-a1y'], onChange);
     fireEvent.click(screen.getByRole('combobox'));

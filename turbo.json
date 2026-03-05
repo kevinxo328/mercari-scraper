@@ -44,6 +44,9 @@
     "lint": {
       "cache": false
     },
+    "test": {
+      "cache": false
+    },
     "scraper": {
       "cache": false,
       "env": ["GITHUB_STEP_SUMMARY", "SCRAPE_CONCURRENCY"]

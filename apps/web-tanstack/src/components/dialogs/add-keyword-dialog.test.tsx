@@ -9,16 +9,48 @@ global.ResizeObserver = class ResizeObserver {
 };
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AddKeywordDialog from './add-keyword-dialog';
-import { useTRPC } from '@/trpc/client';
 
-// Mock trpc client
-jest.mock('@/trpc/client', () => ({
-  useTRPC: jest.fn()
+// Mock @/router so the component's `trpc` proxy is replaced with fixtures
+vi.mock('@/router', () => ({
+  trpc: {
+    scraper: {
+      getCategories: {
+        queryOptions: () => ({
+          queryKey: ['categories'],
+          queryFn: async () => ({ tree: FIXTURE_TREE, map: FIXTURE_MAP })
+        })
+      },
+      createKeyword: {
+        mutationOptions: (opts: {
+          onSuccess?: () => void;
+          onError?: () => void;
+        }) => ({
+          mutationFn: vi.fn().mockResolvedValue({}),
+          ...opts
+        })
+      },
+      updateKeyword: {
+        mutationOptions: (opts: {
+          onSuccess?: () => void;
+          onError?: () => void;
+        }) => ({
+          mutationFn: vi.fn().mockResolvedValue({}),
+          ...opts
+        })
+      },
+      getKeywords: { pathFilter: () => ({ queryKey: ['keywords'] }) }
+    }
+  }
 }));
 
-// Mock sonner
-jest.mock('sonner', () => ({
-  toast: { success: jest.fn(), error: jest.fn() }
+// Mock sonner toast helpers
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() }
+}));
+
+// Mock the local Toaster wrapper to avoid pulling in next-themes (not installed)
+vi.mock('@/components/shadcn/sonner', () => ({
+  Toaster: () => null
 }));
 
 const FIXTURE_TREE = [
@@ -36,49 +68,13 @@ const FIXTURE_MAP: Record<string, { label: string; path: string[] }> = {
   'root-b': { label: 'Root B', path: ['Root B'] }
 };
 
-function mockTRPC(overrides = {}) {
-  const base = {
-    scraper: {
-      getCategories: {
-        queryOptions: () => ({
-          queryKey: ['categories'],
-          queryFn: async () => ({ tree: FIXTURE_TREE, map: FIXTURE_MAP })
-        })
-      },
-      createKeyword: {
-        mutationOptions: (opts: {
-          onSuccess?: () => void;
-          onError?: () => void;
-        }) => ({
-          mutationFn: jest.fn().mockResolvedValue({}),
-          ...opts
-        })
-      },
-      updateKeyword: {
-        mutationOptions: (opts: {
-          onSuccess?: () => void;
-          onError?: () => void;
-        }) => ({
-          mutationFn: jest.fn().mockResolvedValue({}),
-          ...opts
-        })
-      },
-      getKeywords: { pathFilter: () => ({ queryKey: ['keywords'] }) }
-    },
-    ...overrides
-  };
-  (useTRPC as jest.Mock).mockReturnValue(base);
-  return base;
-}
-
 function renderDialog(props = {}) {
-  mockTRPC();
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } }
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <AddKeywordDialog open={true} onOpenChange={jest.fn()} {...props}>
+      <AddKeywordDialog open={true} onOpenChange={vi.fn()} {...props}>
         <button>Open</button>
       </AddKeywordDialog>
     </QueryClientProvider>

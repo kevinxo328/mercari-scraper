@@ -7,20 +7,14 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     // TODO: Temporarily disable declaration files until we figure out a solution for Next.js
     "declaration": false,
     "declarationMap": false,
-    "composite": false
+    "composite": false,
+    "types": ["vitest/globals"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
