@@ -8,15 +8,14 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# cache
+tsconfig.tsbuildinfo
 
 # tankstack start
 /.tankstack
 
 # production
-/build
+/dist
 
 # misc
 .DS_Store
