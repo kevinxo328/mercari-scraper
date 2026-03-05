@@ -206,7 +206,7 @@ describe('TreeSelectTrigger', () => {
     renderTreeSelect(['leaf-a1x', 'leaf-b1'], onChange);
     const badge = screen
       .getByText('Mid A1 > Leaf A1X')
-      .closest('[data-testid="badge"]')!;
+      .closest('[data-testid="badge"]') as HTMLElement;
     fireEvent.click(within(badge).getByRole('button'));
     expect(onChange).toHaveBeenCalledWith(['leaf-b1']);
   });
