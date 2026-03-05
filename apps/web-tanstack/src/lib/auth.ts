@@ -1,70 +1,39 @@
-import NextAuth, { type NextAuthResult } from 'next-auth';
-import Google from 'next-auth/providers/google';
-import Credentials from 'next-auth/providers/credentials';
+import { betterAuth } from 'better-auth';
+import { APIError } from 'better-auth/api';
+import { tanstackStartCookies } from 'better-auth/tanstack-start';
 
 const ALLOWED_EMAILS =
   process.env.AUTH_ALLOW_EMAILS?.split(',').map((e) =>
     e.trim().toLowerCase()
   ) || [];
 
-const providers: any[] = [
-  Google({
-    clientId: process.env.AUTH_GOOGLE_ID!,
-    clientSecret: process.env.AUTH_GOOGLE_SECRET!
-  })
-];
-
-// Add Credentials provider for development environment to bypass Google Auth automation restrictions
-if (process.env.NODE_ENV === 'development') {
-  providers.push(
-    Credentials({
-      name: 'Dev Login',
-      credentials: {
-        email: {
-          label: 'Email',
-          type: 'text',
-          placeholder: 'test@example.com'
-        }
-      },
-      async authorize(credentials) {
-        return {
-          id: 'dev-user-id',
-          name: 'Dev User',
-          email: (credentials?.email as string) || 'test@example.com',
-          image: 'https://avatar.vercel.sh/dev'
-        };
-      }
-    })
-  );
-}
-
-const nextAuth: NextAuthResult = NextAuth({
+export const auth = betterAuth({
   pages: {
-    signIn: '/auth/login'
+    error: '/auth/login'
   },
-  providers,
-  callbacks: {
-    async signIn({ user, account }) {
-      // Bypass allowed emails check for credentials provider (dev only)
-      if (account?.provider === 'credentials') {
-        return true;
-      }
-
-      const email = user.email?.toLowerCase();
-
-      // If ALLOWED_EMAILS is not set, allow all users to sign in
-      if (ALLOWED_EMAILS.length === 0) {
-        return true;
-      }
-
-      // Check if email is in the allowed list
-      if (!email || !ALLOWED_EMAILS.includes(email)) {
-        return '/auth/login?error=unauthorized';
-      }
-
-      return true;
+  socialProviders: {
+    google: {
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!
     }
-  }
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const email = user.email?.toLowerCase();
+          if (
+            ALLOWED_EMAILS.length > 0 &&
+            (!email || !ALLOWED_EMAILS.includes(email))
+          ) {
+            throw new APIError('UNAUTHORIZED', {
+              message: 'Email is not in whitelist'
+            });
+          }
+          return { data: user };
+        }
+      }
+    }
+  },
+  plugins: [tanstackStartCookies()] // make sure this is the last plugin in the array
 });
-
-export const { auth, handlers, signIn, signOut } = nextAuth;

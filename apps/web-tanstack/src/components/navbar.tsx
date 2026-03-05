@@ -1,15 +1,20 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { useScroll } from '@/hooks/use-scroll';
 
 type Props = {
   children?: React.ReactNode;
+  centerSlot?: React.ReactNode;
   isScrolled?: boolean;
 };
 
-export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
+export const NavBar = ({
+  children,
+  centerSlot,
+  isScrolled: propIsScrolled
+}: Props) => {
   const internalIsScrolled = useScroll();
   const isScrolled = propIsScrolled ?? internalIsScrolled;
 
@@ -20,8 +25,8 @@ export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
         isScrolled ? 'p-2' : 'p-4'
       )}
     >
-      <div className="container flex justify-between items-center mx-auto">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="container flex items-center gap-4 mx-auto">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
             width={isScrolled ? '24' : '30'}
@@ -46,14 +51,19 @@ export const NavBar = ({ children, isScrolled: propIsScrolled }: Props) => {
           </svg>
           <h1
             className={cn(
-              'font-bold transition-all duration-300',
+              'font-bold transition-all duration-300 hidden md:block',
               isScrolled ? 'text-sm' : 'text-md'
             )}
           >
             Mercari Scraper
           </h1>
         </Link>
-        <div className="flex items-center gap-4">{children}</div>
+        {centerSlot && (
+          <div className="flex-1 flex justify-center">{centerSlot}</div>
+        )}
+        <div className="flex items-center gap-4 shrink-0 ml-auto">
+          {children}
+        </div>
       </div>
     </header>
   );

@@ -9,7 +9,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { useTRPC } from '@/trpc/client';
+import { trpc } from '@/router';
 import { XIcon, Pencil, Trash2, Star } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -30,7 +30,7 @@ import {
   SelectValue
 } from '../shadcn/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
-import AddKeywordDialog from '../dialog/add-keyword-dialog';
+import AddKeywordDialog from '../dialogs/add-keyword-dialog';
 
 type SortableField =
   | 'keyword'
@@ -68,7 +68,6 @@ const formatPrice = (value: number | null) => {
 };
 
 export default function KeywordTable() {
-  const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

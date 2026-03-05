@@ -8,8 +8,10 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { NuqsAdapter } from 'nuqs/adapters/react';
 import globalsCss from '../styles/globals.css?url';
+import AppHeader from '@/components/app-header';
+import { Toaster } from '@/components/shadcn/sonner';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -51,8 +53,10 @@ function RootLayout() {
       </head>
       <body className="min-h-dvh flex flex-col">
         <NuqsAdapter>
+          <AppHeader />
           <Outlet />
         </NuqsAdapter>
+        <Toaster />
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

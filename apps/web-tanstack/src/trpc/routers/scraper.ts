@@ -1,9 +1,10 @@
-import { publicProcedure, protectedProcedure, router } from '../setup';
+import { procedure, router } from '../setup';
 import { z } from 'zod';
 import { mercariCategories } from '@mercari-scraper/database';
+import { ensureSession } from '@/lib/auth-server';
 
 export const scraperRouter = router({
-  getKeywords: publicProcedure
+  getKeywords: procedure
     .input(
       z.object({
         pageSize: z.number().min(1).max(100).default(20),
@@ -13,8 +14,7 @@ export const scraperRouter = router({
           .enum(['keyword', 'createdAt', 'updatedAt', 'minPrice', 'maxPrice'])
           .default('updatedAt'),
         search: z.string().max(255).optional(),
-        hasResults: z.boolean().optional(),
-        pinnedFirst: z.boolean().optional()
+        hasResults: z.boolean().optional()
       })
     )
     .query(async ({ ctx, input }) => {
@@ -32,13 +32,8 @@ export const scraperRouter = router({
         where.results = input.hasResults ? { some: {} } : { none: {} };
       }
 
-      // Build orderBy clause - prioritize pinned keywords if requested
-      const orderBy = input.pinnedFirst
-        ? [
-            { isPinned: 'desc' as const },
-            { [input.orderByField]: input.orderby }
-          ]
-        : { [input.orderByField]: input.orderby };
+      // Build orderBy clause
+      const orderBy = { [input.orderByField]: input.orderby };
 
       const [keywords, total] = await Promise.all([
         db.scraperKeyword.findMany({
@@ -51,8 +46,6 @@ export const scraperRouter = router({
           where
         })
       ]);
-
-      console.log(mercariCategories);
 
       const data = keywords.map((keyword) => ({
         ...keyword,
@@ -73,7 +66,7 @@ export const scraperRouter = router({
         pageSize: input.pageSize
       };
     }),
-  getResults: publicProcedure
+  getResults: procedure
     .input(
       z.object({
         minPrice: z.number().min(0).optional(),
@@ -116,12 +109,13 @@ export const scraperRouter = router({
         }
       });
     }),
-  infiniteResults: publicProcedure
+  infiniteResults: procedure
     .input(
       z.object({
         minPrice: z.number().min(0).nullish(),
         maxPrice: z.number().min(0).nullish(),
         keywords: z.array(z.string()).optional(),
+        updatedSince: z.date().optional(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().nullish(),
         orderby: z.enum(['asc', 'desc']).default('desc')
@@ -149,6 +143,9 @@ export const scraperRouter = router({
           }
         };
       }
+      if (input.updatedSince) {
+        where.updatedAt = { gte: input.updatedSince };
+      }
 
       const results = await db.scraperResult.findMany({
         where,
@@ -170,31 +167,32 @@ export const scraperRouter = router({
         nextCursor
       };
     }),
-  deleteResult: protectedProcedure
+  deleteResult: procedure
     .input(
       z.object({
         id: z.string().uuid()
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await ensureSession();
       await ctx.db.scraperResult.delete({
         where: { id: input.id }
       });
       return { success: true };
     }),
-  updateKeyword: publicProcedure
+  updateKeyword: procedure
     .input(
       z.object({
         id: z.string().uuid(),
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string()).default([]),
-        isPinned: z.boolean().optional()
+        categoryIds: z.array(z.string()).default([])
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, keyword, minPrice, maxPrice, categoryIds, isPinned } = input;
+      await ensureSession();
+      const { id, keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&
         maxPrice !== null &&
@@ -211,37 +209,24 @@ export const scraperRouter = router({
           keyword,
           minPrice: typeof minPrice === 'undefined' ? null : minPrice,
           maxPrice: typeof maxPrice === 'undefined' ? null : maxPrice,
-          categoryIds,
-          ...(typeof isPinned !== 'undefined' && { isPinned })
+          categoryIds
         }
       });
     }),
-  deleteKeyword: protectedProcedure
+  deleteKeyword: procedure
     .input(
       z.object({
         id: z.string().uuid()
       })
     )
     .mutation(async ({ ctx, input }) => {
+      await ensureSession();
       await ctx.db.scraperKeyword.delete({
         where: { id: input.id }
       });
       return { success: true };
     }),
-  togglePinKeyword: publicProcedure
-    .input(
-      z.object({
-        id: z.string().uuid(),
-        isPinned: z.boolean()
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      return await ctx.db.scraperKeyword.update({
-        where: { id: input.id },
-        data: { isPinned: input.isPinned }
-      });
-    }),
-  getCategories: publicProcedure.query(() => {
+  getCategories: procedure.query(() => {
     type RawNode = {
       code: string;
       name: string;
@@ -281,23 +266,28 @@ export const scraperRouter = router({
 
     return { tree, map };
   }),
-  getLastRun: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.scraperRun.findFirst({
-      orderBy: { completedAt: 'desc' }
+  getLastRun: procedure.query(async ({ ctx }) => {
+    const runs = await ctx.db.scraperRun.findMany({
+      where: { completedAt: { not: null } },
+      orderBy: { completedAt: 'desc' },
+      take: 2
     });
+    const lastRun = runs[0] ?? null;
+    const sinceDate = runs[1]?.completedAt ?? null;
+    return lastRun ? { ...lastRun, sinceDate } : null;
   }),
-  createKeyword: protectedProcedure
+  createKeyword: procedure
     .input(
       z.object({
         keyword: z.string().min(1).max(255),
         minPrice: z.number().min(0).nullable().optional(),
         maxPrice: z.number().min(0).nullable().optional(),
-        categoryIds: z.array(z.string()).default([]),
-        isPinned: z.boolean().default(false)
+        categoryIds: z.array(z.string()).default([])
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { keyword, minPrice, maxPrice, categoryIds, isPinned } = input;
+      await ensureSession();
+      const { keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&
         maxPrice !== null &&
@@ -313,8 +303,7 @@ export const scraperRouter = router({
           keyword,
           minPrice: typeof minPrice === 'undefined' ? null : minPrice,
           maxPrice: typeof maxPrice === 'undefined' ? null : maxPrice,
-          categoryIds,
-          isPinned
+          categoryIds
         }
       });
     })
