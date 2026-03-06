@@ -1,7 +1,7 @@
 'use client';
 /* eslint-env browser */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnDef,
@@ -137,43 +137,51 @@ export default function KeywordTable() {
     };
   }, [isComposing, trimmedSearchValue, searchTerm]);
 
-  const handleSort = (field: SortableField) => {
-    if (sortField === field) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
+  const handleSort = useCallback(
+    (field: SortableField) => {
+      if (sortField === field) {
+        setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      } else {
+        setSortField(field);
+        setSortOrder('asc');
+      }
+    },
+    [sortField]
+  );
 
-  const handleEdit = (keyword: ScraperKeyword) => {
+  const handleEdit = useCallback((keyword: ScraperKeyword) => {
     setKeywordToEdit(keyword);
     setEditDialogOpen(true);
-  };
+  }, []);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchInput('');
     setSearchTerm('');
     setPage(1);
-  };
+  }, []);
 
-  const handleDelete = (keyword: ScraperKeyword) => {
-    const shouldDelete =
-      typeof window !== 'undefined' && typeof window.confirm === 'function'
-        ? window.confirm(`Delete "${keyword.keyword}"? This cannot be undone.`)
-        : true;
+  const handleDelete = useCallback(
+    (keyword: ScraperKeyword) => {
+      const shouldDelete =
+        typeof window !== 'undefined' && typeof window.confirm === 'function'
+          ? window.confirm(
+              `Delete "${keyword.keyword}"? This cannot be undone.`
+            )
+          : true;
 
-    if (!shouldDelete) {
-      return;
-    }
-    setDeletingId(keyword.id);
-    deleteMutation.mutate(
-      { id: keyword.id },
-      {
-        onSettled: () => setDeletingId(null)
+      if (!shouldDelete) {
+        return;
       }
-    );
-  };
+      setDeletingId(keyword.id);
+      deleteMutation.mutate(
+        { id: keyword.id },
+        {
+          onSettled: () => setDeletingId(null)
+        }
+      );
+    },
+    [deleteMutation]
+  );
 
   const isDeleting = deleteMutation.isPending;
 
