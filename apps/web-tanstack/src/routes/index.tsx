@@ -73,7 +73,7 @@ function Home() {
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     const last = virtualItems[virtualItems.length - 1];
-    if (last && last.index >= rowCount - 4) {
+    if (last && last.index >= rowCount - 10) {
       fetchNextPage();
     }
   }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
