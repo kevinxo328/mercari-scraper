@@ -44,17 +44,17 @@ You will need this connection string in the next step to configure your environm
 
 ### 3. Setup environment variables
 
-Once the database is ready, copy the `.env.example` file to the [`/packages/database`](./packages/database/), [`/apps/web`](./apps/web/) and [`/apps/scraper`](./apps/scraper/) directories as `.env`:
+Once the database is ready, copy the `.env.example` file to `.env` in each of the following directories:
 
 ```bash
-cp .env.example ./packages/database/.env
-cp .env.example ./apps/web/.env
-cp .env.example ./apps/scraper/.env
+# Copy example files to .env in each package
+cp ./packages/database/.env.example ./packages/database/.env
+cp ./apps/web/.env.example ./apps/web/.env
+cp ./apps/web-tanstack/.env.example ./apps/web-tanstack/.env
+cp ./apps/scraper/.env.example ./apps/scraper/.env
 ```
 
-This ensures Prisma has access to the `DATABASE_URL` and `DIRECT_URL` environment variable, which is required to connect to your database.
-
-If you added a custom database name, or use a cloud based database, you will need to update the `DATABASE_URL` in your `.env` accordingly.
+Each directory has a specialized `.env.example` file containing the environment variables relevant to that specific part of the application.
 
 ### 4. Migrate your database
 
