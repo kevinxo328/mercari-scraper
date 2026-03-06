@@ -1,7 +1,6 @@
-import { procedure, router } from '../setup';
+import { procedure, protectedProcedure, router } from '../setup';
 import { z } from 'zod';
 import { mercariCategories } from '@mercari-scraper/database';
-import { ensureSession } from '@/lib/auth-server';
 
 export const scraperRouter = router({
   getKeywords: procedure
@@ -167,20 +166,19 @@ export const scraperRouter = router({
         nextCursor
       };
     }),
-  deleteResult: procedure
+  deleteResult: protectedProcedure
     .input(
       z.object({
         id: z.string().uuid()
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ensureSession();
       await ctx.db.scraperResult.delete({
         where: { id: input.id }
       });
       return { success: true };
     }),
-  updateKeyword: procedure
+  updateKeyword: protectedProcedure
     .input(
       z.object({
         id: z.string().uuid(),
@@ -191,7 +189,6 @@ export const scraperRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ensureSession();
       const { id, keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&
@@ -213,14 +210,13 @@ export const scraperRouter = router({
         }
       });
     }),
-  deleteKeyword: procedure
+  deleteKeyword: protectedProcedure
     .input(
       z.object({
         id: z.string().uuid()
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ensureSession();
       await ctx.db.scraperKeyword.delete({
         where: { id: input.id }
       });
@@ -276,7 +272,7 @@ export const scraperRouter = router({
     const sinceDate = runs[1]?.completedAt ?? null;
     return lastRun ? { ...lastRun, sinceDate } : null;
   }),
-  createKeyword: procedure
+  createKeyword: protectedProcedure
     .input(
       z.object({
         keyword: z.string().min(1).max(255),
@@ -286,7 +282,6 @@ export const scraperRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ensureSession();
       const { keyword, minPrice, maxPrice, categoryIds } = input;
       if (
         minPrice !== null &&

@@ -1,31 +1,27 @@
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { prisma } from '@mercari-scraper/database';
 import { transformer } from './shared/transformer';
+import { auth } from '@/lib/auth';
 
-/**
- * Create a context for tRPC procedures
- * You can access things like database, session, etc. via context
- * @see https://trpc.io/docs/context
- */
-export const createContext = async () => {
+export const createContext = async ({ req }: { req: Request }) => {
+  const session = await auth.api.getSession({ headers: req.headers });
   return {
-    db: prisma
+    db: prisma,
+    session
   };
 };
 
 export type Context = Awaited<ReturnType<typeof createContext>>;
 
-/**
- * Initialization of tRPC backend
- * Should be done only once per backend!
- */
 const t = initTRPC.context<Context>().create({
   transformer
 });
 
-/**
- * Export reusable router and procedure helpers
- * that can be used throughout the router
- */
 export const router = t.router;
 export const procedure = t.procedure;
+export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.session) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
+  return next({ ctx: { ...ctx, session: ctx.session } });
+});

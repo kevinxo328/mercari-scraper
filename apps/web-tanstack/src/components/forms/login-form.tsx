@@ -17,7 +17,7 @@ export default function LoginForm({ redirect }: LoginFormProps) {
           className="w-full"
           onClick={() =>
             signIn.social({
-              callbackURL: redirect || '/',
+              callbackURL: redirect.startsWith('/') ? redirect : '/',
               provider: 'google'
             })
           }
