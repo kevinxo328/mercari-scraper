@@ -131,7 +131,6 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 2. To adjust the schedule frequency, edit the `schedule` block inside [`.github/workflows/scraper.yml`](.github/workflows/scraper.yml).
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
    - `DATABASE_URL`
-   - `DIRECT_URL`
    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
    - Any other required environment variables
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
@@ -160,7 +159,6 @@ You can deploy the `web` frontend to [Vercel](https://vercel.com/).
 1. Log in to Vercel and create a new project connected to your GitHub repository.
 2. In the Vercel project settings, add the following environment variables:
    - `DATABASE_URL`
-   - `DIRECT_URL`
    - Any other required environment variables
 3. Set the `Root Directory` in Vercel to `apps/web`.
 4. Save the settings and deploy. Vercel will automatically detect the Next.js app and complete the deployment.
