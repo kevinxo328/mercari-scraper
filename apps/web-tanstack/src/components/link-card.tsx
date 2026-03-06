@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Image } from '@unpic/react';
 export type Props = {
@@ -11,7 +12,7 @@ export type Props = {
   onDelete?: () => void;
 };
 
-const LinkCard = (props: Props) => {
+const LinkCard = memo(function LinkCard(props: Props) {
   const shouldShowDelete =
     props.showDelete && typeof props.onDelete === 'function';
 
@@ -52,6 +53,6 @@ const LinkCard = (props: Props) => {
       </p>
     </a>
   );
-};
+});
 
 export default LinkCard;
