@@ -8,9 +8,6 @@ const ALLOWED_EMAILS =
   ) || [];
 
 export const auth = betterAuth({
-  pages: {
-    error: '/auth/login'
-  },
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,
