@@ -13,7 +13,16 @@ import globalsCss from '../styles/globals.css?url';
 import AppHeader from '@/components/app-header';
 import { Toaster } from '@/components/shadcn/sonner';
 
+function RootPending() {
+  return (
+    <div className="flex grow h-full w-full items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-100" />
+    </div>
+  );
+}
+
 export const Route = createRootRoute({
+  pendingComponent: RootPending,
   head: () => ({
     meta: [
       {
