@@ -1,5 +1,5 @@
 import { publicProcedure, protectedProcedure, router } from '../setup';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import { mercariCategories } from '@mercari-scraper/database';
 
 export const scraperRouter = router({
