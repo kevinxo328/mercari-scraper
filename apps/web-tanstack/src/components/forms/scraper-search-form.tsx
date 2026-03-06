@@ -1,6 +1,6 @@
 'use client';
 
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { Button } from '../shadcn/button';
 import {
   Form,
