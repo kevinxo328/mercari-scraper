@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/client.ts"
+    ".": "./src/client.ts",
+    "./generated/client": "./generated/client/index.js"
   },
   "scripts": {
     "db:migrate:deploy": "prisma migrate deploy",
