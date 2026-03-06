@@ -241,7 +241,7 @@ test.describe('Scrape Mercari', () => {
         });
       }
 
-      writeResults({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
+      writeResults({ createdCount, appUrl: process.env.WEB_APP_URL });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       writeResults({ error: message });
