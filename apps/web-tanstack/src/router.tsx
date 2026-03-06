@@ -9,7 +9,15 @@ import { transformer } from './trpc/shared/transformer';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: 1
+    }
+  }
+});
 export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: createTRPCClient({
     links: [
