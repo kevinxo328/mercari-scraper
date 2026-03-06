@@ -5,6 +5,16 @@ import { Button } from '@/components/shadcn/button';
 import { PlusIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/_protected/dashboard')({
+  loader: async ({ context: { queryClient, trpc } }) => {
+    await queryClient.prefetchQuery(
+      trpc.scraper.getKeywords.queryOptions({
+        page: 1,
+        pageSize: 10,
+        orderby: 'desc',
+        orderByField: 'updatedAt'
+      })
+    );
+  },
   component: RouteComponent
 });
 

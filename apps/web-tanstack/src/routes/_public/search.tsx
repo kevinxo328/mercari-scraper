@@ -1,5 +1,5 @@
 import { createFileRoute, useHydrated } from '@tanstack/react-router';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/shadcn/button';
 import ScraperSearchForm, {
   ScraperFormValues
@@ -33,6 +33,15 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_public/search')({
   validateSearch: searchSchema,
+  loader: async ({ context: { queryClient, trpc } }) => {
+    await queryClient.prefetchQuery(
+      trpc.scraper.getKeywords.queryOptions({
+        orderby: 'desc',
+        orderByField: 'updatedAt',
+        hasResults: true
+      })
+    );
+  },
   component: RouteComponent
 });
 
@@ -119,7 +128,7 @@ export default function RouteComponent() {
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     const last = virtualItems[virtualItems.length - 1];
-    if (last && last.index >= rowCount - 4) {
+    if (last && last.index >= rowCount - 10) {
       fetchNextPage();
     }
   }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -136,26 +145,32 @@ export default function RouteComponent() {
     );
   };
 
-  const handleSubmit = (data: ScraperFormValues) => {
-    setKeywords(data.keywords);
-    setMinPrice(data.minPrice);
-    setMaxPrice(data.maxPrice);
-  };
+  const handleSubmit = useCallback(
+    (data: ScraperFormValues) => {
+      setKeywords(data.keywords);
+      setMinPrice(data.minPrice);
+      setMaxPrice(data.maxPrice);
+    },
+    [setKeywords, setMinPrice, setMaxPrice]
+  );
 
-  const handleDelete = async (id: string) => {
-    const shouldDelete = isHydrated
-      ? window.confirm('Are you sure you want to delete this item?')
-      : true;
+  const handleDelete = useCallback(
+    async (id: string) => {
+      const shouldDelete = isHydrated
+        ? window.confirm('Are you sure you want to delete this item?')
+        : true;
 
-    if (!shouldDelete) return;
+      if (!shouldDelete) return;
 
-    setDeletingId(id);
-    try {
-      await deleteResult(id);
-    } finally {
-      setDeletingId(null);
-    }
-  };
+      setDeletingId(id);
+      try {
+        await deleteResult(id);
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [isHydrated, deleteResult]
+  );
 
   return (
     <main className="container relative mx-auto flex gap-4 p-4 overflow-hidden lg:overflow-hidden">
