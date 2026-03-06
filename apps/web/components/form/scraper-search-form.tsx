@@ -1,6 +1,6 @@
 'use client';
 
-import z from 'zod';
+import { z } from 'zod/v4';
 import { Button } from '../shadcn/button';
 import {
   Form,
@@ -11,7 +11,7 @@ import {
   FormMessage
 } from '../shadcn/form';
 import { Input } from '../shadcn/input';
-import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import {
   Select,
@@ -26,7 +26,7 @@ const formSchema = z
   .object({
     keywords: z.array(z.string()),
     minPrice: z
-      .number({ invalid_type_error: 'Invalid number' })
+      .number({ error: 'Invalid number' })
       .nullable()
       .transform((val: any) => {
         if (val === null || val === undefined || val === '') return null;
@@ -37,7 +37,7 @@ const formSchema = z
         message: 'Min price must be greater than or equal to 0'
       }),
     maxPrice: z
-      .number({ invalid_type_error: 'Invalid number' })
+      .number({ error: 'Invalid number' })
       .nullable()
       .transform((val: any) => {
         if (val === null || val === undefined || val === '') return null;
