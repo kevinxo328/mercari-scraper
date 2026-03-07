@@ -5,6 +5,9 @@ module.exports = {
   parserOptions: {
     project: true
   },
+  env: {
+    es2020: true
+  },
   rules: {
     'turbo/no-undeclared-env-vars': [
       'error',
