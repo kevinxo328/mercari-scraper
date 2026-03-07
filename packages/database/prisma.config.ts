@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { defineConfig, env } from 'prisma/config';
+import { defineConfig } from 'prisma/config';
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -7,6 +7,9 @@ export default defineConfig({
     path: 'prisma/migrations'
   },
   datasource: {
-    url: env('DATABASE_URL') // postgres://user:pass@host:5432/db
+    // DATABASE_URL is not required during `prisma generate` (schema → client
+    // type generation). Fallback to empty string so CI/Vercel build steps
+    // that only run generate don't fail on a missing env var.
+    url: process.env.DATABASE_URL ?? ''
   }
 });
