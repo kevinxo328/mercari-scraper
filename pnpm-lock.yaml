@@ -509,9 +509,6 @@ importers:
       '@prisma/client':
         specifier: ^7.4.2
         version: 7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.5.4))(typescript@5.5.4)
-      '@types/node':
-        specifier: ^20.17.47
-        version: 20.19.37
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
@@ -525,6 +522,9 @@ importers:
       '@mercari-scraper/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
+      '@types/node':
+        specifier: ^20.17.47
+        version: 20.19.37
       '@types/pg':
         specifier: ^8.18.0
         version: 8.18.0
