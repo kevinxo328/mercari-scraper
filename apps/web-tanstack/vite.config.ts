@@ -23,11 +23,12 @@ export default defineConfig({
       }
     }),
     nitro({
-      // pg is a CJS module with a known Rollup CJS→ESM interop bug (TDZ on
-      // `get default()`). Tell Nitro not to bundle it; let Node resolve it
-      // at runtime from the workspace node_modules instead.
       rollupConfig: {
-        external: ['pg', '@prisma/adapter-pg']
+        // 'compat' interop prevents the CJS→ESM TDZ bug where `pg`'s
+        // `get default()` getter fires before the variable is initialised.
+        output: {
+          interop: 'compat'
+        }
       }
     }),
     viteReact(),
