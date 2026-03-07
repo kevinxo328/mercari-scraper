@@ -4,12 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef,useState } from 'react';
+import { useRef, useState } from 'react';
 
 import {
   CommandEmpty,
   CommandItem,
-  CommandList} from '@/components/shadcn/command';
+  CommandList
+} from '@/components/shadcn/command';
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/trpc/client';
 

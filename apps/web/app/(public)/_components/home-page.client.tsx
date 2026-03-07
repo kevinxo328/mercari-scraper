@@ -3,7 +3,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useSession } from 'next-auth/react';
-import { useEffect,useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import LinkCard from '@/components/link-card';
 import { Skeleton } from '@/components/shadcn/skeleton';

@@ -1,9 +1,10 @@
 import {
   getCategoryByCode,
   PrismaClient,
-  type ScraperKeyword} from '@mercari-scraper/database';
-import { type Page,test } from '@playwright/test';
-import { existsSync, readFileSync,writeFileSync } from 'fs';
+  type ScraperKeyword
+} from '@mercari-scraper/database';
+import { type Page, test } from '@playwright/test';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import os from 'os';
 import pLimit from 'p-limit';
 import path from 'path';

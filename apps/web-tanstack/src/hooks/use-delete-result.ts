@@ -3,7 +3,8 @@
 import {
   InfiniteData,
   useMutation,
-  useQueryClient} from '@tanstack/react-query';
+  useQueryClient
+} from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { trpc } from '@/router';

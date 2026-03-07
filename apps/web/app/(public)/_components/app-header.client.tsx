@@ -3,14 +3,15 @@
 import Link from 'next/dist/client/link';
 import { redirect } from 'next/navigation';
 import { usePathname } from 'next/navigation';
-import { signOut,useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 import KeywordSearch from '@/components/keyword-search';
 import NavBar from '@/components/navbar';
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage} from '@/components/shadcn/avatar';
+  AvatarImage
+} from '@/components/shadcn/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,

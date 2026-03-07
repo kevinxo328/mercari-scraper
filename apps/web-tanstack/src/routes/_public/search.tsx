@@ -6,8 +6,9 @@ import {
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
-  useQueryState} from 'nuqs';
-import { useEffect,useRef, useState } from 'react';
+  useQueryState
+} from 'nuqs';
+import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
 import ScraperSearchForm, {

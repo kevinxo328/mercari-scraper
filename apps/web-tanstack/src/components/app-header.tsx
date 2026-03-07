@@ -5,7 +5,8 @@ import NavBar from '@/components/navbar';
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage} from '@/components/shadcn/avatar';
+  AvatarImage
+} from '@/components/shadcn/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown,ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { memo } from 'react';
 
 import { Checkbox } from '@/components/shadcn/checkbox';
@@ -11,7 +11,8 @@ import { TreeNode } from './types';
 import {
   getDescendantValues,
   getIndeterminate,
-  hasSelectedAncestor} from './utils';
+  hasSelectedAncestor
+} from './utils';
 
 interface TreeSelectItemProps {
   node: TreeNode;

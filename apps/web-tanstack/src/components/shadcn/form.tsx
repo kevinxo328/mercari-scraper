@@ -10,7 +10,8 @@ import {
   type FieldValues,
   FormProvider,
   useFormContext,
-  useFormState} from 'react-hook-form';
+  useFormState
+} from 'react-hook-form';
 
 import { Label } from '@/components/shadcn/label';
 import { cn } from '@/lib/utils';
@@ -163,4 +164,5 @@ export {
   FormItem,
   FormLabel,
   FormMessage,
-  useFormField};
+  useFormField
+};

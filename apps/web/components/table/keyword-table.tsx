@@ -8,7 +8,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { Pencil, Trash2,XIcon } from 'lucide-react';
+import { Pencil, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/shadcn/button';

@@ -5,14 +5,16 @@ import {
   TreeSelect,
   TreeSelectContent,
   TreeSelectGroup,
-  TreeSelectTrigger} from './index';
+  TreeSelectTrigger
+} from './index';
 import { TreeNode } from './types';
 import {
   buildFlatMap,
   filterNodes,
   getDescendantValues,
   getIndeterminate,
-  hasSelectedAncestor} from './utils';
+  hasSelectedAncestor
+} from './utils';
 
 // Fixture tree:
 // root-a

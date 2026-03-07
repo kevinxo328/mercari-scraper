@@ -5,7 +5,8 @@ import {
   ChevronDown,
   WandSparkles,
   XCircle,
-  XIcon} from 'lucide-react';
+  XIcon
+} from 'lucide-react';
 import * as React from 'react';
 
 import { Badge } from '@/components/shadcn/badge';

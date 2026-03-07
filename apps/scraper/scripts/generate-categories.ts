@@ -14,7 +14,7 @@
  */
 
 import { chromium } from '@playwright/test';
-import { mkdirSync,writeFileSync } from 'fs';
+import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
