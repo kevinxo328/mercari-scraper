@@ -19,7 +19,7 @@
     "turbo": "^2.5.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "name": "mercari-scraper",
   "packageManager": "pnpm@10.9.0",
