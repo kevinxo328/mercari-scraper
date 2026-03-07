@@ -20,11 +20,5 @@
     "node": ">=22"
   },
   "name": "mercari-scraper",
-  "packageManager": "pnpm@10.9.0",
-  "pnpm": {
-    "overrides": {
-      "react": "19.2.4",
-      "react-dom": "19.2.4"
-    }
-  }
+  "packageManager": "pnpm@10.9.0"
 }
