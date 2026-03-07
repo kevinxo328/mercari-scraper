@@ -2,8 +2,8 @@
 // We test the DFS builder functions directly rather than the tRPC router to avoid
 // bootstrapping the full tRPC/Prisma context in Jest.
 
-import { buildFlatMap } from '@/components/tree-select/utils';
 import type { TreeNode } from '@/components/tree-select/types';
+import { buildFlatMap } from '@/components/tree-select/utils';
 
 // Minimal fixture that mirrors the raw mercari-categories.json shape
 const RAW_TREE = [

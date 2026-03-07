@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 
 // Radix UI Popover requires ResizeObserver
 global.ResizeObserver = class ResizeObserver {
@@ -8,8 +8,10 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AddKeywordDialog from './add-keyword-dialog';
+
 import { useTRPC } from '@/trpc/client';
+
+import AddKeywordDialog from './add-keyword-dialog';
 
 // Mock trpc client
 jest.mock('@/trpc/client', () => ({

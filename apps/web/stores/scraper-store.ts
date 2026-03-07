@@ -1,7 +1,8 @@
-import { ScraperResult, ScraperFilter, ScraperKeyword } from '@/types/scraper';
-import { createStore } from 'zustand/vanilla';
 import { devtools } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
+
 import { API } from '@/lib/api';
+import { ScraperFilter, ScraperKeyword,ScraperResult } from '@/types/scraper';
 
 export type ScraperState = {
   results: {

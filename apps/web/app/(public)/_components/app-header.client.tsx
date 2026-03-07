@@ -1,23 +1,23 @@
 'use client';
 
-import NavBar from '@/components/navbar';
-import KeywordSearch from '@/components/keyword-search';
-import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/dist/client/link';
+import { redirect } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { signOut,useSession } from 'next-auth/react';
+
+import KeywordSearch from '@/components/keyword-search';
+import NavBar from '@/components/navbar';
 import {
   Avatar,
-  AvatarImage,
-  AvatarFallback
-} from '@/components/shadcn/avatar';
+  AvatarFallback,
+  AvatarImage} from '@/components/shadcn/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/shadcn/dropdown-menu';
-import { redirect } from 'next/navigation';
 import { useScroll } from '@/hooks/use-scroll';
-import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export default function AppHeader() {

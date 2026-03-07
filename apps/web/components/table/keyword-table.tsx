@@ -1,7 +1,6 @@
 'use client';
 /* eslint-env browser */
 
-import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnDef,
@@ -9,8 +8,9 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { useTRPC } from '@/trpc/client';
-import { XIcon, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2,XIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import {
@@ -21,7 +21,10 @@ import {
   TableHeader,
   TableRow
 } from '@/components/shadcn/table';
+import { useTRPC } from '@/trpc/client';
 import { ScraperKeyword } from '@/types/scraper';
+
+import AddKeywordDialog from '../dialog/add-keyword-dialog';
 import {
   Select,
   SelectContent,
@@ -30,7 +33,6 @@ import {
   SelectValue
 } from '../shadcn/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
-import AddKeywordDialog from '../dialog/add-keyword-dialog';
 
 type SortableField =
   | 'keyword'

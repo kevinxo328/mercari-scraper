@@ -1,6 +1,7 @@
-import { publicProcedure, protectedProcedure, router } from '../setup';
-import { z } from 'zod';
 import { mercariCategories } from '@mercari-scraper/database';
+import { z } from 'zod';
+
+import { protectedProcedure, publicProcedure, router } from '../setup';
 
 export const scraperRouter = router({
   getKeywords: publicProcedure

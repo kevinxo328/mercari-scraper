@@ -1,5 +1,6 @@
-import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 import React from 'react';
+
+import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 import HomePageClient from './_components/home-page.client';
 

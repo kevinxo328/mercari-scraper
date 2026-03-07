@@ -1,12 +1,14 @@
 'use client';
 
+import { ChevronDown, XCircle,XIcon } from 'lucide-react';
 import React from 'react';
-import { ChevronDown, XIcon, XCircle } from 'lucide-react';
-import { PopoverTrigger } from '@/components/shadcn/popover';
+
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
+import { PopoverTrigger } from '@/components/shadcn/popover';
 import { Separator } from '@/components/shadcn/separator';
 import { cn } from '@/lib/utils';
+
 import { useTreeSelect } from './tree-select';
 
 interface TreeSelectTriggerProps {

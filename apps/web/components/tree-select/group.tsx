@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { TreeNode } from './types';
-import { useTreeSelect } from './tree-select';
+
 import { TreeSelectItem } from './item';
+import { useTreeSelect } from './tree-select';
+import { TreeNode } from './types';
 
 interface TreeSelectGroupProps {
   items: TreeNode[];

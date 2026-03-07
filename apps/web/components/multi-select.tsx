@@ -1,23 +1,15 @@
 /* eslint-env browser */
-import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import {
   CheckIcon,
-  XCircle,
   ChevronDown,
-  XIcon,
-  WandSparkles
-} from 'lucide-react';
+  WandSparkles,
+  XCircle,
+  XIcon} from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
-import { Separator } from '@/components/shadcn/separator';
-import { Button } from '@/components/shadcn/button';
 import { Badge } from '@/components/shadcn/badge';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/shadcn/popover';
+import { Button } from '@/components/shadcn/button';
 import {
   Command,
   CommandEmpty,
@@ -27,6 +19,13 @@ import {
   CommandList,
   CommandSeparator
 } from '@/components/shadcn/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/shadcn/popover';
+import { Separator } from '@/components/shadcn/separator';
+import { cn } from '@/lib/utils';
 
 /**
  * Animation types and configurations
@@ -1228,4 +1227,4 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 
 MultiSelect.displayName = 'MultiSelect';
 
-export type { MultiSelectOption, MultiSelectGroup, MultiSelectProps };
+export type { MultiSelectGroup, MultiSelectOption, MultiSelectProps };
