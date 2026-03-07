@@ -1,10 +1,6 @@
 {
   "context": {
-    "fileName": [
-      "GEMINI.md",
-      "AGENTS.md",
-      "CLAUDE.md"
-    ]
+    "fileName": ["GEMINI.md", "AGENTS.md", "CLAUDE.md"]
   },
   "hooks": {
     "AfterTool": [
@@ -13,11 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node -e \"let d=''; process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).tool_input.file_path))\" | xargs pnpm prettier --write 2>/dev/null || true"
-          },
-          {
-            "type": "command",
-            "command": "node -e \"let d=''; process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).tool_input.file_path))\" | xargs pnpm exec eslint --fix 2>/dev/null || true"
+            "command": ".agents/hooks/post-edit.sh"
           }
         ]
       }
