@@ -1,12 +1,11 @@
-import NavBar from '@/components/navbar';
-import KeywordSearch from '@/components/keyword-search';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
-import { signOut, useSession } from '@/lib/auth-client';
+
+import KeywordSearch from '@/components/keyword-search';
+import NavBar from '@/components/navbar';
 import {
   Avatar,
-  AvatarImage,
-  AvatarFallback
-} from '@/components/shadcn/avatar';
+  AvatarFallback,
+  AvatarImage} from '@/components/shadcn/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +13,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/shadcn/dropdown-menu';
 import { useScroll } from '@/hooks/use-scroll';
+import { signOut, useSession } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
 export default function AppHeader() {

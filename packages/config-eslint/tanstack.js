@@ -18,7 +18,7 @@ module.exports = {
     node: true,
     es6: true
   },
-  plugins: ['only-warn', '@typescript-eslint'],
+  plugins: ['only-warn', '@typescript-eslint', 'simple-import-sort'],
   settings: {
     'import/resolver': {
       typescript: {
@@ -43,7 +43,9 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': [
           'warn',
           { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
-        ]
+        ],
+        'simple-import-sort/imports': 'warn',
+        'simple-import-sort/exports': 'warn'
       }
     }
   ]

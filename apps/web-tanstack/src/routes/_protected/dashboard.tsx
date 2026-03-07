@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import KeywordTable from '@/components/tables/keyword-table';
+import { PlusIcon } from 'lucide-react';
+
 import AddKeywordDialog from '@/components/dialogs/add-keyword-dialog';
 import { Button } from '@/components/shadcn/button';
-import { PlusIcon } from 'lucide-react';
+import KeywordTable from '@/components/tables/keyword-table';
 
 export const Route = createFileRoute('/_protected/dashboard')({
   component: RouteComponent

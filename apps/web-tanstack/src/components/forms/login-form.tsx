@@ -1,8 +1,10 @@
 'use client';
 
-import { signIn } from '@/lib/auth-client';
-import { Button } from '../shadcn/button';
 import { FcGoogle } from 'react-icons/fc';
+
+import { signIn } from '@/lib/auth-client';
+
+import { Button } from '../shadcn/button';
 
 interface LoginFormProps {
   redirect: string;

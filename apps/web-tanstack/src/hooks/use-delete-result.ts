@@ -1,11 +1,11 @@
 'use client';
 
 import {
+  InfiniteData,
   useMutation,
-  useQueryClient,
-  InfiniteData
-} from '@tanstack/react-query';
+  useQueryClient} from '@tanstack/react-query';
 import { toast } from 'sonner';
+
 import { trpc } from '@/router';
 
 type InfiniteResultsPage = {

@@ -1,5 +1,5 @@
-import { Trash2 } from 'lucide-react';
 import { Image } from '@unpic/react';
+import { Trash2 } from 'lucide-react';
 export type Props = {
   url: string;
   title: string;

@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   createRootRoute,
   HeadContent,
@@ -7,11 +8,12 @@ import {
   Scripts
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { NuqsAdapter } from 'nuqs/adapters/react';
-import globalsCss from '../styles/globals.css?url';
+
 import AppHeader from '@/components/app-header';
 import { Toaster } from '@/components/shadcn/sonner';
+
+import globalsCss from '../styles/globals.css?url';
 
 function RootPending() {
   return (

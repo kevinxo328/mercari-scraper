@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+
 import { resolveAuthError } from '@/lib/auth-errors';
 
 export const Route = createFileRoute('/api/auth/error')({

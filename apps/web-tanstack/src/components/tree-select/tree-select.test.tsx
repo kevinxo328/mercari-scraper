@@ -1,19 +1,18 @@
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
-import {
-  buildFlatMap,
-  getDescendantValues,
-  hasSelectedAncestor,
-  getIndeterminate,
-  filterNodes
-} from './utils';
-import { TreeNode } from './types';
+
 import {
   TreeSelect,
-  TreeSelectTrigger,
   TreeSelectContent,
-  TreeSelectGroup
-} from './index';
+  TreeSelectGroup,
+  TreeSelectTrigger} from './index';
+import { TreeNode } from './types';
+import {
+  buildFlatMap,
+  filterNodes,
+  getDescendantValues,
+  getIndeterminate,
+  hasSelectedAncestor} from './utils';
 
 // Fixture tree:
 // root-a

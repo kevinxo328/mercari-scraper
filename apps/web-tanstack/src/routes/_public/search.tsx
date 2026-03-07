@@ -1,19 +1,20 @@
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { createFileRoute, useHydrated } from '@tanstack/react-router';
-import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/shadcn/button';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Funnel } from 'lucide-react';
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  useQueryState} from 'nuqs';
+import { useEffect,useRef, useState } from 'react';
+import { z } from 'zod';
+
 import ScraperSearchForm, {
   ScraperFormValues
 } from '@/components/forms/scraper-search-form';
-import {
-  useQueryState,
-  parseAsArrayOf,
-  parseAsString,
-  parseAsInteger
-} from 'nuqs';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { trpc } from '@/router';
 import LinkCard from '@/components/link-card';
-import { Skeleton } from '@/components/shadcn/skeleton';
+import { Button } from '@/components/shadcn/button';
 import {
   Sheet,
   SheetContent,
@@ -21,11 +22,10 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/shadcn/sheet';
-import { Funnel } from 'lucide-react';
-import { useSession } from '@/lib/auth-client';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { useDeleteResult } from '@/hooks/use-delete-result';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { z } from 'zod';
+import { useSession } from '@/lib/auth-client';
+import { trpc } from '@/router';
 
 const searchSchema = z.object({
   keywords: z.string().optional()

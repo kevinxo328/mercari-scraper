@@ -1,8 +1,9 @@
 'use client';
 
 import { Link } from '@tanstack/react-router';
-import { cn } from '@/lib/utils';
+
 import { useScroll } from '@/hooks/use-scroll';
+import { cn } from '@/lib/utils';
 
 type Props = {
   children?: React.ReactNode;
