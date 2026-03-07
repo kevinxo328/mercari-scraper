@@ -317,9 +317,6 @@ importers:
       '@trpc/client':
         specifier: ^11.6.0
         version: 11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2)
-      '@trpc/next':
-        specifier: ^11.6.0
-        version: 11.7.2(@tanstack/react-query@5.90.12(react@19.2.4))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/react-query@11.7.2(@tanstack/react-query@5.90.12(react@19.2.4))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(next@16.0.10(@babel/core@7.29.0)(@playwright/test@1.57.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.2)
       '@trpc/react-query':
         specifier: ^11.6.0
         version: 11.7.2(@tanstack/react-query@5.90.12(react@19.2.4))(@trpc/client@11.7.2(@trpc/server@11.7.2(typescript@5.7.2))(typescript@5.7.2))(@trpc/server@11.7.2(typescript@5.7.2))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.2)
@@ -393,9 +390,6 @@ importers:
       '@mercari-scraper/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
-      '@prisma/nextjs-monorepo-workaround-plugin':
-        specifier: ^6.17.0
-        version: 6.19.1
       '@tailwindcss/vite':
         specifier: ^4.2.1
         version: 4.2.1(vite@7.3.1(@types/node@20.19.37)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0))
@@ -1992,9 +1986,6 @@ packages:
 
   '@prisma/get-platform@7.4.2':
     resolution: {integrity: sha512-UTnChXRwiauzl/8wT4hhe7Xmixja9WE28oCnGpBtRejaHhvekx5kudr3R4Y9mLSA0kqGnAMeyTiKwDVMjaEVsw==}
-
-  '@prisma/nextjs-monorepo-workaround-plugin@6.19.1':
-    resolution: {integrity: sha512-/K9LcWywyGbr6Mkibw5SIDSkEdzCd7fnpOjj8mqQFbjX8tvjMVcYzocBuJJB+z66VQ8HvJJHc1Zwn2y7H+iXqA==}
 
   '@prisma/query-plan-executor@7.2.0':
     resolution: {integrity: sha512-EOZmNzcV8uJ0mae3DhTsiHgoNCuu1J9mULQpGCh62zN3PxPTd+qI9tJvk5jOst8WHKQNwJWR3b39t0XvfBB0WQ==}
@@ -8875,8 +8866,6 @@ snapshots:
   '@prisma/get-platform@7.4.2':
     dependencies:
       '@prisma/debug': 7.4.2
-
-  '@prisma/nextjs-monorepo-workaround-plugin@6.19.1': {}
 
   '@prisma/query-plan-executor@7.2.0': {}
 

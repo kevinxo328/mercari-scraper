@@ -2,20 +2,12 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "db:migrate:deploy": "turbo run db:migrate:deploy",
-    "db:migrate:dev": "turbo run db:migrate:dev",
-    "db:push": "turbo run db:push",
-    "db:seed": "turbo run db:seed",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "lint:fix": "turbo run lint:fix",
-    "scraper": "turbo run scraper",
-    "scraper:debug": "turbo run scraper:debug",
-    "scraper:ui": "turbo run scraper:ui",
-    "scraper:report": "turbo run scraper:report"
+    "lint:fix": "turbo run lint:fix"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",
