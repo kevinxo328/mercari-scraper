@@ -11,8 +11,9 @@ This turborepo includes the following packages/apps:
 ### Apps and packages
 
 - `web`: a [Next.js](https://nextjs.org/) app
+- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app (experimental, work in progress)
 - `scraper`: a [Playwright](https://playwright.dev/) scraper
-- `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-prettier` and `plugin:turbo/recommended`)
 - `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
 - `@mercari-scraper/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
@@ -87,7 +88,7 @@ pnpm generate
 
 This runs `prisma generate` and rebuilds the generated client under `packages/database/generated/client/`. Always use `pnpm generate` from the repo root rather than running `prisma generate` directly inside the package.
 
-### 7. Seed your database
+### 6. Seed your database
 
 To populate your database with initial or fake data, use [Prisma's seeding functionality](https://www.prisma.io/docs/guides/database/seed-database).
 
@@ -162,6 +163,8 @@ You can deploy the `web` frontend to [Vercel](https://vercel.com/).
    - Any other required environment variables
 3. Set the `Root Directory` in Vercel to `apps/web`.
 4. Save the settings and deploy. Vercel will automatically detect the Next.js app and complete the deployment.
+
+> **Note:** `web-tanstack` is an experimental app built with TanStack Start and is currently a work in progress. It is not yet ready for production deployment.
 
 ---
 
