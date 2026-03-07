@@ -11,10 +11,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      '@prisma/client':
-        specifier: 7.4.2
-        version: 7.4.2(prisma@7.4.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.2))(typescript@5.7.2)
     devDependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.18.0
@@ -31,9 +27,6 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.8.1
-      prisma:
-        specifier: 7.4.2
-        version: 7.4.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.7.2)
       tsx:
         specifier: 4.19.1
         version: 4.19.1
@@ -8857,6 +8850,7 @@ snapshots:
       zeptomatch: 2.1.0
     transitivePeerDependencies:
       - typescript
+    optional: true
 
   '@prisma/driver-adapter-utils@7.4.2':
     dependencies:
@@ -13705,6 +13699,7 @@ snapshots:
       - magicast
       - react
       - react-dom
+    optional: true
 
   prompts@2.4.2:
     dependencies:
@@ -14697,6 +14692,7 @@ snapshots:
   valibot@1.2.0(typescript@5.7.2):
     optionalDependencies:
       typescript: 5.7.2
+    optional: true
 
   validate-npm-package-license@3.0.4:
     dependencies:
