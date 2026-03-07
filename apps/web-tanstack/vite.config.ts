@@ -38,6 +38,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // 'compat' interop prevents the CJS→ESM TDZ bug for pg and similar
+        // CJS modules when bundled by Vite's SSR build (e.g. on Vercel where
+        // node_modules are not available and pg must be inlined).
+        interop: 'compat',
         manualChunks(id) {
           if (!id.includes('node_modules/')) {
             return;
