@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/client.ts",
-    "./generated/client": "./generated/client/index.js"
+    ".": "./src/client.ts"
   },
   "scripts": {
     "db:migrate:deploy": "prisma migrate deploy",
@@ -21,14 +20,18 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0",
-    "@types/node": "^20.17.47"
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
+    "@types/node": "^20.17.47",
+    "dotenv": "^17.3.1",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
+    "@types/pg": "^8.18.0",
     "eslint": "^8.57.0",
-    "prisma": "^6.7.0",
+    "prisma": "^7.4.2",
     "rimraf": "^5.0.5",
     "tsup": "^8.0.2",
     "tsx": "4.19.1",

@@ -1,20 +1,19 @@
-import { createRequire } from 'module';
+import { PrismaClient } from '../generated/prisma/client';
 
-// Use createRequire to load the CJS Prisma generated client, avoiding
-// ESM/CJS named export interop issues when running under tsx or Node.js ESM.
-const _require = createRequire(import.meta.url);
-const { PrismaClient } = _require(
-  '@mercari-scraper/database/generated/client'
-) as typeof import('@mercari-scraper/database/generated/client');
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const globalForPrisma = global as unknown as {
-  prisma: import('@mercari-scraper/database/generated/client').PrismaClient;
-};
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!
+});
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+declare global {
+  var __prisma: PrismaClient | undefined;
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = globalThis.__prisma || new PrismaClient({ adapter });
 
-// Type-only re-export: stripped at runtime, so no CJS/ESM interop issue.
-export type * from '@mercari-scraper/database/generated/client';
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.__prisma = prisma;
+}
+
 export * from './categories';
