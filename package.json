@@ -1,47 +1,31 @@
 {
   "private": true,
-  "prisma": {
-    "schema": "packages/database/prisma/schema.prisma",
-    "seed": "tsx packages/database/src/seed.ts"
-  },
   "scripts": {
     "build": "turbo run build",
-    "db:migrate:deploy": "turbo run db:migrate:deploy",
-    "db:migrate:dev": "turbo run db:migrate:dev",
-    "db:push": "turbo run db:push",
-    "db:seed": "turbo run db:seed",
     "dev": "turbo run dev",
-    "dev:mock": "turbo run dev:mock",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
     "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
-    "scraper": "turbo run scraper",
-    "scraper:debug": "turbo run scraper:debug",
-    "scraper:ui": "turbo run scraper:ui",
-    "scraper:report": "turbo run scraper:report"
+    "test": "turbo run test",
+    "lint:fix": "turbo run lint:fix"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-turbo": "^2.8.11",
     "prettier": "^3.2.5",
-    "prisma": "^6.7.0",
     "tsx": "4.19.1",
-    "turbo": "^2.5.2"
+    "turbo": "^2.5.2",
+    "typescript": "5.7.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "name": "mercari-scraper",
-  "dependencies": {
-    "@prisma/client": "^6.7.0"
-  },
   "packageManager": "pnpm@10.9.0",
   "pnpm": {
     "overrides": {
-      "react-dom": "19.2.2"
+      "glob": ">=10.5.0",
+      "minimatch": ">=3.1.3",
+      "rollup": ">=4.59.0"
     }
   }
 }

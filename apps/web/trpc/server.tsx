@@ -1,13 +1,15 @@
 import 'server-only'; // <-- ensure this file cannot be imported from the client
-import { createContext } from './setup';
-import { appRouter } from './routers/index';
+
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import {
   createTRPCOptionsProxy,
   TRPCQueryOptions
 } from '@trpc/tanstack-react-query';
 import { cache } from 'react';
+
+import { appRouter } from './routers/index';
+import { createContext } from './setup';
 import { makeQueryClient } from './shared/query-client';
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 // IMPORTANT: Create a stable getter for the query client that
 //            will return the same client during the same request.

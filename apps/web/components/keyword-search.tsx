@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, X } from 'lucide-react';
-import { useTRPC } from '@/trpc/client';
 import { useQuery } from '@tanstack/react-query';
 import { Command as CommandPrimitive } from 'cmdk';
+import { Search, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
+
 import {
-  CommandList,
+  CommandEmpty,
   CommandItem,
-  CommandEmpty
+  CommandList
 } from '@/components/shadcn/command';
 import { cn } from '@/lib/utils';
+import { useTRPC } from '@/trpc/client';
 
 export default function KeywordSearch({ className }: { className?: string }) {
   const router = useRouter();

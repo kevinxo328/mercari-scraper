@@ -1,21 +1,23 @@
 'use client';
 /* eslint-env browser */
 
-import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/shadcn/button';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Funnel } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  useQueryState
+} from 'nuqs';
+import { useEffect, useRef, useState } from 'react';
+
 import ScraperSearchForm, {
   ScraperFormValues
 } from '@/components/form/scraper-search-form';
-import {
-  useQueryState,
-  parseAsArrayOf,
-  parseAsString,
-  parseAsInteger
-} from 'nuqs';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useTRPC } from '@/trpc/client';
 import LinkCard from '@/components/link-card';
-import { Skeleton } from '@/components/shadcn/skeleton';
+import { Button } from '@/components/shadcn/button';
 import {
   Sheet,
   SheetContent,
@@ -23,10 +25,9 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/shadcn/sheet';
-import { Funnel } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { useDeleteResult } from '@/hooks/use-delete-result';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useTRPC } from '@/trpc/client';
 
 function useColCount() {
   const [cols, setCols] = useState(2);

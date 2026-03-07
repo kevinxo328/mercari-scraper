@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
 import LinkCard, { Props } from './link-card';
 
 describe('ScraperResultCard', () => {
@@ -38,7 +37,7 @@ describe('ScraperResultCard', () => {
 
   it('shows delete button and triggers handler', async () => {
     const user = userEvent.setup();
-    const handleDelete = vi.fn();
+    const handleDelete = jest.fn();
 
     render(<LinkCard {...props} showDelete onDelete={handleDelete} />);
 

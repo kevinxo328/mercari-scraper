@@ -22,16 +22,16 @@ pnpm lint            # Lint all packages
 pnpm lint:fix        # Lint + auto-fix
 pnpm format          # Prettier format
 
-# Scraper
-pnpm scraper         # Run scraper
-pnpm scraper:debug   # Debug mode
-pnpm scraper:ui      # Playwright UI
+# Scraper (run directly in apps/scraper, not via Turbo)
+pnpm --filter scraper scraper         # Run scraper
+pnpm --filter scraper scraper:debug   # Debug mode
+pnpm --filter scraper scraper:ui      # Playwright UI
 
-# Database
-pnpm generate        # Generate Prisma client
-pnpm db:migrate:dev  # Create + apply migration (dev)
-pnpm db:push         # Push schema without migration
-pnpm db:seed         # Seed initial data
+# Database (run directly in packages/database, not via Turbo)
+pnpm generate                                              # Generate Prisma client (all packages)
+pnpm --filter @mercari-scraper/database db:migrate:dev    # Create + apply migration (dev)
+pnpm --filter @mercari-scraper/database db:push           # Push schema without migration
+pnpm --filter @mercari-scraper/database db:seed           # Seed initial data
 ```
 
 ## Code Style & Conventions

@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useTRPC } from '@/trpc/client';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useSession } from 'next-auth/react';
+import { useEffect, useRef, useState } from 'react';
+
 import LinkCard from '@/components/link-card';
 import { Skeleton } from '@/components/shadcn/skeleton';
-import { useSession } from 'next-auth/react';
-import { useDeleteResult } from '@/hooks/use-delete-result';
 import TimeDisplay from '@/components/time-display';
+import { useDeleteResult } from '@/hooks/use-delete-result';
+import { useTRPC } from '@/trpc/client';
 
 function useColCount() {
   const [cols, setCols] = useState(2);

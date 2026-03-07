@@ -1,6 +1,6 @@
 import NextAuth, { type NextAuthResult } from 'next-auth';
-import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 
 const ALLOWED_EMAILS =
   process.env.AUTH_ALLOW_EMAILS?.split(',').map((e) =>

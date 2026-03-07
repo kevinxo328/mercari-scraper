@@ -9,7 +9,13 @@ module.exports = {
     'turbo/no-undeclared-env-vars': [
       'error',
       {
-        allowList: ['NODE_ENV', 'CI', 'ANTHROPIC_API_KEY']
+        allowList: [
+          'NODE_ENV',
+          'CI',
+          'ANTHROPIC_API_KEY',
+          'GITHUB_STEP_SUMMARY',
+          'SCRAPE_CONCURRENCY'
+        ]
       }
     ]
   },

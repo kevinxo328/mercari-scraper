@@ -1,6 +1,5 @@
-import { prisma } from './client';
-
 import type { ScraperKeyword } from '../generated/client';
+import { prisma } from './client';
 
 const DEFAULT_KEYWORD = [
   // Add your own keyword to pre-populate the database with

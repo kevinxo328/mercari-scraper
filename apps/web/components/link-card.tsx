@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
+import Image from 'next/image';
 
 export type Props = {
   url: string;

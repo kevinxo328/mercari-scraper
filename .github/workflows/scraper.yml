@@ -3,7 +3,7 @@ name: Scrape Mercari
 on:
   schedule:
     # Run every day at 4 AM UTC (This is 12 PM UTC+8)
-    - cron: "0 4 * * *"
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 22
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
@@ -33,7 +33,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          WEB_APP_URL: ${{ secrets.WEB_APP_URL }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

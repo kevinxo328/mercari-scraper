@@ -1,61 +1,32 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["DATABASE_URL"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".output/**"],
       "env": [
         "NODE_ENV",
         "AUTH_ALLOW_EMAILS",
         "AUTH_GOOGLE_ID",
         "AUTH_GOOGLE_SECRET",
         "SLACK_WEBHOOK_URL",
-        "NEXT_PUBLIC_APP_URL",
+        "WEB_APP_URL",
         "VERCEL_URL"
       ]
     },
-    "db:migrate:dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "db:migrate:deploy": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    },
-    "db:seed": {
-      "cache": false
-    },
     "dev": {
+      "dependsOn": ["^generate"],
       "cache": false,
       "persistent": true
-    },
-    "dev:mock": {
-      "cache": false,
-      "persistent": true,
-      "env": ["MSW_ENABLED", "NEXT_PUBLIC_MSW_ENABLED"]
     },
     "generate": {
       "dependsOn": ["^generate"],
       "cache": false
     },
-    "lint": {
-      "cache": false
-    },
-    "scraper": {
-      "cache": false,
-      "env": ["GITHUB_STEP_SUMMARY", "SCRAPE_CONCURRENCY"]
-    },
-    "scraper:debug": {
-      "cache": false
-    },
-    "scraper:ui": {
-      "cache": false
-    },
-    "scraper:report": {
-      "cache": false
-    }
+    "lint": {},
+    "lint:fix": { "cache": false },
+    "test": {}
   }
 }

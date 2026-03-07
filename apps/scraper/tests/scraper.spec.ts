@@ -1,14 +1,15 @@
-import { test, type Page } from '@playwright/test';
-import { writeFileSync, existsSync, readFileSync } from 'fs';
-import os from 'os';
-import path from 'path';
-import pLimit from 'p-limit';
-import { getMercariUrl } from '../lib/utils';
 import {
+  getCategoryByCode,
   PrismaClient,
-  type ScraperKeyword,
-  getCategoryByCode
+  type ScraperKeyword
 } from '@mercari-scraper/database';
+import { type Page, test } from '@playwright/test';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import os from 'os';
+import pLimit from 'p-limit';
+import path from 'path';
+
+import { getMercariUrl } from '../lib/utils';
 
 function writeResults(data: {
   createdCount?: number;
@@ -241,7 +242,7 @@ test.describe('Scrape Mercari', () => {
         });
       }
 
-      writeResults({ createdCount, appUrl: process.env.NEXT_PUBLIC_APP_URL });
+      writeResults({ createdCount, appUrl: process.env.WEB_APP_URL });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       writeResults({ error: message });

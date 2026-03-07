@@ -1,9 +1,10 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { Button } from '../shadcn/button';
-import { FcGoogle } from 'react-icons/fc';
 import { useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { FcGoogle } from 'react-icons/fc';
+
+import { Button } from '../shadcn/button';
 
 const DEFAULT_CALLBACK_URL = '/dashboard';
 

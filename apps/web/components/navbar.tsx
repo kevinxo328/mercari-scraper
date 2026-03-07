@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+
 import { useScroll } from '@/hooks/use-scroll';
+import { cn } from '@/lib/utils';
 
 type Props = {
   children?: React.ReactNode;

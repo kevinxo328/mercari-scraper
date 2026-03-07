@@ -11,8 +11,9 @@ This turborepo includes the following packages/apps:
 ### Apps and packages
 
 - `web`: a [Next.js](https://nextjs.org/) app
+- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app (experimental, work in progress)
 - `scraper`: a [Playwright](https://playwright.dev/) scraper
-- `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-prettier` and `plugin:turbo/recommended`)
 - `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
 - `@mercari-scraper/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
@@ -44,17 +45,17 @@ You will need this connection string in the next step to configure your environm
 
 ### 3. Setup environment variables
 
-Once the database is ready, copy the `.env.example` file to the [`/packages/database`](./packages/database/), [`/apps/web`](./apps/web/) and [`/apps/scraper`](./apps/scraper/) directories as `.env`:
+Once the database is ready, copy the `.env.example` file to `.env` in each of the following directories:
 
 ```bash
-cp .env.example ./packages/database/.env
-cp .env.example ./apps/web/.env
-cp .env.example ./apps/scraper/.env
+# Copy example files to .env in each package
+cp ./packages/database/.env.example ./packages/database/.env
+cp ./apps/web/.env.example ./apps/web/.env
+cp ./apps/web-tanstack/.env.example ./apps/web-tanstack/.env
+cp ./apps/scraper/.env.example ./apps/scraper/.env
 ```
 
-This ensures Prisma has access to the `DATABASE_URL` and `DIRECT_URL` environment variable, which is required to connect to your database.
-
-If you added a custom database name, or use a cloud based database, you will need to update the `DATABASE_URL` in your `.env` accordingly.
+Each directory has a specialized `.env.example` file containing the environment variables relevant to that specific part of the application.
 
 ### 4. Migrate your database
 
@@ -77,7 +78,17 @@ For production environments, always push schema changes to your database using t
 > cd packages/database && pnpm prisma migrate deploy
 > ```
 
-### 5. Seed your database
+### 5. Generate Prisma Client
+
+After running migrations (or any time `prisma/schema.prisma` changes), regenerate the Prisma client:
+
+```bash
+pnpm generate
+```
+
+This runs `prisma generate` and rebuilds the generated client under `packages/database/generated/client/`. Always use `pnpm generate` from the repo root rather than running `prisma generate` directly inside the package.
+
+### 6. Seed your database
 
 To populate your database with initial or fake data, use [Prisma's seeding functionality](https://www.prisma.io/docs/guides/database/seed-database).
 
@@ -88,7 +99,7 @@ Update the seed script located at [`packages/database/src/seed.ts`](/packages/da
 pnpm run db:seed
 ```
 
-### 6. Build your application
+### 8. Build your application
 
 To build all apps and packages in the monorepo, run:
 
@@ -97,7 +108,7 @@ To build all apps and packages in the monorepo, run:
 pnpm run build
 ```
 
-### 7. Start the application
+### 9. Start the application
 
 Finally, start your application with:
 
@@ -121,7 +132,6 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 2. To adjust the schedule frequency, edit the `schedule` block inside [`.github/workflows/scraper.yml`](.github/workflows/scraper.yml).
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
    - `DATABASE_URL`
-   - `DIRECT_URL`
    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
    - Any other required environment variables
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
@@ -150,10 +160,11 @@ You can deploy the `web` frontend to [Vercel](https://vercel.com/).
 1. Log in to Vercel and create a new project connected to your GitHub repository.
 2. In the Vercel project settings, add the following environment variables:
    - `DATABASE_URL`
-   - `DIRECT_URL`
    - Any other required environment variables
 3. Set the `Root Directory` in Vercel to `apps/web`.
 4. Save the settings and deploy. Vercel will automatically detect the Next.js app and complete the deployment.
+
+> **Note:** `web-tanstack` is an experimental app built with TanStack Start and is currently a work in progress. It is not yet ready for production deployment.
 
 ---
 

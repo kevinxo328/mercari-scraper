@@ -1,8 +1,9 @@
-import KeywordTable from '@/components/table/keyword-table';
+import { PlusIcon } from 'lucide-react';
+
 import AddKeywordDialog from '@/components/dialog/add-keyword-dialog';
 import { Button } from '@/components/shadcn/button';
-import { PlusIcon } from 'lucide-react';
-import { trpc, prefetch, HydrateClient } from '@/trpc/server';
+import KeywordTable from '@/components/table/keyword-table';
+import { HydrateClient, prefetch, trpc } from '@/trpc/server';
 
 export default async function DashboardPage() {
   // Prefetch keywords with default values matching KeywordTable's initial state

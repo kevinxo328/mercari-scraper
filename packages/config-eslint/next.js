@@ -4,12 +4,7 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: [
-    'eslint:recommended',
-    'prettier',
-    require.resolve('@vercel/style-guide/eslint/next'),
-    'plugin:turbo/recommended'
-  ],
+  extends: ['eslint:recommended', 'prettier', 'plugin:turbo/recommended'],
   globals: {
     React: true,
     JSX: true
@@ -18,7 +13,7 @@ module.exports = {
     node: true,
     es6: true
   },
-  plugins: ['only-warn', '@typescript-eslint'],
+  plugins: ['only-warn', '@typescript-eslint', 'simple-import-sort'],
   settings: {
     'import/resolver': {
       typescript: {
@@ -43,7 +38,9 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': [
           'warn',
           { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
-        ]
+        ],
+        'simple-import-sort/imports': 'warn',
+        'simple-import-sort/exports': 'warn'
       }
     }
   ]
