@@ -56,8 +56,7 @@
     "sonner": "^2.0.7",
     "superjson": "^2.2.2",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.3.6",
-    "zustand": "^4.5.7"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@mercari-scraper/database": "workspace:*",
