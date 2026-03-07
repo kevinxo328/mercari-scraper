@@ -1,6 +1,7 @@
 import {
   getCategoryByCode,
-  PrismaClient,
+  prisma,
+  type PrismaClient,
   type ScraperKeyword
 } from '@mercari-scraper/database';
 import { type Page, test } from '@playwright/test';
@@ -183,7 +184,6 @@ test.describe('Scrape Mercari', () => {
   // Set the timeout for the entire test suite to 30 minutes
   test.setTimeout(1800_000);
 
-  const prisma = new PrismaClient();
   let keywords: ScraperKeyword[] = [];
   let scraperRunId: string | null = null;
 

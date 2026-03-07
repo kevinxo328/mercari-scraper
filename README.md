@@ -26,6 +26,7 @@ This turborepo has some additional tools already setup for you:
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
+- [Vitest / Jest](https://vitest.dev/) for unit and integration testing
 - [Prisma ORM](https://prisma.io/) for accessing the database
 
 ## Getting started
@@ -99,6 +100,17 @@ Update the seed script located at [`packages/database/src/seed.ts`](/packages/da
 pnpm run db:seed
 ```
 
+### 7. Verify your code (Lint & Type Check)
+
+To ensure code quality and type safety across all packages, run:
+
+```bash
+# Runs lint and type-check simultaneously
+pnpm check
+```
+
+This command uses Turbo to run both ESLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
+
 ### 8. Build your application
 
 To build all apps and packages in the monorepo, run:
@@ -107,6 +119,11 @@ To build all apps and packages in the monorepo, run:
 # Using pnpm
 pnpm run build
 ```
+
+This command is now configured as a robust pipeline that automatically:
+1.  **Generates** the Prisma client.
+2.  **Runs all tests** (`test`) to ensure logic is correct.
+3.  **Builds** the packages only if all previous steps pass.
 
 ### 9. Start the application
 

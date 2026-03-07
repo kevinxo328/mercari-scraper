@@ -13,6 +13,7 @@
     "dev": "tsup src/* --watch",
     "format": "prisma format",
     "generate": "prisma generate",
+    "type-check": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "studio": "prisma studio"
@@ -32,6 +33,7 @@
     "prisma": "^7.4.2",
     "rimraf": "^5.0.5",
     "tsup": "^8.0.2",
-    "tsx": "4.19.1"
+    "tsx": "4.19.1",
+    "typescript": "5.7.2"
   }
 }

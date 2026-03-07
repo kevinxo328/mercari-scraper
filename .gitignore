@@ -26,6 +26,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# TypeScript
+*.tsbuildinfo
+*.tsbuildinfo.json
+
 # turbo
 .turbo
 

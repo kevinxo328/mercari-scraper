@@ -7,6 +7,7 @@
     "scraper:debug": "playwright test --debug",
     "scraper:ui": "playwright test --ui",
     "scraper:report": "playwright show-report",
+    "type-check": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0"
   },
@@ -19,6 +20,7 @@
     "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.0",
+    "typescript": "5.7.2"
   }
 }
