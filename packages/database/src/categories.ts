@@ -1,4 +1,4 @@
-import categoriesData from './data/mercari-categories.json';
+import categoriesData from './data/mercari-categories.json' with { type: 'json' };
 
 export interface MercariCategory {
   code: string;

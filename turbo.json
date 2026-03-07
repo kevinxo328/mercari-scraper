@@ -3,7 +3,7 @@
   "globalEnv": ["DATABASE_URL"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "^generate"],
+      "dependsOn": ["^build", "generate", "test"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".output/**"],
       "env": [
@@ -22,11 +22,18 @@
       "persistent": true
     },
     "generate": {
-      "dependsOn": ["^generate"],
       "cache": false
     },
-    "lint": {},
+    "type-check": {
+      "dependsOn": ["^generate"],
+      "cache": true
+    },
+    "lint": {
+      "dependsOn": ["^generate"]
+    },
     "lint:fix": { "cache": false },
-    "test": {}
+    "test": {
+      "dependsOn": ["^generate"]
+    }
   }
 }

@@ -1,5 +1,9 @@
 {
   "extends": "@mercari-scraper/typescript-config/base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "downlevelIteration": true
+  },
   "include": ["**/*.ts", "**/*.tsx", "tsup.config.ts"],
   "exclude": ["node_modules"]
 }
