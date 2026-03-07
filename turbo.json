@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": [
-        "^build"
+        "^build",
+        "^generate"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -12,7 +13,8 @@
       "outputs": [
         "dist/**",
         ".next/**",
-        "!.next/cache/**"
+        "!.next/cache/**",
+        ".outputs/**"
       ],
       "env": [
         "NODE_ENV",
@@ -38,16 +40,11 @@
       "cache": false
     },
     "dev": {
+      "dependsOn": [
+        "^generate"
+      ],
       "cache": false,
       "persistent": true
-    },
-    "dev:mock": {
-      "cache": false,
-      "persistent": true,
-      "env": [
-        "MSW_ENABLED",
-        "NEXT_PUBLIC_MSW_ENABLED"
-      ]
     },
     "generate": {
       "dependsOn": [
