@@ -8,6 +8,15 @@ const ALLOWED_EMAILS =
   ) || [];
 
 export const auth = betterAuth({
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 7 * 24 * 60 * 60, // 7 days cache duration
+      strategy: 'jwe', // can be "jwt" or "compact"
+      refreshCache: true // Enable stateless refresh
+    }
+  },
+
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,
