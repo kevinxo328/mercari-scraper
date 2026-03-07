@@ -209,9 +209,6 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^15.5.4
         version: 15.5.9
-      '@prisma/nextjs-monorepo-workaround-plugin':
-        specifier: ^6.17.0
-        version: 6.19.1
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
