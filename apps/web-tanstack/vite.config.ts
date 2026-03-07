@@ -22,7 +22,14 @@ export default defineConfig({
         routesDirectory: 'routes' // Defaults to "routes", relative to srcDirectory
       }
     }),
-    nitro(),
+    nitro({
+      // pg is a CJS module with a known Rollup CJS→ESM interop bug (TDZ on
+      // `get default()`). Tell Nitro not to bundle it; let Node resolve it
+      // at runtime from the workspace node_modules instead.
+      rollupConfig: {
+        external: ['pg', '@prisma/adapter-pg']
+      }
+    }),
     viteReact(),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
