@@ -31,7 +31,10 @@
     "lint": {
       "dependsOn": ["^generate"]
     },
-    "lint:fix": { "cache": false },
+    "lint:fix": {
+      "dependsOn": ["^generate"],
+      "cache": false
+    },
     "test": {
       "dependsOn": ["^generate"]
     }
