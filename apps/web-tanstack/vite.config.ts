@@ -11,6 +11,9 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  ssr: {
+    external: ['pg', '@prisma/client', '@prisma/adapter-pg', 'prisma']
+  },
   plugins: [
     tailwindcss(),
     // Enables Vite to resolve imports using path aliases.
