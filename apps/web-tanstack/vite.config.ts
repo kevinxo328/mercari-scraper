@@ -23,12 +23,8 @@ export default defineConfig({
       }
     }),
     nitro({
-      rollupConfig: {
-        // 'compat' interop prevents the CJS→ESM TDZ bug where `pg`'s
-        // `get default()` getter fires before the variable is initialised.
-        output: {
-          interop: 'compat'
-        }
+      unenv: {
+        external: ['pg', '@prisma/client', '@prisma/adapter-pg', 'prisma']
       }
     }),
     viteReact(),
