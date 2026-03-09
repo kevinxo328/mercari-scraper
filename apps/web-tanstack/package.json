@@ -19,6 +19,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
     "@hookform/resolvers": "^5.2.2",
+    "@mercari-scraper/database": "workspace:*",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -63,7 +64,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@mercari-scraper/database": "workspace:*",
     "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
     "@tailwindcss/vite": "^4.2.1",

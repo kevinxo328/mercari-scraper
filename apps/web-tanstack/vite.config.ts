@@ -12,7 +12,11 @@ export default defineConfig({
     port: 3000
   },
   ssr: {
-    external: ['pg', '@prisma/client', '@prisma/adapter-pg', 'prisma']
+    external: ['pg'],
+    noExternal: [
+      '@prisma/adapter-pg',
+      '@mercari-scraper/database'
+    ]
   },
   plugins: [
     tailwindcss(),
@@ -26,9 +30,7 @@ export default defineConfig({
       }
     }),
     nitro({
-      unenv: {
-        external: ['pg', '@prisma/client', '@prisma/adapter-pg', 'prisma']
-      }
+      unenv: {}
     }),
     viteReact(),
     process.env.ANALYZE === 'true' &&
