@@ -14,6 +14,7 @@ export default defineConfig({
   ssr: {
     external: ['pg'],
     noExternal: [
+      '@prisma/client',
       '@prisma/adapter-pg',
       '@mercari-scraper/database'
     ]
