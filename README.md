@@ -11,7 +11,7 @@ This turborepo includes the following packages/apps:
 ### Apps and packages
 
 - `web`: a [Next.js](https://nextjs.org/) app
-- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app (experimental, work in progress)
+- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app
 - `scraper`: a [Playwright](https://playwright.dev/) scraper
 - `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-prettier` and `plugin:turbo/recommended`)
 - `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
@@ -57,6 +57,17 @@ cp ./apps/scraper/.env.example ./apps/scraper/.env
 ```
 
 Each directory has a specialized `.env.example` file containing the environment variables relevant to that specific part of the application.
+
+#### Authentication Variables
+
+For `web` and `web-tanstack`, you will also need to configure authentication variables:
+
+- **Google OAuth**: Obtain `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` from the [Google Cloud Console](https://console.cloud.google.com/).
+- **Secret**: Generate a random secret (e.g., using `openssl rand -base64 32`).
+  - `web` uses `AUTH_SECRET`.
+  - `web-tanstack` uses `BETTER_AUTH_SECRET`.
+- **Better Auth URL**: For `web-tanstack`, you MUST specify `BETTER_AUTH_URL` (e.g., `http://localhost:3000` in dev).
+- **Allowed Emails**: Specify `AUTH_ALLOW_EMAILS` as a comma-separated list to restrict access.
 
 ### 4. Migrate your database
 
@@ -168,20 +179,22 @@ Every scraper run automatically samples CPU and RAM usage every 10 seconds via N
 
 ---
 
-### 2. Deploy `web` to Vercel
+### 2. Deploy `web` or `web-tanstack` to Vercel
 
-You can deploy the `web` frontend to [Vercel](https://vercel.com/).
+You can deploy either the `web` frontend (Next.js) or `web-tanstack` (TanStack Start) to [Vercel](https://vercel.com/).
 
 **Steps:**
 
 1. Log in to Vercel and create a new project connected to your GitHub repository.
 2. In the Vercel project settings, add the following environment variables:
    - `DATABASE_URL`
-   - Any other required environment variables
-3. Set the `Root Directory` in Vercel to `apps/web`.
-4. Save the settings and deploy. Vercel will automatically detect the Next.js app and complete the deployment.
-
-> **Note:** `web-tanstack` is an experimental app built with TanStack Start and is currently a work in progress. It is not yet ready for production deployment.
+   - `AUTH_GOOGLE_ID`
+   - `AUTH_GOOGLE_SECRET`
+   - `AUTH_ALLOW_EMAILS`
+   - For `web`: `AUTH_SECRET`
+   - For `web-tanstack`: `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` (the production URL)
+3. Set the `Root Directory` in Vercel to `apps/web` or `apps/web-tanstack`.
+4. Save the settings and deploy. Vercel will automatically detect the application type and complete the deployment.
 
 ---
 
