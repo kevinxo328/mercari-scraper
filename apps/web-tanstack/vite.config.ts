@@ -13,11 +13,13 @@ export default defineConfig({
   },
   ssr: {
     external: ['pg'],
-    noExternal: [
-      '@prisma/client',
-      '@prisma/adapter-pg',
-      '@mercari-scraper/database'
-    ]
+    // In dev, node_modules are available so we don't need to bundle these.
+    // In production (e.g. Vercel), node_modules may be absent so they must
+    // be inlined to avoid runtime resolution failures.
+    noExternal:
+      process.env.NODE_ENV === 'production'
+        ? ['@prisma/client', '@prisma/adapter-pg', '@mercari-scraper/database']
+        : []
   },
   plugins: [
     tailwindcss(),
