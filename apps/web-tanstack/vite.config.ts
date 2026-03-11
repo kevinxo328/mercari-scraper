@@ -35,7 +35,11 @@ export default defineConfig({
     nitro({
       unenv: {}
     }),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler']
+      }
+    }),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
   ],
