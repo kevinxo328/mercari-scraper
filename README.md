@@ -10,8 +10,8 @@ This turborepo includes the following packages/apps:
 
 ### Apps and packages
 
-- `web`: a [Next.js](https://nextjs.org/) app
-- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app
+- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app **(primary web app, deployed on Vercel)**
+- `web`: a [Next.js](https://nextjs.org/) app (legacy)
 - `scraper`: a [Playwright](https://playwright.dev/) scraper
 - `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-prettier` and `plugin:turbo/recommended`)
 - `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
@@ -179,9 +179,9 @@ Every scraper run automatically samples CPU and RAM usage every 10 seconds via N
 
 ---
 
-### 2. Deploy `web` or `web-tanstack` to Vercel
+### 2. Deploy `web-tanstack` or `web` to Vercel
 
-You can deploy either the `web` frontend (Next.js) or `web-tanstack` (TanStack Start) to [Vercel](https://vercel.com/).
+You can deploy either the `web-tanstack` frontend (TanStack Start, **primary**) or `web` (Next.js) to [Vercel](https://vercel.com/).
 
 **Steps:**
 
@@ -193,7 +193,7 @@ You can deploy either the `web` frontend (Next.js) or `web-tanstack` (TanStack S
    - `AUTH_ALLOW_EMAILS`
    - For `web`: `AUTH_SECRET`
    - For `web-tanstack`: `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` (the production URL)
-3. Set the `Root Directory` in Vercel to `apps/web` or `apps/web-tanstack`.
+3. Set the `Root Directory` in Vercel to `apps/web-tanstack` or `apps/web`.
 4. Save the settings and deploy. Vercel will automatically detect the application type and complete the deployment.
 
 ---
