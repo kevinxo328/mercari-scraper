@@ -4,19 +4,10 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'static.mercdn.net',
-        pathname: '/**'
-      },
-      {
-        protocol: 'https',
-        hostname: '**',
-        pathname: '/**'
-      }
-    ]
-  }
+    minimumCacheTTL: 2678400, // 31 days
+    remotePatterns: []
+  },
+  reactCompiler: true
 };
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({

@@ -78,6 +78,7 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.0.18",
+    "babel-plugin-react-compiler": "^1.0.0",
     "baseline-browser-mapping": "^2.10.0",
     "eslint": "^8.57.1",
     "jsdom": "^28.1.0",
