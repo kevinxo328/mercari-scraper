@@ -16,7 +16,10 @@ export const auth = betterAuth({
       refreshCache: true // Enable stateless refresh
     }
   },
-
+  trustedOrigins: [
+    'http://localhost:3000',
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [])
+  ],
   socialProviders: {
     google: {
       clientId: process.env.AUTH_GOOGLE_ID!,

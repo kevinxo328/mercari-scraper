@@ -11,6 +11,16 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  ssr: {
+    external: ['pg'],
+    // In dev, node_modules are available so we don't need to bundle these.
+    // In production (e.g. Vercel), node_modules may be absent so they must
+    // be inlined to avoid runtime resolution failures.
+    noExternal:
+      process.env.NODE_ENV === 'production'
+        ? ['@prisma/client', '@prisma/adapter-pg', '@mercari-scraper/database']
+        : []
+  },
   plugins: [
     tailwindcss(),
     // Enables Vite to resolve imports using path aliases.
@@ -23,13 +33,7 @@ export default defineConfig({
       }
     }),
     nitro({
-      rollupConfig: {
-        // 'compat' interop prevents the CJS→ESM TDZ bug where `pg`'s
-        // `get default()` getter fires before the variable is initialised.
-        output: {
-          interop: 'compat'
-        }
-      }
+      unenv: {}
     }),
     viteReact(),
     process.env.ANALYZE === 'true' &&
