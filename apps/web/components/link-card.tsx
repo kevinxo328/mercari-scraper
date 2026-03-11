@@ -30,6 +30,7 @@ const LinkCard = (props: Props) => {
           className="object-contain object-center  w-full h-full group-hover:scale-105 transition-transform duration-300 ease-in-out"
           src={props.imageUrl}
           alt={props.title}
+          unoptimized
         />
         {shouldShowDelete && (
           <button
