@@ -1,4 +1,3 @@
-'use client';
 /* eslint-env browser */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

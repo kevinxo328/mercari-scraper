@@ -1,5 +1,3 @@
-'use client';
-
 import { FcGoogle } from 'react-icons/fc';
 
 import { signIn } from '@/lib/auth-client';

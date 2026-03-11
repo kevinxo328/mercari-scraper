@@ -1,5 +1,3 @@
-'use client';
-
 import { ChevronDown, XCircle, XIcon } from 'lucide-react';
 import React from 'react';
 
