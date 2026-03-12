@@ -9,14 +9,16 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     # This job will only run on the main branch for scheduled events or when manually triggered
     if: ${{ github.event_name != 'schedule' || github.ref == 'refs/heads/main' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install pnpm
@@ -33,7 +35,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           WEB_APP_URL: ${{ secrets.WEB_APP_URL }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
