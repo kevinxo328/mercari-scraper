@@ -48,8 +48,8 @@ export default defineConfig({
     rollupOptions: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output: {
-        // advancedChunks is a Rolldown feature; types not yet in rollown-vite
-        advancedChunks: {
+        // codeSplitting is a Rolldown feature; types not yet in rolldown-vite
+        codeSplitting: {
           groups: [
             {
               name: 'vendor-react',
