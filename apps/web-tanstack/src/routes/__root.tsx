@@ -1,14 +1,31 @@
 /// <reference types="vite/client" />
 
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   createRootRoute,
   HeadContent,
   Outlet,
   Scripts
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { NuqsAdapter } from 'nuqs/adapters/react';
+import { lazy, Suspense } from 'react';
+
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const TanStackRouterDevtools = import.meta.env.PROD
+  ? () => null
+  : lazy(() =>
+      import('@tanstack/react-router-devtools').then((m) => ({
+        default: m.TanStackRouterDevtools
+      }))
+    );
+
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const ReactQueryDevtools = import.meta.env.PROD
+  ? () => null
+  : lazy(() =>
+      import('@tanstack/react-query-devtools').then((m) => ({
+        default: m.ReactQueryDevtools
+      }))
+    );
 
 import AppHeader from '@/components/app-header';
 import { Toaster } from '@/components/shadcn/sonner';
@@ -68,8 +85,10 @@ function RootLayout() {
           <Outlet />
         </NuqsAdapter>
         <Toaster />
-        <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        <Suspense>
+          <TanStackRouterDevtools position="bottom-right" />
+          <ReactQueryDevtools buttonPosition="bottom-left" />
+        </Suspense>
         <Scripts />
       </body>
     </html>

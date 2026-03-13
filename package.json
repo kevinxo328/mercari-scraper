@@ -22,12 +22,5 @@
     "node": ">=22"
   },
   "name": "mercari-scraper",
-  "packageManager": "pnpm@10.9.0",
-  "pnpm": {
-    "overrides": {
-      "glob": ">=10.5.0",
-      "minimatch": ">=3.1.3",
-      "rollup": ">=4.59.0"
-    }
-  }
+  "packageManager": "pnpm@10.9.0"
 }

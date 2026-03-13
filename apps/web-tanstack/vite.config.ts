@@ -2,12 +2,14 @@
 import { defineConfig } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { nitro } from 'nitro/vite';
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true
+  },
   server: {
     port: 3000
   },
@@ -24,7 +26,6 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     // Enables Vite to resolve imports using path aliases.
-    tsconfigPaths(),
     tanstackStart({
       srcDirectory: 'src', // This is the default
       router: {
@@ -45,53 +46,28 @@ export default defineConfig({
   ],
   build: {
     rollupOptions: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       output: {
-        // 'compat' interop prevents the CJS→ESM TDZ bug for pg and similar
-        // CJS modules when bundled by Vite's SSR build (e.g. on Vercel where
-        // node_modules are not available and pg must be inlined).
-        interop: 'compat',
-        manualChunks(id) {
-          if (!id.includes('node_modules/')) {
-            return;
-          }
-
-          if (
-            id.includes('node_modules/react/') ||
-            id.includes('node_modules/react-dom/')
-          ) {
-            return 'vendor-react';
-          }
-
-          if (
-            id.includes('node_modules/@radix-ui/') ||
-            id.includes('node_modules/lucide-react/') ||
-            id.includes('node_modules/sonner/') ||
-            id.includes('node_modules/cmdk/')
-          ) {
-            return 'vendor-ui';
-          }
-
-          if (
-            id.includes('node_modules/@tanstack/react-query/') ||
-            id.includes('node_modules/@tanstack/query-core/') ||
-            id.includes('node_modules/@tanstack/react-query-devtools/') ||
-            id.includes('node_modules/@tanstack/react-table/') ||
-            id.includes('node_modules/@tanstack/react-virtual/') ||
-            id.includes('node_modules/@trpc/client/') ||
-            id.includes('node_modules/@trpc/react-query/') ||
-            id.includes('node_modules/@trpc/tanstack-react-query/') ||
-            id.includes('node_modules/superjson/')
-          ) {
-            return 'vendor-query';
-          }
-
-          if (
-            id.includes('node_modules/react-hook-form/') ||
-            id.includes('node_modules/@hookform/') ||
-            id.includes('node_modules/zod/')
-          ) {
-            return 'vendor-forms';
-          }
+        // codeSplitting is a Rolldown feature; types not yet in rolldown-vite
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor-react',
+              test: /node_modules\/react(?:-dom)?\//
+            },
+            {
+              name: 'vendor-ui',
+              test: /node_modules\/(@radix-ui|lucide-react|sonner|cmdk)\//
+            },
+            {
+              name: 'vendor-query',
+              test: /node_modules\/(@tanstack\/(react-query|query-core|react-query-devtools|react-table|react-virtual)|@trpc\/(client|react-query|tanstack-react-query)|superjson)\//
+            },
+            {
+              name: 'vendor-forms',
+              test: /node_modules\/(react-hook-form|@hookform|zod)\//
+            }
+          ]
         }
       }
     }
