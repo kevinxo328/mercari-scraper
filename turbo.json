@@ -1,11 +1,25 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "globalEnv": ["DATABASE_URL"],
+  "globalEnv": [
+    "DATABASE_URL"
+  ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "generate", "test"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".output/**"],
+      "dependsOn": [
+        "^build",
+        "generate",
+        "test"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        ".output/**"
+      ],
       "env": [
         "NODE_ENV",
         "AUTH_ALLOW_EMAILS",
@@ -17,7 +31,9 @@
       ]
     },
     "dev": {
-      "dependsOn": ["^generate"],
+      "dependsOn": [
+        "^generate"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -25,18 +41,26 @@
       "cache": false
     },
     "type-check": {
-      "dependsOn": ["^generate"],
+      "dependsOn": [
+        "^generate"
+      ],
       "cache": true
     },
     "lint": {
-      "dependsOn": ["^generate"]
+      "dependsOn": [
+        "^generate"
+      ]
     },
     "lint:fix": {
-      "dependsOn": ["^generate"],
+      "dependsOn": [
+        "^generate"
+      ],
       "cache": false
     },
     "test": {
-      "dependsOn": ["^generate"]
+      "dependsOn": [
+        "^generate"
+      ]
     }
   }
 }
