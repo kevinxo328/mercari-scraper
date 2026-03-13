@@ -1,10 +1,11 @@
 // vite.config.ts
 import { defineConfig } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import viteReact from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { nitro } from 'nitro/vite';
+import babel from '@rolldown/plugin-babel';
 
 export default defineConfig({
   resolve: {
@@ -36,10 +37,23 @@ export default defineConfig({
     nitro({
       unenv: {}
     }),
-    viteReact({
-      babel: {
-        plugins: ['babel-plugin-react-compiler']
-      }
+    // plugin-react v6: JSX transform and Fast Refresh are handled by Oxc (no Babel).
+    react(),
+    // Run React Compiler via Babel separately, since plugin-react v6 dropped Babel.
+    babel({
+      presets: [reactCompilerPreset()],
+      overrides: [
+        {
+          // @rolldown/plugin-babel detects TypeScript files via the glob **/*.tsx.
+          // TanStack Router's code-splitting appends a query string to the module ID
+          // (e.g. index.tsx?tsr-split=component), causing the glob to miss it and
+          // Babel to parse the file without the TypeScript plugin — resulting in a
+          // syntax error on type annotations. This override re-enables TypeScript + JSX
+          // parsing for any module ID that contains ".tsx?".
+          include: /\.tsx\?/,
+          parserOpts: { plugins: ['typescript', 'jsx'] }
+        }
+      ]
     }),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
