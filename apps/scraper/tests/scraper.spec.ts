@@ -80,7 +80,8 @@ async function scrapeKeyword(
 
   if ((await modalScrim.count()) > 0) {
     await modalScrim.click({ force: true, timeout: 3000 });
-    await page.waitForLoadState('networkidle').catch(() => {});
+    // Wait briefly for the modal to disappear instead of waiting for networkidle
+    await page.waitForTimeout(1000);
   }
 
   // Only select item-cell elements that contain actual items (not skeleton placeholders)
