@@ -99,15 +99,18 @@ async function scrapeKeyword(
       const itemCell = itemCells.nth(i);
       const mercariHost = 'https://jp.mercari.com';
 
-      // TODO: Get the price from the aria-label attribute to ensure getting the correct yen value without Japan proxy.
-      const priceSource = (
-        await itemCell
-          .locator('[itemtype]')
-          .getAttribute('aria-label', { timeout: 3000 })
-          .catch((e) => {
-            console.error(`Error getting aria-label: ${e}`);
-          })
-      )?.split(' ');
+      // Get the price from the aria-label attribute to ensure the correct yen value
+      // regardless of region. The label may include a converted local currency at the
+      // end (e.g. "13,800円 NT$2,934"), so we use a regex to extract the digits
+      // before "円" instead of relying on token position.
+      const ariaLabel = await itemCell
+        .locator('[itemtype]')
+        .getAttribute('aria-label', { timeout: 3000 })
+        .catch((e) => {
+          console.error(`Error getting aria-label: ${e}`);
+        });
+
+      const yenMatch = ariaLabel?.match(/(\d[\d,]*)円/);
 
       const data = {
         title: await itemCell.getByTestId('thumbnail-item-name').innerText(),
@@ -115,14 +118,8 @@ async function scrapeKeyword(
           mercariHost +
           (await itemCell.getByTestId('thumbnail-link').getAttribute('href')),
         imageUrl: (await itemCell.locator('img').getAttribute('src')) || '',
-        price: priceSource
-          ? parseInt(
-              priceSource[priceSource.length - 1]
-                .replace('円', '')
-                .replace(/,/g, '')
-            )
-          : -1,
-        currency: priceSource ? 'JPY' : ''
+        price: yenMatch ? parseInt(yenMatch[1].replace(/,/g, '')) : -1,
+        currency: yenMatch ? 'JPY' : ''
       };
 
       const existingRecord = await prisma.scraperResult.findFirst({
