@@ -18,7 +18,7 @@ interface Meta {
 }
 
 interface ScraperResult {
-  createdCount?: number;
+  updatedCount?: number;
   appUrl?: string;
   error?: string;
 }

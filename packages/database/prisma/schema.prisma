@@ -41,6 +41,6 @@ model ScraperResult {
 model ScraperRun {
   id           String    @id @default(uuid()) @db.Uuid
   completedAt  DateTime?
-  createdCount Int       @default(0)
+  updatedCount Int       @default(0)
   createdAt    DateTime  @default(now())
 }
