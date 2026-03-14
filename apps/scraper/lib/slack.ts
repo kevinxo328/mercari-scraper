@@ -21,7 +21,7 @@ export async function notifySlackSummary({
   resource
 }: {
   result: {
-    createdCount?: number;
+    updatedCount?: number;
     appUrl?: string;
     error?: string;
   } | null;
@@ -47,9 +47,9 @@ export async function notifySlackSummary({
     text = `:x: Mercari scraper failed.\n\`\`\`${result.error}\`\`\``;
     if (resourceLine) text += `\n${resourceLine}`;
   } else if (result) {
-    const count = result.createdCount ?? 0;
+    const count = result.updatedCount ?? 0;
     const linkPart = result.appUrl ? ` <${result.appUrl}|View results>` : '';
-    text = `:white_check_mark: Mercari scraper completed. ${count} new item${count === 1 ? '' : 's'} found.${linkPart}`;
+    text = `:white_check_mark: Mercari scraper completed. ${count} updated item${count === 1 ? '' : 's'} found.${linkPart}`;
     if (resourceLine) text += `\n${resourceLine}`;
   } else if (resourceLine) {
     text = resourceLine;
@@ -57,23 +57,5 @@ export async function notifySlackSummary({
     return;
   }
 
-  await sendSlackMessage(text);
-}
-
-export async function notifySlack({
-  createdCount,
-  appUrl
-}: {
-  createdCount: number;
-  appUrl?: string;
-}): Promise<void> {
-  const linkPart = appUrl ? ` <${appUrl}|View results>` : '';
-  const text = `:white_check_mark: Mercari scraper completed. ${createdCount} new item${createdCount === 1 ? '' : 's'} found.${linkPart}`;
-  await sendSlackMessage(text);
-}
-
-export async function notifySlackError(error: unknown): Promise<void> {
-  const message = error instanceof Error ? error.message : String(error);
-  const text = `:x: Mercari scraper failed.\n\`\`\`${message}\`\`\``;
   await sendSlackMessage(text);
 }

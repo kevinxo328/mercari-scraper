@@ -13,7 +13,7 @@ import path from 'path';
 import { getMercariUrl } from '../lib/utils';
 
 function writeResults(data: {
-  createdCount?: number;
+  updatedCount?: number;
   appUrl?: string;
   error?: string;
 }) {
@@ -38,7 +38,7 @@ async function scrapeKeyword(
   record: ScraperKeyword,
   prisma: PrismaClient
 ): Promise<number> {
-  let createdCount = 0;
+  let updatedCount = 0;
 
   // Block images to speed up the loading time.
   await page.route('**/*', (route) => {
@@ -136,7 +136,7 @@ async function scrapeKeyword(
             }
           }
         });
-        createdCount++;
+        updatedCount++;
       } else {
         const existingKeywordRelation = existingRecord.keywords.some(
           (k: { id: string }) => k.id === record.id
@@ -162,6 +162,7 @@ async function scrapeKeyword(
               }
             }
           });
+          updatedCount++;
         }
       }
     }
@@ -169,7 +170,7 @@ async function scrapeKeyword(
     console.log(`No items found for keyword: ${record.keyword}`);
   }
 
-  return createdCount;
+  return updatedCount;
 }
 
 // Set the viewport size for the page to ensure all items are visible.
@@ -226,20 +227,20 @@ test.describe('Scrape Mercari', () => {
         )
       );
 
-      const createdCount = counts.reduce((sum, n) => sum + n, 0);
+      const updatedCount = counts.reduce((sum, n) => sum + n, 0);
 
       if (scraperRunId) {
         await prisma.scraperRun.update({
           where: { id: scraperRunId },
-          data: { completedAt: new Date(), createdCount }
+          data: { completedAt: new Date(), updatedCount }
         });
       } else {
         await prisma.scraperRun.create({
-          data: { completedAt: new Date(), createdCount }
+          data: { completedAt: new Date(), updatedCount }
         });
       }
 
-      writeResults({ createdCount, appUrl: process.env.WEB_APP_URL });
+      writeResults({ updatedCount, appUrl: process.env.WEB_APP_URL });
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       writeResults({ error: message });
