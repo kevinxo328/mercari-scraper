@@ -19,6 +19,9 @@ interface Meta {
 
 interface ScraperResult {
   updatedCount?: number;
+  totalFound?: number;
+  totalUnique?: number;
+  failedKeywords?: string[];
   appUrl?: string;
   error?: string;
 }

@@ -22,6 +22,9 @@ export async function notifySlackSummary({
 }: {
   result: {
     updatedCount?: number;
+    totalFound?: number;
+    totalUnique?: number;
+    failedKeywords?: string[];
     appUrl?: string;
     error?: string;
   } | null;
@@ -47,9 +50,18 @@ export async function notifySlackSummary({
     text = `:x: Mercari scraper failed.\n\`\`\`${result.error}\`\`\``;
     if (resourceLine) text += `\n${resourceLine}`;
   } else if (result) {
-    const count = result.updatedCount ?? 0;
+    const updated = result.updatedCount ?? 0;
+    const found = result.totalFound ?? 0;
+    const unique = result.totalUnique ?? 0;
     const linkPart = result.appUrl ? ` <${result.appUrl}|View results>` : '';
-    text = `:white_check_mark: Mercari scraper completed. ${count} updated item${count === 1 ? '' : 's'} found.${linkPart}`;
+
+    const failed = result.failedKeywords || [];
+    const anomalyPart =
+      failed.length > 0
+        ? `\n:warning: *Anomalies detected in ${failed.length} keyword(s):*\n${failed.map((k) => `> • ${k}`).join('\n')}`
+        : '';
+
+    text = `:white_check_mark: Mercari scraper completed. *${updated}* updated / *${unique}* unique / *${found}* total items.${linkPart}${anomalyPart}`;
     if (resourceLine) text += `\n${resourceLine}`;
   } else if (resourceLine) {
     text = resourceLine;
