@@ -2,36 +2,25 @@
 
 [![Scrape Mercari](https://github.com/kevinxo328/mercari-scraper/actions/workflows/scraper.yml/badge.svg?branch=main)](https://github.com/kevinxo328/mercari-scraper/actions/workflows/scraper.yml)
 
-This project is an automated scraper tool for personal use, specifically designed for periodically crawling product information on the Mercari platform. Its main function is to regularly check and extract newly listed products, assisting users in immediately grasping the latest product trends.
+Personal-use Mercari scraper that periodically crawls product listings and stores results for tracking new items.
 
 ## What's inside?
 
-This turborepo includes the following packages/apps:
-
 ### Apps and packages
 
-- `web-tanstack`: a [TanStack Start](https://tanstack.com/start) app **(primary web app, deployed on Vercel)**
-- `web`: a [Next.js](https://nextjs.org/) app (legacy)
-- `scraper`: a [Playwright](https://playwright.dev/) scraper
-- `@mercari-scraper/eslint-config`: `eslint` configurations (includes `eslint-config-prettier` and `plugin:turbo/recommended`)
-- `@mercari-scraper/database`: [Prisma ORM](https://prisma.io/) to manage & access your database
-- `@mercari-scraper/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- `web-tanstack`: TanStack Start app (primary, deploy to Vercel)
+- `web`: Next.js app (legacy)
+- `scraper`: Playwright scraper
+- `@mercari-scraper/database`: Prisma ORM
+- `@mercari-scraper/eslint-config`, `@mercari-scraper/typescript-config`
 
 ### Utilities
 
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-- [Vitest / Jest](https://vitest.dev/) for unit and integration testing
-- [Prisma ORM](https://prisma.io/) for accessing the database
+- TypeScript, ESLint, Prettier
+- Vitest / Jest
+- Prisma ORM
 
 ## Getting started
-
-Follow these steps to set up and run your Turborepo project with Prisma ORM:
 
 ```bash
 git clone https://github.com/kevinxo328/mercari-scraper.git
@@ -40,9 +29,14 @@ cd mercari-scraper
 
 ### 2. Set up Supabase
 
-This project uses [Supabase](https://supabase.com/) as the database backend. Please sign up for a Supabase account and create a new project. After your project is created, you will receive a database connection string.
+This project uses [Supabase](https://supabase.com/) as the database backend. Create a project and get the connection string.
 
-You will need this connection string in the next step to configure your environment variables.
+**Warning:** Scraper data will keep growing. Set up a scheduled cleanup (e.g., Supabase Scheduled Jobs / cron) to delete old records. Example:
+
+```sql
+DELETE FROM "ScraperResult"
+WHERE "updatedAt" < NOW() - INTERVAL '7 days';
+```
 
 ### 3. Setup environment variables
 
@@ -56,35 +50,25 @@ cp ./apps/web-tanstack/.env.example ./apps/web-tanstack/.env
 cp ./apps/scraper/.env.example ./apps/scraper/.env
 ```
 
-Each directory has a specialized `.env.example` file containing the environment variables relevant to that specific part of the application.
+For `web` and `web-tanstack`, also set Google OAuth and auth secrets (see each `.env.example` for required vars):
 
-#### Authentication Variables
-
-For `web` and `web-tanstack`, you will also need to configure authentication variables:
-
-- **Google OAuth**: Obtain `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` from the [Google Cloud Console](https://console.cloud.google.com/).
-- **Secret**: Generate a random secret (e.g., using `openssl rand -base64 32`).
-  - `web` uses `AUTH_SECRET`.
-  - `web-tanstack` uses `BETTER_AUTH_SECRET`.
-- **Better Auth URL**: For `web-tanstack`, you MUST specify `BETTER_AUTH_URL` (e.g., `http://localhost:3000` in dev).
-- **Allowed Emails**: Specify `AUTH_ALLOW_EMAILS` as a comma-separated list to restrict access.
+- `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
+- `AUTH_ALLOW_EMAILS`
+- `web`: `AUTH_SECRET`
+- `web-tanstack`: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
 
 ### 4. Migrate your database
 
-Once your database is running, you’ll need to create and apply migrations to set up the necessary tables. Run the database migration command:
+Once your database is running, create and apply migrations to set up the tables:
 
 ```bash
 # Using pnpm
 pnpm run db:migrate:dev
 ```
 
-You’ll be prompted to name the migration. Once you provide a name, Prisma will create and apply the migration to your database.
-
-> Note: The `db:migrate:dev` script (located in [packages/database/package.json](/packages/database/package.json)) uses [Prisma Migrate](https://www.prisma.io/migrate) under the hood.
-
-For production environments, always push schema changes to your database using the [`prisma migrate deploy` command](https://www.prisma.io/docs/orm/prisma-client/deployment/deploy-database-changes-with-prisma-migrate). You can find an example `db:migrate:deploy` script in the [`package.json` file](/packages/database/package.json) of the `database` package.
-
-> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error, use `prisma migrate deploy` instead, which applies existing migration files directly without requiring a shadow database:
+> **Note:** For production, use `prisma migrate deploy`.
+>
+> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error, use `prisma migrate deploy` instead:
 >
 > ```bash
 > cd packages/database && pnpm prisma migrate deploy
@@ -98,16 +82,11 @@ After running migrations (or any time `prisma/schema.prisma` changes), regenerat
 pnpm generate
 ```
 
-This runs `prisma generate` and rebuilds the generated client under `packages/database/generated/client/`. Always use `pnpm generate` from the repo root rather than running `prisma generate` directly inside the package.
+### 6. Seed your database (optional)
 
-### 6. Seed your database
-
-To populate your database with initial or fake data, use [Prisma's seeding functionality](https://www.prisma.io/docs/guides/database/seed-database).
-
-Update the seed script located at [`packages/database/src/seed.ts`](/packages/database/src/seed.ts) to include any additional data that you want to seed. Once edited, run the seed command:
+Edit `packages/database/src/seed.ts`, then run:
 
 ```bash
-# Using pnpm
 pnpm run db:seed
 ```
 
@@ -131,11 +110,6 @@ To build all apps and packages in the monorepo, run:
 pnpm run build
 ```
 
-This command is now configured as a robust pipeline that automatically:
-1.  **Generates** the Prisma client.
-2.  **Runs all tests** (`test`) to ensure logic is correct.
-3.  **Builds** the packages only if all previous steps pass.
-
 ### 9. Start the application
 
 Finally, start your application with:
@@ -144,9 +118,7 @@ Finally, start your application with:
 pnpm run dev
 ```
 
-Your app will be running at `http://localhost:3000`. Open it in your browser to see it in action!
-
-You can also read the official [detailed step-by-step guide from Prisma ORM](https://pris.ly/guide/turborepo?utm_campaign=turborepo-example) to build a project from scratch using Turborepo and Prisma ORM.
+Your app will be running at `http://localhost:3000`.
 
 ## Deploy
 
@@ -166,16 +138,7 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 
 #### Resource Monitoring
 
-Every scraper run automatically samples CPU and RAM usage every 10 seconds via Node.js built-ins (no extra dependencies). After the run completes:
-
-- **Console** — a summary table is printed (duration, peak RAM, avg CPU, etc.)
-- **GitHub Actions** — the summary is also written to the [Job Summary](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary) page
-- **Slack** — if `SLACK_WEBHOOK_URL` is configured, a single message is sent combining the scrape result and resource stats:
-
-  ```
-  ✅ Mercari scraper completed. 42 new items found. View results
-  📊 3m 40s | RAM peak 1.84 GB | CPU avg 20.7% peak 37.9%
-  ```
+Each scraper run logs CPU/RAM stats and writes a summary to GitHub Actions. If `SLACK_WEBHOOK_URL` is set, a single message is sent on completion.
 
 ---
 
