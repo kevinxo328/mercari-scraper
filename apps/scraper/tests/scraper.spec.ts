@@ -35,6 +35,7 @@ function writeResults(data: {
 
 const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
+const MAX_KEYWORD_RETRIES = 2;
 const VIEWPORT_WIDTH = 1280;
 const VIEWPORT_HEIGHT = 12000;
 
@@ -278,28 +279,56 @@ test.describe('Scrape Mercari', () => {
       const limit = pLimit(SCRAPE_CONCURRENCY);
 
       // Process all keywords concurrently, capped at SCRAPE_CONCURRENCY at a time.
+      // Retry up to MAX_KEYWORD_RETRIES times if a keyword returns 0 items,
+      // to handle transient Mercari rate-limiting or slow page renders.
       const results = await Promise.all(
         keywords.map((record) =>
           limit(async () => {
-            const newPage = await page.context().newPage();
-            await newPage.setViewportSize({
-              width: VIEWPORT_WIDTH,
-              height: VIEWPORT_HEIGHT
-            });
-            try {
-              return await scrapeKeyword(newPage, record, prisma);
-            } catch (e) {
-              console.error(`Error scraping keyword "${record.keyword}": ${e}`);
-              return {
-                keyword: record.keyword,
-                foundItems: 0,
-                uniqueItems: 0,
-                updatedItems: 0,
-                error: e instanceof Error ? e.message : String(e)
-              };
-            } finally {
-              await newPage.close().catch(() => {});
+            let result = {
+              keyword: record.keyword,
+              foundItems: 0,
+              uniqueItems: 0,
+              updatedItems: 0,
+              error: undefined as string | undefined
+            };
+
+            for (
+              let attempt = 1;
+              attempt <= MAX_KEYWORD_RETRIES + 1;
+              attempt++
+            ) {
+              const newPage = await page.context().newPage();
+              await newPage.setViewportSize({
+                width: VIEWPORT_WIDTH,
+                height: VIEWPORT_HEIGHT
+              });
+              try {
+                result = await scrapeKeyword(newPage, record, prisma);
+              } catch (e) {
+                console.error(
+                  `Error scraping keyword "${record.keyword}": ${e}`
+                );
+                result = {
+                  keyword: record.keyword,
+                  foundItems: 0,
+                  uniqueItems: 0,
+                  updatedItems: 0,
+                  error: e instanceof Error ? e.message : String(e)
+                };
+              } finally {
+                await newPage.close().catch(() => {});
+              }
+
+              if (result.foundItems > 0 || attempt > MAX_KEYWORD_RETRIES) break;
+
+              console.log(
+                `Retrying keyword: ${record.keyword} (attempt ${attempt + 1}/${MAX_KEYWORD_RETRIES + 1})`
+              );
+              // Exponential backoff: 3s, 6s
+              await page.waitForTimeout(3000 * attempt);
             }
+
+            return result;
           })
         )
       );
