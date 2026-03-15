@@ -36,7 +36,7 @@ function writeResults(data: {
 const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
 const VIEWPORT_WIDTH = 1280;
-const VIEWPORT_HEIGHT = 12000;
+const VIEWPORT_HEIGHT = 72000;
 
 async function scrapeKeyword(
   page: Page,
@@ -222,7 +222,7 @@ async function scrapeKeyword(
       );
 
       const counts = await Promise.all(dbTasks);
-      updatedCount = counts.reduce((sum, n) => sum + n, 0);
+      updatedCount = counts.reduce<number>((sum, n) => sum + n, 0);
     } else {
       console.log(`No items found for keyword: ${record.keyword}`);
       errorMsg = 'No items found';
