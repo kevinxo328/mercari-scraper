@@ -35,6 +35,8 @@ function writeResults(data: {
 
 const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
+const VIEWPORT_WIDTH = 1280;
+const VIEWPORT_HEIGHT = 72000;
 
 async function scrapeKeyword(
   page: Page,
@@ -143,6 +145,9 @@ async function scrapeKeyword(
       MAX_ITEM_COUNT
     );
 
+    // Release the page early to free up browser resources for other concurrent tasks
+    await page.close();
+
     if (itemsData.length > 0) {
       foundCount = itemsData.length;
       // Deduplicate items by URL to prevent unique constraint violations during concurrent DB writes
@@ -217,11 +222,10 @@ async function scrapeKeyword(
       );
 
       const counts = await Promise.all(dbTasks);
-      updatedCount = counts.reduce((sum, n) => sum + n, 0);
+      updatedCount = counts.reduce<number>((sum, n) => sum + n, 0);
     } else {
       console.log(`No items found for keyword: ${record.keyword}`);
       errorMsg = 'No items found';
-      await page.screenshot({ path: `no-items-${record.keyword}.png` });
     }
   } catch (e) {
     errorMsg = e instanceof Error ? e.message : String(e);
@@ -239,7 +243,7 @@ async function scrapeKeyword(
 
 // Set the viewport size for the page to ensure all items are visible.
 test.use({
-  viewport: { width: 1280, height: 72000 }
+  viewport: { width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT }
 });
 
 test.describe('Scrape Mercari', () => {
@@ -278,7 +282,10 @@ test.describe('Scrape Mercari', () => {
         keywords.map((record) =>
           limit(async () => {
             const newPage = await page.context().newPage();
-            await newPage.setViewportSize({ width: 1280, height: 72000 });
+            await newPage.setViewportSize({
+              width: VIEWPORT_WIDTH,
+              height: VIEWPORT_HEIGHT
+            });
             try {
               return await scrapeKeyword(newPage, record, prisma);
             } catch (e) {
@@ -291,7 +298,7 @@ test.describe('Scrape Mercari', () => {
                 error: e instanceof Error ? e.message : String(e)
               };
             } finally {
-              await newPage.close();
+              await newPage.close().catch(() => {});
             }
           })
         )
