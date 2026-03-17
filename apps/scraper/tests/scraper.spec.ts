@@ -182,9 +182,17 @@ async function scrapeKeyword(
           const existingRecord = existingRecordsMap.get(data.url);
 
           if (!existingRecord) {
-            await prisma.scraperResult.create({
-              data: {
+            // Use upsert to handle race conditions when the same URL appears
+            // across multiple concurrent keyword scrapes
+            await prisma.scraperResult.upsert({
+              where: { url: data.url },
+              create: {
                 ...data,
+                keywords: {
+                  connect: [{ id: record.id }]
+                }
+              },
+              update: {
                 keywords: {
                   connect: [{ id: record.id }]
                 }
