@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "react-hooks"],
+  "rules": {
+    "no-unused-vars": "off",
+    "typescript/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "ignore": {
+    "ignorePattern": [
+      "node_modules",
+      "dist",
+      "build",
+      "out",
+      ".output",
+      ".next",
+      "generated",
+      "apps/web-tanstack/src/routeTree.gen.ts",
+      "playwright-report",
+      "test-results",
+      "**/*.config.*",
+      "**/*.spec.*"
+    ]
+  }
+}
