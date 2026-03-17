@@ -6,7 +6,6 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 module.exports = {
   extends: [
     'eslint:recommended',
-    'prettier',
     'plugin:@tanstack/eslint-plugin-router/recommended',
     'plugin:turbo/recommended'
   ],

@@ -1,4 +1,4 @@
-import type { ScraperKeyword } from '../generated/client';
+import type { ScraperKeyword } from '../generated/prisma/client';
 import { prisma } from './client';
 
 const DEFAULT_KEYWORD = [
