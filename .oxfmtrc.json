@@ -2,5 +2,10 @@
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "printWidth": 80,
   "singleQuote": true,
-  "trailingComma": "none"
+  "trailingComma": "none",
+  "ignorePatterns": [
+    "**/*.md",
+    "generated",
+    "apps/web-tanstack/src/routeTree.gen.ts"
+  ]
 }
