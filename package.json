@@ -1,9 +1,11 @@
 {
+  "name": "mercari-scraper",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "oxfmt .",
+    "format:check": "oxfmt . --check",
     "generate": "turbo run generate",
     "type-check": "turbo run type-check",
     "check": "turbo run lint type-check",
@@ -13,7 +15,7 @@
   },
   "devDependencies": {
     "eslint-plugin-turbo": "^2.8.11",
-    "prettier": "^3.2.5",
+    "oxfmt": "latest",
     "tsx": "4.19.1",
     "turbo": "^2.5.2",
     "typescript": "5.7.2"
@@ -21,6 +23,5 @@
   "engines": {
     "node": ">=22"
   },
-  "name": "mercari-scraper",
   "packageManager": "pnpm@10.9.0"
 }
