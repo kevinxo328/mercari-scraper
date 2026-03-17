@@ -1,3 +1,0 @@
-{
-  "ignorePatterns": ["**/build", "**/public", "routeTree.gen.ts"]
-}
