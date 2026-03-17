@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { nitro } from 'nitro/vite';
 import babel from '@rolldown/plugin-babel';
+import oxlintPlugin from 'vite-plugin-oxlint';
 
 export default defineConfig({
   resolve: {
@@ -55,6 +56,7 @@ export default defineConfig({
         }
       ]
     }),
+    oxlintPlugin({ configFile: '../../oxlintrc.json' }),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
   ],

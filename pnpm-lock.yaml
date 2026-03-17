@@ -482,6 +482,9 @@ importers:
       vite:
         specifier: ^8.0.0-beta.13
         version: 8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)
+      vite-plugin-oxlint:
+        specifier: latest
+        version: 2.0.1(oxlint@1.56.0)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       vitest:
         specifier: ^4.1.0
         version: 4.1.0(@types/node@22.19.15)(jsdom@28.1.0(@noble/hashes@2.0.1))(msw@2.12.4(@types/node@22.19.15)(typescript@5.7.2))(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
@@ -5815,6 +5818,9 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
+  package-manager-detector@1.6.0:
+    resolution: {integrity: sha512-61A5ThoTiDG/C8s8UMZwSorAGwMJ0ERVGj2OjoW5pAalsNOg15+iQiPzrLJ4jhZ1HJzmC2PIHT2oEiH3R5fzNA==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -6809,6 +6815,12 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  vite-plugin-oxlint@2.0.1:
+    resolution: {integrity: sha512-+WPw00LwN8BZ9uKro0a2lOE8+Da8YHM6p5p10E43mXw/zYCQNV2pEnDuxehCUhUJ/KyAf4cs01n6i4Ey4JfhfQ==}
+    peerDependencies:
+      oxlint: '>=0.9.0'
+      vite: '>=5.0.0'
 
   vite@8.0.0:
     resolution: {integrity: sha512-fPGaRNj9Zytaf8LEiBhY7Z6ijnFKdzU/+mL8EFBaKr7Vw1/FWcTBAMW0wLPJAGMPX38ZPVCVgLceWiEqeoqL2Q==}
@@ -12191,6 +12203,8 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
+  package-manager-detector@1.6.0: {}
+
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -13068,6 +13082,13 @@ snapshots:
   valibot@1.2.0(typescript@5.7.2):
     optionalDependencies:
       typescript: 5.7.2
+
+  vite-plugin-oxlint@2.0.1(oxlint@1.56.0)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)):
+    dependencies:
+      cross-spawn: 7.0.6
+      oxlint: 1.56.0
+      package-manager-detector: 1.6.0
+      vite: 8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)
 
   vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0):
     dependencies:
