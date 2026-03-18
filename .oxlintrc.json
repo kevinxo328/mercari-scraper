@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "jsPlugins": ["eslint-plugin-simple-import-sort", "eslint-plugin-turbo"],
+  "rules": {
+    "no-unused-vars": "off",
+    "typescript/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn"
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    ".next",
+    "generated",
+    "prisma",
+    "playwright-report",
+    "test-results",
+    "coverage",
+    "**/*.config.*",
+    "**/*.spec.*",
+    "**/routeTree.gen.ts"
+  ]
+}

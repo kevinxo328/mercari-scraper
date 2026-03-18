@@ -10,8 +10,6 @@
     "preview": "vite preview",
     "analyze": "ANALYZE=true vite build",
     "start": "node .output/server/index.mjs",
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "eslint . --fix --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -64,11 +62,9 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
     "@rolldown/plugin-babel": "^0.2.0",
     "@tailwindcss/vite": "^4.2.1",
-    "@tanstack/eslint-plugin-router": "^1.155.0",
     "@tanstack/react-router-devtools": "^1.163.3",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -81,7 +77,6 @@
     "@vitest/coverage-v8": "^4.1.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "baseline-browser-mapping": "^2.10.0",
-    "eslint": "^8.57.1",
     "jsdom": "^28.1.0",
     "nitro": "3.0.1-alpha.2",
     "rollup-plugin-visualizer": "^7.0.1",

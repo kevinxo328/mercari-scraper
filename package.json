@@ -8,14 +8,17 @@
     "format:check": "oxfmt . --check",
     "generate": "turbo run generate",
     "type-check": "turbo run type-check",
-    "check": "turbo run lint type-check",
-    "lint": "turbo run lint",
+    "check": "oxlint . --deny-warnings && turbo run type-check",
+    "lint": "oxlint . --deny-warnings",
     "test": "turbo run test",
-    "lint:fix": "turbo run lint:fix"
+    "lint:fix": "oxlint . --fix"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-router": "^1.155.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
     "eslint-plugin-turbo": "^2.8.11",
     "oxfmt": "latest",
+    "oxlint": "latest",
     "tsx": "4.19.1",
     "turbo": "^2.5.2",
     "typescript": "5.7.2"

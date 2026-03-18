@@ -8,9 +8,7 @@
     "scraper:debug": "playwright test --debug",
     "scraper:ui": "playwright test --ui",
     "scraper:report": "playwright show-report",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "eslint . --fix --max-warnings 0"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@playwright/test": "^1.52.0",
@@ -18,11 +16,9 @@
   },
   "devDependencies": {
     "@mercari-scraper/database": "workspace:*",
-    "@mercari-scraper/eslint-config": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
     "dotenv": "^17.3.1",
-    "eslint": "^8.57.0",
     "typescript": "5.7.2"
   }
 }

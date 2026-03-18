@@ -18,6 +18,7 @@ vi.mock('react', async (importOriginal) => {
 
 import { render, screen } from '@testing-library/react';
 import * as React from 'react';
+
 import TimeDisplay from './time-display';
 
 describe('TimeDisplay', () => {

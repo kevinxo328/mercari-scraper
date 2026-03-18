@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react';
 import {
   createMemoryHistory,
+  createRootRoute,
   createRouter,
-  RouterProvider,
-  createRootRoute
+  RouterProvider
 } from '@tanstack/react-router';
+import { render, screen } from '@testing-library/react';
+
 import NavBar from './navbar';
 
 function renderWithRouter(ui: React.ReactElement) {

@@ -1,11 +1,11 @@
 // vite.config.ts
-import { defineConfig } from 'vite';
+import babel from '@rolldown/plugin-babel';
+import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { nitro } from 'nitro/vite';
-import babel from '@rolldown/plugin-babel';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   resolve: {

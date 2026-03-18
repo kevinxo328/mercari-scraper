@@ -1,0 +1,6 @@
+{
+  "extends": ["../../.oxlintrc.json"],
+  "rules": {
+    "turbo/no-undeclared-env-vars": ["error", { "allowList": ["NODE_ENV"] }]
+  }
+}
