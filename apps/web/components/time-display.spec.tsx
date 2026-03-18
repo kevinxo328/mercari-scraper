@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import TimeDisplay from './time-display';
 import React from 'react';
+
+import TimeDisplay from './time-display';
 
 describe('TimeDisplay', () => {
   it('renders loading on server side', () => {

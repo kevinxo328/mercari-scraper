@@ -7,8 +7,8 @@ if [[ ! "$FILE_PATH" =~ \.(js|jsx|ts|tsx)$ ]]; then
   exit 0
 fi
 
-# 1. Prettier
-pnpm exec prettier --write "$FILE_PATH" 2>/dev/null
+# 1. oxfmt
+pnpm exec oxfmt "$FILE_PATH" 2>/dev/null
 
 # 2. ESLint
 pnpm exec eslint --fix "$FILE_PATH" 2>/dev/null

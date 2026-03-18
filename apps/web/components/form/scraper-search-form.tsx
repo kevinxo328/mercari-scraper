@@ -104,7 +104,7 @@ export default function ScraperResultForm(props: Props) {
         form.setValue('keywords', filteredKeywords);
       }
     }
-  }, [props.keywordOptions, props.defaultValues]);
+  }, [props.keywordOptions, props.defaultValues, form]);
 
   return (
     <Form {...form}>

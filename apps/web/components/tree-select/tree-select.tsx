@@ -56,7 +56,11 @@ export function TreeSelect({
   const toggleExpanded = (nodeValue: string) => {
     setExpandedValues((prev) => {
       const next = new Set(prev);
-      next.has(nodeValue) ? next.delete(nodeValue) : next.add(nodeValue);
+      if (next.has(nodeValue)) {
+        next.delete(nodeValue);
+      } else {
+        next.add(nodeValue);
+      }
       return next;
     });
   };
