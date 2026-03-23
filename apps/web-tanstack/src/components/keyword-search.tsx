@@ -55,7 +55,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
       navigate({
         to: '/search',
         search: {
-          keywords: encodeURIComponent(target)
+          keyword: encodeURIComponent(target)
         }
       });
     } else {
@@ -76,7 +76,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
     setMobileOpen(false);
     navigate({
       to: '/search',
-      search: { keywords: encodeURIComponent(keyword) }
+      search: { keyword: encodeURIComponent(keyword) }
     });
   };
 

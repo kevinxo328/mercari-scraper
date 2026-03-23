@@ -28,14 +28,7 @@ import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/router';
 
 const searchSchema = z.object({
-  keywords: z
-    .union([z.string(), z.array(z.string())])
-    .transform((val) => {
-      if (!val) return undefined;
-      return Array.isArray(val) ? val : [val];
-    })
-    .optional()
-    .catch(undefined),
+  keyword: z.string().optional().catch(undefined),
   minPrice: z.number().optional().catch(undefined),
   maxPrice: z.number().optional().catch(undefined)
 });
@@ -73,7 +66,7 @@ export default function RouteComponent() {
   const colCount = useColCount();
   const isHydrated = useHydrated();
   const navigate = useNavigate({ from: Route.fullPath });
-  const { keywords, minPrice, maxPrice } = Route.useSearch();
+  const { keyword, minPrice, maxPrice } = Route.useSearch();
 
   const { data: keywordOptionsData } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
@@ -101,7 +94,7 @@ export default function RouteComponent() {
   } = useInfiniteQuery(
     trpc.scraper.infiniteResults.infiniteQueryOptions(
       {
-        keywords,
+        keywords: keyword ? [keyword] : undefined,
         minPrice: minPrice,
         maxPrice: maxPrice,
         limit: 48,
@@ -153,7 +146,7 @@ export default function RouteComponent() {
     window.scrollTo({ top: 0, behavior: 'instant' });
     navigate({
       search: {
-        keywords: data.keywords?.length > 0 ? data.keywords : undefined,
+        keyword: data.keyword || undefined,
         minPrice: data.minPrice ?? undefined,
         maxPrice: data.maxPrice ?? undefined
       }
@@ -275,7 +268,7 @@ export default function RouteComponent() {
           ref={formRef}
           onSubmit={handleSubmit}
           defaultValues={{
-            keywords,
+            keyword,
             minPrice,
             maxPrice
           }}
@@ -304,7 +297,7 @@ export default function RouteComponent() {
               ref={mobileFormRef}
               onSubmit={handleSubmit}
               defaultValues={{
-                keywords,
+                keyword,
                 minPrice,
                 maxPrice
               }}

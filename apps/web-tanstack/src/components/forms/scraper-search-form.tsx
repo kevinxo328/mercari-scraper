@@ -24,7 +24,7 @@ import {
 
 const formSchema = z
   .object({
-    keywords: z.array(z.string()),
+    keyword: z.string(),
     minPrice: z
       .number()
       .nullable()
@@ -66,24 +66,17 @@ type Props = {
   onSubmit?: (data: ScraperFormValues) => void;
   keywordOptions?: { id: string; keyword: string; pinned: boolean }[];
   defaultValues?: {
-    keywords?: string | string[];
+    keyword?: string;
     minPrice?: number | null;
     maxPrice?: number | null;
   };
 };
 
 export default function ScraperResultForm(props: Props) {
-  const getDefaultKeywords = () => {
-    if (!props.defaultValues?.keywords) return [];
-    if (Array.isArray(props.defaultValues.keywords))
-      return props.defaultValues.keywords;
-    return [props.defaultValues.keywords];
-  };
-
   const form = useForm<ScraperFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      keywords: getDefaultKeywords(),
+      keyword: props.defaultValues?.keyword ?? '',
       minPrice: props.defaultValues?.minPrice ?? null,
       maxPrice: props.defaultValues?.maxPrice ?? null
     }
@@ -91,12 +84,12 @@ export default function ScraperResultForm(props: Props) {
 
   useEffect(() => {
     form.reset({
-      keywords: getDefaultKeywords(),
+      keyword: props.defaultValues?.keyword ?? '',
       minPrice: props.defaultValues?.minPrice ?? null,
       maxPrice: props.defaultValues?.maxPrice ?? null
     });
   }, [
-    props.defaultValues?.keywords,
+    props.defaultValues?.keyword,
     props.defaultValues?.minPrice,
     props.defaultValues?.maxPrice,
     form
@@ -114,17 +107,14 @@ export default function ScraperResultForm(props: Props) {
   };
 
   useEffect(() => {
-    // Remove keywords that are not in the options
+    // Clear keyword if it's not in the options
     if (props.keywordOptions) {
       const validKeywords = props.keywordOptions.map(
         (option) => option.keyword
       );
-      const currentKeywords = form.getValues('keywords');
-      const filteredKeywords = currentKeywords.filter((keyword) =>
-        validKeywords.includes(keyword)
-      );
-      if (filteredKeywords.length !== currentKeywords.length) {
-        form.setValue('keywords', filteredKeywords);
+      const currentKeyword = form.getValues('keyword');
+      if (currentKeyword && !validKeywords.includes(currentKeyword)) {
+        form.setValue('keyword', '');
       }
     }
   }, [props.keywordOptions, props.defaultValues]);
@@ -137,16 +127,16 @@ export default function ScraperResultForm(props: Props) {
         ref={props.ref}
       >
         <FormField
-          name="keywords"
+          name="keyword"
           control={form.control}
           render={({ field }) => (
             <FormItem className="flex flex-col gap-2">
               <FormLabel className="text-xl font-semibold">Keyword</FormLabel>
               <FormControl>
                 <Select
-                  value={field.value?.[0] || ''}
+                  value={field.value || ''}
                   onValueChange={(value) => {
-                    field.onChange(value ? [value] : []);
+                    field.onChange(value);
                   }}
                 >
                   <SelectTrigger className="w-full">
@@ -166,13 +156,13 @@ export default function ScraperResultForm(props: Props) {
                         </span>
                       </SelectItem>
                     ))}
-                    {field.value?.[0] &&
+                    {field.value &&
                       (!props.keywordOptions ||
                         !props.keywordOptions.some(
-                          (o) => o.keyword === field.value?.[0]
+                          (o) => o.keyword === field.value
                         )) && (
-                        <SelectItem value={field.value[0]} className="hidden">
-                          {field.value[0]}
+                        <SelectItem value={field.value} className="hidden">
+                          {field.value}
                         </SelectItem>
                       )}
                   </SelectContent>
