@@ -5,7 +5,7 @@
 A Turborepo monorepo for scraping Mercari Japan listings.
 
 - **`apps/scraper`** - Playwright-based scraper, runs daily via GitHub Actions
-- **`apps/web`** - Next.js admin dashboard (tRPC, NextAuth, TanStack Query, Radix UI)
+- **`apps/web-nextjs`** - Next.js admin dashboard (tRPC, NextAuth, TanStack Query, shadcn/ui)
 - **`packages/database`** - Shared Prisma ORM layer (PostgreSQL via Supabase)
 - **`packages/config-eslint`** / **`packages/config-typescript`** - Shared configs
 

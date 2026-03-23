@@ -1,4 +1,0 @@
-{
-  "extends": ["../../.oxlintrc.json"],
-  "jsPlugins": ["@tanstack/eslint-plugin-router"]
-}
