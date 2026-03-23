@@ -11,12 +11,12 @@ Personal-use Mercari scraper that periodically crawls product listings and store
 - `web-nextjs`: Next.js admin dashboard (tRPC, NextAuth, TanStack Query, shadcn/ui)
 - `scraper`: Playwright scraper
 - `@mercari-scraper/database`: Prisma ORM
-- `@mercari-scraper/eslint-config`, `@mercari-scraper/typescript-config`
+- `@mercari-scraper/typescript-config`
 
 ### Utilities
 
-- TypeScript, ESLint, Prettier
-- Vitest / Jest
+- TypeScript, oxlint, oxfmt
+- Jest
 - Prisma ORM
 
 ## Getting started
@@ -96,7 +96,7 @@ To ensure code quality and type safety across all packages, run:
 pnpm check
 ```
 
-This command uses Turbo to run both ESLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
+This command uses oxlint and TypeScript's `tsc` check via Turbo. It is highly recommended to run this before committing any changes.
 
 ### 8. Build your application
 
@@ -130,6 +130,7 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
    - `DATABASE_URL`
    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
+   - `WEB_APP_URL` (optional) — web app URL passed to the scraper
    - Any other required environment variables
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
 
