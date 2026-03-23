@@ -6,7 +6,7 @@ import {
   Outlet,
   Scripts
 } from '@tanstack/react-router';
-import { NuqsAdapter } from 'nuqs/adapters/react';
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 import { lazy, Suspense } from 'react';
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
