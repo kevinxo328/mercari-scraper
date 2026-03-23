@@ -11,12 +11,12 @@ Personal-use Mercari scraper that periodically crawls product listings and store
 - `web-tanstack`: TanStack Start app (deploy to Vercel)
 - `scraper`: Playwright scraper
 - `@mercari-scraper/database`: Prisma ORM
-- `@mercari-scraper/eslint-config`, `@mercari-scraper/typescript-config`
+- `@mercari-scraper/typescript-config`
 
 ### Utilities
 
-- TypeScript, ESLint, Prettier
-- Vitest / Jest
+- TypeScript, OxLint, OxFmt
+- Vitest
 - Prisma ORM
 
 ## Getting started
@@ -59,8 +59,7 @@ For `web-tanstack`, also set Google OAuth and auth secrets (see `.env.example` f
 Once your database is running, create and apply migrations to set up the tables:
 
 ```bash
-# Using pnpm
-pnpm run db:migrate:dev
+pnpm --filter @mercari-scraper/database db:migrate:dev
 ```
 
 > **Note:** For production, use `prisma migrate deploy`.
@@ -84,7 +83,7 @@ pnpm generate
 Edit `packages/database/src/seed.ts`, then run:
 
 ```bash
-pnpm run db:seed
+pnpm --filter @mercari-scraper/database db:seed
 ```
 
 ### 7. Verify your code (Lint & Type Check)
@@ -96,7 +95,7 @@ To ensure code quality and type safety across all packages, run:
 pnpm check
 ```
 
-This command uses Turbo to run both ESLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
+This command uses Turbo to run both OxLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
 
 ### 8. Build your application
 
@@ -130,7 +129,7 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
    - `DATABASE_URL`
    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
-   - Any other required environment variables
+   - `WEB_APP_URL` (optional) — used in notifications
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
 
 #### Resource Monitoring
