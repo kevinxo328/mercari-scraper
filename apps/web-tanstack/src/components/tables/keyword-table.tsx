@@ -7,7 +7,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { Pencil, Trash2, XIcon } from 'lucide-react';
+import { Pencil, Star, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/shadcn/button';
@@ -109,6 +109,42 @@ export default function KeywordTable() {
     })
   );
 
+  const pinMutation = useMutation(
+    trpc.scraper.pinKeyword.mutationOptions({
+      onMutate: async ({ id, pinned }) => {
+        await queryClient.cancelQueries(trpc.scraper.getKeywords.pathFilter());
+        const previousData = queryClient.getQueriesData(
+          trpc.scraper.getKeywords.pathFilter()
+        );
+        queryClient.setQueriesData(
+          trpc.scraper.getKeywords.pathFilter(),
+          (old: any) => {
+            if (!old) return old;
+            return {
+              ...old,
+              data: old.data.map((kw: ScraperKeyword) =>
+                kw.id === id ? { ...kw, pinned } : kw
+              )
+            };
+          }
+        );
+        return { previousData };
+      },
+      onError: (_err, _vars, context: any) => {
+        if (context?.previousData) {
+          for (const [queryKey, data] of context.previousData) {
+            queryClient.setQueryData(queryKey, data);
+          }
+        }
+      },
+      onSettled: async () => {
+        await queryClient.invalidateQueries(
+          trpc.scraper.getKeywords.pathFilter()
+        );
+      }
+    })
+  );
+
   const keywords = keywordsData?.data ?? [];
   const total = keywordsData?.total ?? 0;
   const totalPages =
@@ -193,9 +229,28 @@ export default function KeywordTable() {
           )}
         </button>
       ),
-      cell: ({ row }) => (
-        <span className="font-medium">{row.original.keyword}</span>
-      ),
+      cell: ({ row }) => {
+        const keyword = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label={keyword.pinned ? 'Unpin' : 'Pin'}
+              onClick={() =>
+                pinMutation.mutate({ id: keyword.id, pinned: !keyword.pinned })
+              }
+              className={`disabled:opacity-40 shrink-0 ${keyword.pinned ? 'text-yellow-400 hover:text-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
+              disabled={pinMutation.isPending}
+            >
+              <Star
+                className="h-4 w-4"
+                fill={keyword.pinned ? 'currentColor' : 'none'}
+              />
+            </button>
+            <span className="font-medium">{keyword.keyword}</span>
+          </div>
+        );
+      },
       meta: {
         className:
           'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'

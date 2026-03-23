@@ -72,13 +72,22 @@ export default function RouteComponent() {
   const [minPrice, setMinPrice] = useQueryState('minPrice', parseAsInteger);
   const [maxPrice, setMaxPrice] = useQueryState('maxPrice', parseAsInteger);
 
-  const { data: keywordOptions } = useQuery(
+  const { data: keywordOptionsData } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
       orderby: 'desc',
       orderByField: 'updatedAt',
       hasResults: true
     })
   );
+  const keywordOptions = keywordOptionsData
+    ? {
+        ...keywordOptionsData,
+        data: [...keywordOptionsData.data].sort((a, b) => {
+          if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+          return a.keyword.localeCompare(b.keyword);
+        })
+      }
+    : undefined;
 
   const {
     data: infiniteResults,

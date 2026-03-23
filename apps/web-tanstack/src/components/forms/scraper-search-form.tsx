@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Star } from 'lucide-react';
 import { useEffect } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import { z } from 'zod/v3';
@@ -63,7 +64,7 @@ export type ScraperFormValues = z.infer<typeof formSchema>;
 type Props = {
   ref?: React.Ref<HTMLFormElement>;
   onSubmit?: (data: ScraperFormValues) => void;
-  keywordOptions?: { id: string; keyword: string }[];
+  keywordOptions?: { id: string; keyword: string; pinned: boolean }[];
   defaultValues?: Partial<ScraperFormValues>;
 };
 
@@ -128,9 +129,17 @@ export default function ScraperResultForm(props: Props) {
                     <SelectValue placeholder="Select a keyword" />
                   </SelectTrigger>
                   <SelectContent>
-                    {props.keywordOptions?.map(({ keyword, id }) => (
+                    {props.keywordOptions?.map(({ keyword, id, pinned }) => (
                       <SelectItem key={id} value={keyword}>
-                        {keyword}
+                        <span className="flex items-center gap-1">
+                          {keyword}
+                          {pinned && (
+                            <Star
+                              className="size-3 text-yellow-400 shrink-0"
+                              fill="currentColor"
+                            />
+                          )}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>

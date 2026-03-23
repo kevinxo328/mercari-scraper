@@ -20,6 +20,7 @@ export type ScraperFilter = {
 export type ScraperKeyword = {
   id: string;
   keyword: string;
+  pinned: boolean;
   minPrice: number | null;
   maxPrice: number | null;
   categoryIds: string[];

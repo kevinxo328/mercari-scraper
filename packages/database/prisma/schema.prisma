@@ -15,6 +15,7 @@ datasource db {
 model ScraperKeyword {
   id        String   @id @default(uuid()) @db.Uuid
   keyword   String   @unique @db.VarChar(255)
+  pinned    Boolean  @default(false)
   minPrice  Int?
   maxPrice  Int?
   categoryIds String[]
