@@ -66,7 +66,7 @@ export function TreeSelectTrigger({
                 <Badge
                   key={value}
                   data-testid="badge"
-                  className="border-foreground/10 text-foreground bg-card hover:bg-card/80 m-1"
+                  className="border-foreground/10 text-foreground bg-secondary hover:bg-secondary/80 m-1"
                 >
                   <span>{getBadgeLabel(value)}</span>
                   <div
@@ -115,7 +115,10 @@ export function TreeSelectTrigger({
                 className="flex min-h-6 h-full"
               />
               <ChevronDown
-                className="h-4 mx-2 cursor-pointer text-muted-foreground"
+                className={cn(
+                  'h-4 mx-2 cursor-pointer text-muted-foreground transition-transform duration-200',
+                  isOpen && 'rotate-180'
+                )}
                 aria-hidden="true"
               />
             </div>
@@ -125,7 +128,12 @@ export function TreeSelectTrigger({
             <span className="text-sm text-muted-foreground mx-3">
               {placeholder}
             </span>
-            <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
+            <ChevronDown
+              className={cn(
+                'h-4 cursor-pointer text-muted-foreground mx-2 transition-transform duration-200',
+                isOpen && 'rotate-180'
+              )}
+            />
           </div>
         )}
       </Button>

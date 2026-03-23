@@ -60,6 +60,20 @@ export const TreeSelectItem = memo(function TreeSelectItem({
     toggleExpanded(node.value);
   };
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    if (isDisabled) return;
+    // Checkbox and chevron handle their own clicks
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-slot="checkbox"]') || target.closest('button')) {
+      return;
+    }
+    if (hasChildren) {
+      toggleExpanded(node.value);
+    } else {
+      toggleValue(node.value, node);
+    }
+  };
+
   // When selecting a parent, also ensure descendants are not individually stored
   // (parent takes precedence — handled in TreeSelect.toggleValue)
   void getDescendantValues;
@@ -74,6 +88,7 @@ export const TreeSelectItem = memo(function TreeSelectItem({
       data-testid={`item-${node.value}`}
       data-value={node.value}
       onMouseEnter={() => setFocusedValue(node.value)}
+      onClick={handleRowClick}
       className={cn(
         'flex items-center gap-1 py-1 px-2 rounded-sm cursor-pointer select-none',
         'hover:bg-accent hover:text-accent-foreground',
