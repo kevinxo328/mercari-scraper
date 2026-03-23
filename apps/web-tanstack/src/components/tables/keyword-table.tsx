@@ -7,11 +7,12 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { Pencil, Star, Trash2, XIcon } from 'lucide-react';
+import { Check, Pencil, Star, Tag, Trash2, XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Table,
   TableBody,
@@ -20,6 +21,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/shadcn/table';
+import { cn } from '@/lib/utils';
 import { trpc } from '@/router';
 import { ScraperKeyword } from '@/types/scraper';
 
@@ -54,6 +56,8 @@ const SORTABLE_COLUMNS: {
   { key: 'updatedAt', label: 'Updated' }
 ];
 
+const SKELETON_ROW_COUNT = 5;
+
 const formatDate = (date: Date | string) => {
   const value = new Date(date);
   if (Number.isNaN(value.getTime())) return 'N/A';
@@ -78,6 +82,7 @@ export default function KeywordTable() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isComposing, setIsComposing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [keywordToEdit, setKeywordToEdit] = useState<ScraperKeyword | null>(
     null
@@ -195,15 +200,8 @@ export default function KeywordTable() {
   };
 
   const handleDelete = (keyword: ScraperKeyword) => {
-    const shouldDelete =
-      typeof window !== 'undefined' && typeof window.confirm === 'function'
-        ? window.confirm(`Delete "${keyword.keyword}"? This cannot be undone.`)
-        : true;
-
-    if (!shouldDelete) {
-      return;
-    }
     setDeletingId(keyword.id);
+    setConfirmingId(null);
     deleteMutation.mutate(
       { id: keyword.id },
       {
@@ -213,6 +211,9 @@ export default function KeywordTable() {
   };
 
   const isDeleting = deleteMutation.isPending;
+
+  const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const rangeEnd = Math.min(page * pageSize, total);
 
   const columns: ColumnDef<ScraperKeyword>[] = [
     {
@@ -309,7 +310,7 @@ export default function KeywordTable() {
             ))}
           </div>
         ) : (
-          <span className="text-gray-400">No categories</span>
+          <span className="text-gray-400">—</span>
         );
       }
     },
@@ -351,6 +352,45 @@ export default function KeywordTable() {
       cell: ({ row }) => {
         const keyword = row.original;
         const isRowDeleting = deletingId === keyword.id && isDeleting;
+        const isConfirming = confirmingId === keyword.id;
+
+        if (isConfirming) {
+          return (
+            <div className="flex items-center justify-center gap-1">
+              <span className="mr-1 text-xs text-gray-500">Delete?</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => handleDelete(keyword)}
+                    disabled={isRowDeleting}
+                    aria-label="Confirm delete"
+                    className="h-8 w-8"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Confirm</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setConfirmingId(null)}
+                    disabled={isRowDeleting}
+                    aria-label="Cancel delete"
+                    className="h-8 w-8"
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Cancel</TooltipContent>
+              </Tooltip>
+            </div>
+          );
+        }
 
         return (
           <div className="flex items-center justify-center gap-2">
@@ -373,11 +413,11 @@ export default function KeywordTable() {
               <TooltipTrigger asChild>
                 <Button
                   size="icon"
-                  variant="destructive"
-                  onClick={() => handleDelete(keyword)}
+                  variant="ghost"
+                  onClick={() => setConfirmingId(keyword.id)}
                   disabled={isRowDeleting}
                   aria-label="Delete"
-                  className="h-8 w-8"
+                  className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -463,7 +503,12 @@ export default function KeywordTable() {
           </Button>
         </div>
       </div>
-      <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800">
+      <div
+        className={cn(
+          'overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 transition-opacity duration-200',
+          isFetching && !isPending && 'opacity-60'
+        )}
+      >
         <Table className="min-w-[900px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -491,11 +536,37 @@ export default function KeywordTable() {
           </TableHeader>
           <TableBody>
             {isPending ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  Loading...
-                </TableCell>
-              </TableRow>
+              Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell className="sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded-full shrink-0" />
+                      <Skeleton className="h-4 w-28" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-14 ml-auto" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-14 ml-auto" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell className="sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]">
+                    <div className="flex items-center justify-center gap-2">
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : isError ? (
               <TableRow>
                 <TableCell
@@ -529,16 +600,35 @@ export default function KeywordTable() {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center text-gray-500"
-                >
-                  No keywords found
+                <TableCell colSpan={columns.length} className="py-16">
+                  <div className="flex flex-col items-center gap-3 text-gray-400">
+                    <Tag className="h-8 w-8 opacity-40" />
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-500">
+                        {searchTerm
+                          ? 'No keywords match your search'
+                          : 'No keywords yet'}
+                      </p>
+                      {!searchTerm && (
+                        <p className="mt-1 text-xs">
+                          Add a keyword to start tracking Mercari listings.
+                        </p>
+                      )}
+                    </div>
+                    {searchTerm && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearSearch}
+                      >
+                        Clear search
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
-          {/* <TableCaption>{isFetching && 'Refreshing data...'}</TableCaption> */}
         </Table>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -565,7 +655,9 @@ export default function KeywordTable() {
             </Select>
           </div>
           <p className="text-sm text-gray-500">
-            Page {page} of {totalPages}
+            {total > 0
+              ? `${rangeStart}–${rangeEnd} of ${total}`
+              : `Page ${page} of ${totalPages}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
