@@ -88,34 +88,6 @@ export default function KeywordSearch({ className }: { className?: string }) {
   return (
     <>
       {/* Mobile: tap to open dialog */}
-      <button
-        className={cn(
-          'md:hidden flex items-center gap-2 w-full border rounded-md px-3 h-9 bg-background text-sm',
-          className
-        )}
-        onClick={() => setMobileOpen(true)}
-      >
-        <Search className="size-4 shrink-0 text-muted-foreground" />
-        <span
-          className={cn(
-            'flex-1 text-left truncate',
-            selected ? 'text-foreground' : 'text-muted-foreground'
-          )}
-        >
-          {selected ?? 'Search keywords…'}
-        </span>
-        {selected && (
-          <X
-            className="size-4 shrink-0 text-muted-foreground"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelected(null);
-              setFilterText('');
-            }}
-          />
-        )}
-      </button>
-
       <CommandDialog
         open={mobileOpen}
         onOpenChange={(v) => {
@@ -126,6 +98,34 @@ export default function KeywordSearch({ className }: { className?: string }) {
         description="Select a keyword to search"
         showCloseButton={false}
         className="h-[420px]"
+        trigger={
+          <button
+            className={cn(
+              'md:hidden flex items-center gap-2 w-full border rounded-md px-3 h-9 bg-background text-sm',
+              className
+            )}
+          >
+            <Search className="size-4 shrink-0 text-muted-foreground" />
+            <span
+              className={cn(
+                'flex-1 text-left truncate',
+                selected ? 'text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              {selected ?? 'Search keywords…'}
+            </span>
+            {selected && (
+              <X
+                className="size-4 shrink-0 text-muted-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelected(null);
+                  setFilterText('');
+                }}
+              />
+            )}
+          </button>
+        }
       >
         <CommandInput
           value={mobileFilter}
