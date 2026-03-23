@@ -6,7 +6,7 @@ import {
   Outlet,
   Scripts
 } from '@tanstack/react-router';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -73,6 +73,19 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (!nav || !('type' in nav) || nav.type !== 'reload') return;
+
+    // On browser reload, the viewport may still restore to a stale position
+    // before TanStack Router rehydrates. Force top on reload only.
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  }, []);
+
   return (
     <html lang="en" className="dark">
       <head>

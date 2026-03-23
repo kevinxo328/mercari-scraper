@@ -23,10 +23,25 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 });
 
 export function getRouter() {
+  if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
+
   const router = createRouter({
     routeTree,
     context: { queryClient, trpc },
     scrollRestoration: true,
+    getScrollRestorationKey: (location) => {
+      const locationKey = location.state.__TSR_key;
+      if (locationKey) return locationKey;
+
+      if (typeof window !== 'undefined') {
+        const state = window.history.state as { __TSR_key?: string } | null;
+        if (state?.__TSR_key) return state.__TSR_key;
+      }
+
+      return location.href;
+    },
     scrollRestorationBehavior: 'instant',
     Wrap: function WrapComponent({ children }) {
       return (
