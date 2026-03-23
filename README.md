@@ -8,16 +8,15 @@ Personal-use Mercari scraper that periodically crawls product listings and store
 
 ### Apps and packages
 
-- `web-tanstack`: TanStack Start app (primary, deploy to Vercel)
-- `web`: Next.js app (legacy)
+- `web-tanstack`: TanStack Start app (deploy to Vercel)
 - `scraper`: Playwright scraper
 - `@mercari-scraper/database`: Prisma ORM
-- `@mercari-scraper/eslint-config`, `@mercari-scraper/typescript-config`
+- `@mercari-scraper/typescript-config`
 
 ### Utilities
 
-- TypeScript, ESLint, Prettier
-- Vitest / Jest
+- TypeScript, OxLint, OxFmt
+- Vitest
 - Prisma ORM
 
 ## Getting started
@@ -45,25 +44,22 @@ Once the database is ready, copy the `.env.example` file to `.env` in each of th
 ```bash
 # Copy example files to .env in each package
 cp ./packages/database/.env.example ./packages/database/.env
-cp ./apps/web/.env.example ./apps/web/.env
 cp ./apps/web-tanstack/.env.example ./apps/web-tanstack/.env
 cp ./apps/scraper/.env.example ./apps/scraper/.env
 ```
 
-For `web` and `web-tanstack`, also set Google OAuth and auth secrets (see each `.env.example` for required vars):
+For `web-tanstack`, also set Google OAuth and auth secrets (see `.env.example` for required vars):
 
 - `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`
 - `AUTH_ALLOW_EMAILS`
-- `web`: `AUTH_SECRET`
-- `web-tanstack`: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
+- `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`
 
 ### 4. Migrate your database
 
 Once your database is running, create and apply migrations to set up the tables:
 
 ```bash
-# Using pnpm
-pnpm run db:migrate:dev
+pnpm --filter @mercari-scraper/database db:migrate:dev
 ```
 
 > **Note:** For production, use `prisma migrate deploy`.
@@ -87,7 +83,7 @@ pnpm generate
 Edit `packages/database/src/seed.ts`, then run:
 
 ```bash
-pnpm run db:seed
+pnpm --filter @mercari-scraper/database db:seed
 ```
 
 ### 7. Verify your code (Lint & Type Check)
@@ -99,7 +95,7 @@ To ensure code quality and type safety across all packages, run:
 pnpm check
 ```
 
-This command uses Turbo to run both ESLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
+This command uses Turbo to run both OxLint and TypeScript's `tsc` check. It is highly recommended to run this before committing any changes.
 
 ### 8. Build your application
 
@@ -133,7 +129,7 @@ The `scraper` app is set up to run automatically on a schedule using GitHub Acti
 3. Go to the GitHub project page → `Settings` → `Secrets and variables` → `Actions`, and add the following environment variables:
    - `DATABASE_URL`
    - `SLACK_WEBHOOK_URL` (optional) — enables Slack notifications on completion
-   - Any other required environment variables
+   - `WEB_APP_URL` (optional) — used in notifications
 4. On each scheduled trigger, GitHub Actions will automatically run the `scraper` and connect to the database.
 
 #### Resource Monitoring
@@ -142,9 +138,9 @@ Each scraper run logs CPU/RAM stats and writes a summary to GitHub Actions. If `
 
 ---
 
-### 2. Deploy `web-tanstack` or `web` to Vercel
+### 2. Deploy `web-tanstack` to Vercel
 
-You can deploy either the `web-tanstack` frontend (TanStack Start, **primary**) or `web` (Next.js) to [Vercel](https://vercel.com/).
+Deploy the `web-tanstack` frontend (TanStack Start) to [Vercel](https://vercel.com/).
 
 **Steps:**
 
@@ -154,9 +150,8 @@ You can deploy either the `web-tanstack` frontend (TanStack Start, **primary**) 
    - `AUTH_GOOGLE_ID`
    - `AUTH_GOOGLE_SECRET`
    - `AUTH_ALLOW_EMAILS`
-   - For `web`: `AUTH_SECRET`
-   - For `web-tanstack`: `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` (the production URL)
-3. Set the `Root Directory` in Vercel to `apps/web-tanstack` or `apps/web`.
+   - `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` (the production URL)
+3. Set the `Root Directory` in Vercel to `apps/web-tanstack`.
 4. Save the settings and deploy. Vercel will automatically detect the application type and complete the deployment.
 
 ---

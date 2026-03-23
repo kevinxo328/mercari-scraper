@@ -15,7 +15,7 @@ export function TreeSelectSearch() {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search..."
-        className="border-0 p-0 h-full text-sm focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+        className="border-0 p-0 h-full text-sm focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent dark:bg-transparent"
       />
     </div>
   );

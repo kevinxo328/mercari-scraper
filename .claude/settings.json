@@ -12,5 +12,7 @@
       }
     ]
   },
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "impeccable@impeccable": true
+  }
 }

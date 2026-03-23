@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Command as CommandPrimitive } from 'cmdk';
-import { Search, X } from 'lucide-react';
+import { Search, Star, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import {
@@ -28,12 +28,16 @@ export default function KeywordSearch({ className }: { className?: string }) {
     })
   );
 
-  const keywords = keywordPage?.data ?? [];
+  const rawKeywords = keywordPage?.data ?? [];
+  const sorted = [...rawKeywords].sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return a.keyword.localeCompare(b.keyword);
+  });
   const filtered = filterText
-    ? keywords.filter((k) =>
+    ? sorted.filter((k) =>
         k.keyword.toLowerCase().includes(filterText.toLowerCase())
       )
-    : keywords;
+    : sorted;
 
   const search = (keyword?: string) => {
     const target = keyword ?? selected;
@@ -115,6 +119,12 @@ export default function KeywordSearch({ className }: { className?: string }) {
             {filtered.map((k) => (
               <CommandItem key={k.id} value={k.keyword} onSelect={handleSelect}>
                 {k.keyword}
+                {k.pinned && (
+                  <Star
+                    className="size-3 text-yellow-400 shrink-0"
+                    fill="currentColor"
+                  />
+                )}
               </CommandItem>
             ))}
           </CommandList>

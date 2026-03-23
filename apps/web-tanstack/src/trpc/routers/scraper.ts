@@ -123,49 +123,108 @@ export const scraperRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const { db } = ctx;
-      const where = {} as Record<string, any>;
+
+      // Build price/date filters (no keywords here — handled per phase)
+      const baseFilters: Record<string, any> = {};
       if (input.minPrice !== null && input.minPrice !== undefined) {
-        where.price = {
-          gte: input.minPrice
-        };
+        baseFilters.price = { gte: input.minPrice };
       }
       if (input.maxPrice !== null && input.maxPrice !== undefined) {
-        where.price = {
-          lte: input.maxPrice
-        };
-      }
-      if (input.keywords) {
-        where.keywords = {
-          some: {
-            keyword: {
-              in: input.keywords.length > 0 ? input.keywords : undefined
-            }
-          }
-        };
+        baseFilters.price = { lte: input.maxPrice };
       }
       if (input.updatedSince) {
-        where.updatedAt = { gte: input.updatedSince };
+        baseFilters.updatedAt = { gte: input.updatedSince };
       }
 
-      const results = await db.scraperResult.findMany({
-        where,
-        take: input.limit + 1,
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: {
-          updatedAt: input.orderby
+      const keywordIds =
+        input.keywords && input.keywords.length > 0
+          ? input.keywords
+          : undefined;
+
+      // Parse cursor: "pinned:<id>" | "regular:<id>" | plain id (legacy)
+      let phase: 'pinned' | 'regular' = 'pinned';
+      let cursorId: string | undefined;
+      if (input.cursor) {
+        if (input.cursor.startsWith('pinned:')) {
+          phase = 'pinned';
+          cursorId = input.cursor.slice('pinned:'.length);
+        } else if (input.cursor.startsWith('regular:')) {
+          phase = 'regular';
+          cursorId = input.cursor.slice('regular:'.length);
+        } else {
+          phase = 'regular';
+          cursorId = input.cursor;
         }
-      });
-
-      let nextCursor: string | null = null;
-      if (results.length > input.limit) {
-        const nextItem = results.pop();
-        nextCursor = nextItem!.id;
       }
 
-      return {
-        data: results,
-        nextCursor
-      };
+      type ResultRow = Awaited<
+        ReturnType<typeof db.scraperResult.findMany>
+      >[number];
+      const results: ResultRow[] = [];
+      let nextCursor: string | null = null;
+      let remaining = input.limit + 1;
+
+      // Phase 1: results whose keywords include at least one pinned keyword
+      if (phase === 'pinned') {
+        const pinnedWhere: Record<string, any> = {
+          ...baseFilters,
+          AND: [
+            { keywords: { some: { pinned: true } } },
+            ...(keywordIds
+              ? [{ keywords: { some: { keyword: { in: keywordIds } } } }]
+              : [])
+          ]
+        };
+
+        const pinnedResults = await db.scraperResult.findMany({
+          where: pinnedWhere,
+          take: remaining,
+          cursor: cursorId ? { id: cursorId } : undefined,
+          orderBy: { updatedAt: input.orderby }
+        });
+
+        results.push(...pinnedResults);
+        remaining -= pinnedResults.length;
+
+        if (results.length > input.limit) {
+          const nextItem = results.pop();
+          nextCursor = `pinned:${nextItem!.id}`;
+          return { data: results, nextCursor };
+        }
+
+        // Pinned phase exhausted; fall through to regular
+        phase = 'regular';
+        cursorId = undefined;
+      }
+
+      // Phase 2: results whose keywords have no pinned keyword
+      if (remaining > 0) {
+        const regularWhere: Record<string, any> = {
+          ...baseFilters,
+          AND: [
+            { keywords: { none: { pinned: true } } },
+            ...(keywordIds
+              ? [{ keywords: { some: { keyword: { in: keywordIds } } } }]
+              : [])
+          ]
+        };
+
+        const regularResults = await db.scraperResult.findMany({
+          where: regularWhere,
+          take: remaining,
+          cursor: cursorId ? { id: cursorId } : undefined,
+          orderBy: { updatedAt: input.orderby }
+        });
+
+        results.push(...regularResults);
+
+        if (results.length > input.limit) {
+          const nextItem = results.pop();
+          nextCursor = `regular:${nextItem!.id}`;
+        }
+      }
+
+      return { data: results, nextCursor };
     }),
   deleteResult: protectedProcedure
     .input(
@@ -222,6 +281,19 @@ export const scraperRouter = router({
         where: { id: input.id }
       });
       return { success: true };
+    }),
+  pinKeyword: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        pinned: z.boolean()
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db.scraperKeyword.update({
+        where: { id: input.id },
+        data: { pinned: input.pinned }
+      });
     }),
   getCategories: procedure.query(() => {
     type RawNode = {

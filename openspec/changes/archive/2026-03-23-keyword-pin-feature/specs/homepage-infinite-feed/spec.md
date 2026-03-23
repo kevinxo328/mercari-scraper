@@ -1,10 +1,4 @@
-# Capability: Homepage Infinite Feed
-
-## Purpose
-
-The homepage displays a unified chronological feed from the latest scraper run, rendered with virtual list and infinite scroll for performance.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Homepage displays a unified chronological feed of the latest scraper run
 
@@ -39,46 +33,3 @@ The two-phase ordering is implemented server-side in `infiniteResults` using a p
 
 - **WHEN** no results exist in the database
 - **THEN** a "No results found" message is shown
-
-### Requirement: Homepage feed uses virtual list rendering
-
-The homepage feed SHALL use row-level virtualization so only the rows currently visible in the viewport (plus overscan) are present in the DOM.
-
-#### Scenario: DOM rows are limited to visible area
-
-- **WHEN** the user has scrolled past many rows
-- **THEN** rows that are far above the viewport are removed from the DOM
-- **THEN** the scroll position and total height are maintained correctly
-
-#### Scenario: Row height measurement
-
-- **WHEN** a row is first rendered
-- **THEN** its actual rendered height is measured and used for subsequent layout calculations
-
-### Requirement: Homepage feed supports infinite scroll
-
-The homepage SHALL automatically fetch the next page of results as the user scrolls near the bottom of the loaded items.
-
-#### Scenario: Next page fetched near bottom
-
-- **WHEN** the user has scrolled such that the last rendered virtual row is within 3 grid rows of the total loaded item count
-- **THEN** `fetchNextPage` is called if `hasNextPage` is true and a fetch is not already in progress
-
-#### Scenario: End of results
-
-- **WHEN** there are no more pages to fetch
-- **THEN** no further fetch requests are made
-
-### Requirement: Authenticated users can delete items from the feed
-
-The homepage feed SHALL show a delete button on each card when the user is authenticated, using the existing delete flow.
-
-#### Scenario: Delete button visible when authenticated
-
-- **WHEN** the user is signed in
-- **THEN** each result card shows a delete button
-
-#### Scenario: Delete removes item from feed
-
-- **WHEN** the user confirms deletion
-- **THEN** the item is removed and the query cache is invalidated
