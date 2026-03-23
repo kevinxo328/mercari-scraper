@@ -1,5 +1,9 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { createFileRoute, useHydrated } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  useElementScrollRestoration,
+  useHydrated
+} from '@tanstack/react-router';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,7 +11,6 @@ import LinkCard from '@/components/link-card';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import TimeDisplay from '@/components/time-display';
 import { useDeleteResult } from '@/hooks/use-delete-result';
-import { useForceScrollTopOnMount } from '@/hooks/use-force-scroll-top-on-mount';
 import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/router';
 
@@ -60,18 +63,20 @@ function Home() {
   const rowCount = Math.ceil(allItems.length / colCount);
 
   const listRef = useRef<HTMLDivElement>(null);
+  const scrollEntry = useElementScrollRestoration({
+    getElement: () => window
+  });
 
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
     estimateSize: () => 220,
     overscan: 4,
-    scrollMargin: listRef.current?.offsetTop ?? 0
+    scrollMargin: listRef.current?.offsetTop ?? 0,
+    initialOffset: scrollEntry?.scrollY
   });
 
   const virtualItems = virtualizer.getVirtualItems();
   const isAuthenticated = !!session;
-
-  useForceScrollTopOnMount();
 
   // Trigger next page when near the end
   useEffect(() => {

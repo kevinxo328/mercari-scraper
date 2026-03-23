@@ -54,13 +54,15 @@ export default function KeywordSearch({ className }: { className?: string }) {
     if (target) {
       navigate({
         to: '/search',
+        resetScroll: true,
         search: {
           keyword: encodeURIComponent(target)
         }
       });
     } else {
       navigate({
-        to: '/search'
+        to: '/search',
+        resetScroll: true
       });
     }
     setOpen(false);
@@ -76,6 +78,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
     setMobileOpen(false);
     navigate({
       to: '/search',
+      resetScroll: true,
       search: { keyword: encodeURIComponent(keyword) }
     });
   };
