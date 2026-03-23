@@ -37,6 +37,7 @@ function CommandDialog({
   className,
   showCloseButton = true,
   trigger,
+  onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof Dialog> & {
   title?: string;
@@ -44,6 +45,7 @@ function CommandDialog({
   className?: string;
   showCloseButton?: boolean;
   trigger?: React.ReactNode;
+  onOpenAutoFocus?: (e: Event) => void;
 }) {
   return (
     <Dialog {...props}>
@@ -55,12 +57,7 @@ function CommandDialog({
       <DialogContent
         className={cn('overflow-hidden p-0', className)}
         showCloseButton={showCloseButton}
-        onOpenAutoFocus={(e) => {
-          // Move focus to the dialog content instead of the input
-          // to prevent mobile keyboard from popping up
-          e.preventDefault();
-          (e.currentTarget as HTMLElement).focus();
-        }}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         <Command className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}

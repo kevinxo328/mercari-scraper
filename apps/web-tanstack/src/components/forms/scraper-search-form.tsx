@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useHydrated } from '@tanstack/react-router';
 import { Star } from 'lucide-react';
 import { useEffect } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
@@ -25,7 +24,7 @@ import {
 
 const formSchema = z
   .object({
-    keywords: z.array(z.string()),
+    keyword: z.string(),
     minPrice: z
       .number()
       .nullable()
@@ -66,19 +65,35 @@ type Props = {
   ref?: React.Ref<HTMLFormElement>;
   onSubmit?: (data: ScraperFormValues) => void;
   keywordOptions?: { id: string; keyword: string; pinned: boolean }[];
-  defaultValues?: Partial<ScraperFormValues>;
+  defaultValues?: {
+    keyword?: string;
+    minPrice?: number | null;
+    maxPrice?: number | null;
+  };
 };
 
 export default function ScraperResultForm(props: Props) {
-  const isHydrated = useHydrated();
   const form = useForm<ScraperFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: props.defaultValues || {
-      keywords: [],
-      minPrice: null,
-      maxPrice: null
+    defaultValues: {
+      keyword: props.defaultValues?.keyword ?? '',
+      minPrice: props.defaultValues?.minPrice ?? null,
+      maxPrice: props.defaultValues?.maxPrice ?? null
     }
   });
+
+  useEffect(() => {
+    form.reset({
+      keyword: props.defaultValues?.keyword ?? '',
+      minPrice: props.defaultValues?.minPrice ?? null,
+      maxPrice: props.defaultValues?.maxPrice ?? null
+    });
+  }, [
+    props.defaultValues?.keyword,
+    props.defaultValues?.minPrice,
+    props.defaultValues?.maxPrice,
+    form
+  ]);
 
   // Because in the form, the value is a string even if the type is number
   // So we need to convert it to number
@@ -92,17 +107,14 @@ export default function ScraperResultForm(props: Props) {
   };
 
   useEffect(() => {
-    // Remove keywords that are not in the options
+    // Clear keyword if it's not in the options
     if (props.keywordOptions) {
       const validKeywords = props.keywordOptions.map(
         (option) => option.keyword
       );
-      const currentKeywords = form.getValues('keywords');
-      const filteredKeywords = currentKeywords.filter((keyword) =>
-        validKeywords.includes(keyword)
-      );
-      if (filteredKeywords.length !== currentKeywords.length) {
-        form.setValue('keywords', filteredKeywords);
+      const currentKeyword = form.getValues('keyword');
+      if (currentKeyword && !validKeywords.includes(currentKeyword)) {
+        form.setValue('keyword', '');
       }
     }
   }, [props.keywordOptions, props.defaultValues]);
@@ -115,16 +127,16 @@ export default function ScraperResultForm(props: Props) {
         ref={props.ref}
       >
         <FormField
-          name="keywords"
+          name="keyword"
           control={form.control}
           render={({ field }) => (
             <FormItem className="flex flex-col gap-2">
               <FormLabel className="text-xl font-semibold">Keyword</FormLabel>
               <FormControl>
                 <Select
-                  value={isHydrated ? field.value?.[0] || '' : ''}
+                  value={field.value || ''}
                   onValueChange={(value) => {
-                    field.onChange(value ? [value] : []);
+                    field.onChange(value);
                   }}
                 >
                   <SelectTrigger className="w-full">
@@ -144,6 +156,15 @@ export default function ScraperResultForm(props: Props) {
                         </span>
                       </SelectItem>
                     ))}
+                    {field.value &&
+                      (!props.keywordOptions ||
+                        !props.keywordOptions.some(
+                          (o) => o.keyword === field.value
+                        )) && (
+                        <SelectItem value={field.value} className="hidden">
+                          {field.value}
+                        </SelectItem>
+                      )}
                   </SelectContent>
                 </Select>
               </FormControl>

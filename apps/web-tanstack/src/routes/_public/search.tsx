@@ -2,16 +2,10 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
   useHydrated,
-  useRouter
+  useNavigate
 } from '@tanstack/react-router';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Funnel } from 'lucide-react';
-import {
-  parseAsArrayOf,
-  parseAsInteger,
-  parseAsString,
-  useQueryState
-} from 'nuqs';
 import { useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 
@@ -34,7 +28,9 @@ import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/router';
 
 const searchSchema = z.object({
-  keywords: z.string().optional()
+  keyword: z.string().optional().catch(undefined),
+  minPrice: z.number().optional().catch(undefined),
+  maxPrice: z.number().optional().catch(undefined)
 });
 
 export const Route = createFileRoute('/_public/search')({
@@ -69,13 +65,8 @@ export default function RouteComponent() {
   const { data: session } = useSession();
   const colCount = useColCount();
   const isHydrated = useHydrated();
-
-  const [keywords, setKeywords] = useQueryState(
-    'keywords',
-    parseAsArrayOf(parseAsString).withDefault([])
-  );
-  const [minPrice, setMinPrice] = useQueryState('minPrice', parseAsInteger);
-  const [maxPrice, setMaxPrice] = useQueryState('maxPrice', parseAsInteger);
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { keyword, minPrice, maxPrice } = Route.useSearch();
 
   const { data: keywordOptionsData } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
@@ -103,7 +94,7 @@ export default function RouteComponent() {
   } = useInfiniteQuery(
     trpc.scraper.infiniteResults.infiniteQueryOptions(
       {
-        keywords,
+        keywords: keyword ? [keyword] : undefined,
         minPrice: minPrice,
         maxPrice: maxPrice,
         limit: 48,
@@ -151,14 +142,15 @@ export default function RouteComponent() {
     );
   };
 
-  const router = useRouter();
-
   const handleSubmit = (data: ScraperFormValues) => {
-    router.resetNextScroll = false;
     window.scrollTo({ top: 0, behavior: 'instant' });
-    setKeywords(data.keywords);
-    setMinPrice(data.minPrice);
-    setMaxPrice(data.maxPrice);
+    navigate({
+      search: {
+        keyword: data.keyword || undefined,
+        minPrice: data.minPrice ?? undefined,
+        maxPrice: data.maxPrice ?? undefined
+      }
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -276,11 +268,11 @@ export default function RouteComponent() {
           ref={formRef}
           onSubmit={handleSubmit}
           defaultValues={{
-            keywords,
+            keyword,
             minPrice,
             maxPrice
           }}
-          keywordOptions={keywordOptions?.data ?? []}
+          keywordOptions={keywordOptions?.data}
         />
       </aside>
 
@@ -305,11 +297,11 @@ export default function RouteComponent() {
               ref={mobileFormRef}
               onSubmit={handleSubmit}
               defaultValues={{
-                keywords,
+                keyword,
                 minPrice,
                 maxPrice
               }}
-              keywordOptions={keywordOptions?.data ?? []}
+              keywordOptions={keywordOptions?.data}
             />
             <Button
               onClick={() => {

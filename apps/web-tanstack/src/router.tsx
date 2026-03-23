@@ -25,7 +25,6 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 export function getRouter() {
   const router = createRouter({
     routeTree,
-    scrollRestoration: true,
     context: { queryClient, trpc },
     Wrap: function WrapComponent({ children }) {
       return (

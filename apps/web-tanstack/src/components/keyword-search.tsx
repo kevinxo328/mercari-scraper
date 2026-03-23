@@ -22,6 +22,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileFilter, setMobileFilter] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const mobileFocusRef = useRef<HTMLSpanElement>(null);
 
   const { data: keywordPage } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
@@ -54,7 +55,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
       navigate({
         to: '/search',
         search: {
-          keywords: encodeURIComponent(target)
+          keyword: encodeURIComponent(target)
         }
       });
     } else {
@@ -75,7 +76,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
     setMobileOpen(false);
     navigate({
       to: '/search',
-      search: { keywords: encodeURIComponent(keyword) }
+      search: { keyword: encodeURIComponent(keyword) }
     });
   };
 
@@ -98,6 +99,10 @@ export default function KeywordSearch({ className }: { className?: string }) {
         description="Select a keyword to search"
         showCloseButton={false}
         className="h-[420px]"
+        onOpenAutoFocus={(e) => {
+          e.preventDefault();
+          mobileFocusRef.current?.focus({ preventScroll: true });
+        }}
         trigger={
           <button
             className={cn(
@@ -127,6 +132,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
           </button>
         }
       >
+        <span ref={mobileFocusRef} tabIndex={-1} style={{ outline: 'none' }} />
         <CommandInput
           value={mobileFilter}
           onValueChange={setMobileFilter}
