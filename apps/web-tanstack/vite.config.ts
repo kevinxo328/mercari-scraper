@@ -43,6 +43,8 @@ export default defineConfig({
     babel({
       presets: [reactCompilerPreset()],
       overrides: [
+        // @ts-expect-error @rolldown/plugin-babel overrides inherits Babel's InputOptions
+        // where some fields are marked required, but partial overrides are valid Babel config.
         {
           // @rolldown/plugin-babel detects TypeScript files via the glob **/*.tsx.
           // TanStack Router's code-splitting appends a query string to the module ID
