@@ -1,9 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import {
-  createFileRoute,
-  useHydrated,
-  useRouter
-} from '@tanstack/react-router';
+import { createFileRoute, useHydrated } from '@tanstack/react-router';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Funnel } from 'lucide-react';
 import {
@@ -151,10 +147,7 @@ export default function RouteComponent() {
     );
   };
 
-  const router = useRouter();
-
   const handleSubmit = (data: ScraperFormValues) => {
-    router.resetNextScroll = false;
     window.scrollTo({ top: 0, behavior: 'instant' });
     setKeywords(data.keywords);
     setMinPrice(data.minPrice);
