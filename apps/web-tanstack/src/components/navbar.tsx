@@ -24,7 +24,14 @@ export const NavBar = ({
         isScrolled ? 'p-2' : 'p-4'
       )}
     >
-      <div className="container flex items-center gap-4 mx-auto">
+      <div
+        className={cn(
+          'container mx-auto items-center gap-4',
+          centerSlot
+            ? 'grid grid-cols-[auto_1fr_auto] md:grid-cols-[1fr_minmax(0,31.25rem)_1fr]'
+            : 'flex'
+        )}
+      >
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
@@ -57,10 +64,13 @@ export const NavBar = ({
             Mercari Scraper
           </h1>
         </Link>
-        {centerSlot && (
-          <div className="flex-1 flex justify-center">{centerSlot}</div>
-        )}
-        <div className="flex items-center gap-4 shrink-0 ml-auto">
+        {centerSlot && <div className="min-w-0">{centerSlot}</div>}
+        <div
+          className={cn(
+            'flex items-center gap-4 shrink-0',
+            centerSlot ? 'justify-end' : 'ml-auto'
+          )}
+        >
           {children}
         </div>
       </div>
