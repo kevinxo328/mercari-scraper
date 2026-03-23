@@ -64,7 +64,7 @@ function Home() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const scrollEntry = useElementScrollRestoration({
-    getElement: () => (typeof window !== 'undefined' ? window : undefined)
+    getElement: () => window
   });
 
   const virtualizer = useWindowVirtualizer({

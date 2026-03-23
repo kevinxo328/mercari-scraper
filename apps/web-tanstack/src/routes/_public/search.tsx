@@ -63,7 +63,7 @@ export default function RouteComponent() {
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const scrollEntry = useElementScrollRestoration({
-    getElement: () => (typeof window !== 'undefined' ? window : undefined)
+    getElement: () => window
   });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data: session } = useSession();
