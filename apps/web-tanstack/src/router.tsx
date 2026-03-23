@@ -26,6 +26,8 @@ export function getRouter() {
   const router = createRouter({
     routeTree,
     context: { queryClient, trpc },
+    scrollRestoration: true,
+    scrollRestorationBehavior: 'instant',
     Wrap: function WrapComponent({ children }) {
       return (
         <QueryClientProvider client={queryClient}>

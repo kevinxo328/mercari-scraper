@@ -24,6 +24,7 @@ import {
 } from '@/components/shadcn/sheet';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { useDeleteResult } from '@/hooks/use-delete-result';
+import { useForceScrollTopOnMount } from '@/hooks/use-force-scroll-top-on-mount';
 import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/router';
 
@@ -67,6 +68,7 @@ export default function RouteComponent() {
   const isHydrated = useHydrated();
   const navigate = useNavigate({ from: Route.fullPath });
   const { keyword, minPrice, maxPrice } = Route.useSearch();
+  useForceScrollTopOnMount();
 
   const { data: keywordOptionsData } = useQuery(
     trpc.scraper.getKeywords.queryOptions({
@@ -143,7 +145,6 @@ export default function RouteComponent() {
   };
 
   const handleSubmit = (data: ScraperFormValues) => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
     navigate({
       search: {
         keyword: data.keyword || undefined,
