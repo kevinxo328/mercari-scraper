@@ -4,10 +4,9 @@ import {
   createRootRoute,
   HeadContent,
   Outlet,
-  Scripts,
-  useLocation
+  Scripts
 } from '@tanstack/react-router';
-import { lazy, Suspense, useLayoutEffect } from 'react';
+import { lazy, Suspense } from 'react';
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -31,14 +30,6 @@ import AppHeader from '@/components/app-header';
 import { Toaster } from '@/components/shadcn/sonner';
 
 import globalsCss from '../styles/globals.css?url';
-
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [pathname]);
-  return null;
-}
 
 function RootPending() {
   return (
@@ -88,7 +79,6 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body className="min-h-dvh flex flex-col">
-        <ScrollToTop />
         <AppHeader />
         <Outlet />
         <Toaster />

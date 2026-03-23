@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
+  useElementScrollRestoration,
   useHydrated,
   useNavigate
 } from '@tanstack/react-router';
@@ -61,6 +62,9 @@ export default function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const scrollEntry = useElementScrollRestoration({
+    getElement: () => window
+  });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data: session } = useSession();
   const colCount = useColCount();
@@ -117,7 +121,8 @@ export default function RouteComponent() {
     count: rowCount,
     estimateSize: () => 220,
     overscan: 4,
-    scrollMargin: listRef.current?.offsetTop ?? 0
+    scrollMargin: listRef.current?.offsetTop ?? 0,
+    initialOffset: scrollEntry?.scrollY
   });
 
   const virtualItems = virtualizer.getVirtualItems();
@@ -143,8 +148,8 @@ export default function RouteComponent() {
   };
 
   const handleSubmit = (data: ScraperFormValues) => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
     navigate({
+      resetScroll: true,
       search: {
         keyword: data.keyword || undefined,
         minPrice: data.minPrice ?? undefined,

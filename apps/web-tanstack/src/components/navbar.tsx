@@ -32,7 +32,7 @@ export const NavBar = ({
             : 'flex'
         )}
       >
-        <Link to="/" className="flex items-center gap-2 shrink-0">
+        <Link to="/" resetScroll className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
             width={isScrolled ? '24' : '30'}

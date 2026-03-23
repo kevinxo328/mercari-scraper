@@ -1,5 +1,9 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { createFileRoute, useHydrated } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  useElementScrollRestoration,
+  useHydrated
+} from '@tanstack/react-router';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef, useState } from 'react';
 
@@ -59,12 +63,16 @@ function Home() {
   const rowCount = Math.ceil(allItems.length / colCount);
 
   const listRef = useRef<HTMLDivElement>(null);
+  const scrollEntry = useElementScrollRestoration({
+    getElement: () => window
+  });
 
   const virtualizer = useWindowVirtualizer({
     count: rowCount,
     estimateSize: () => 220,
     overscan: 4,
-    scrollMargin: listRef.current?.offsetTop ?? 0
+    scrollMargin: listRef.current?.offsetTop ?? 0,
+    initialOffset: scrollEntry?.scrollY
   });
 
   const virtualItems = virtualizer.getVirtualItems();
