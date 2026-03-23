@@ -1,6 +1,10 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { createFileRoute, useHydrated } from '@tanstack/react-router';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import {
+  createFileRoute,
+  useHydrated,
+  useRouter
+} from '@tanstack/react-router';
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Funnel } from 'lucide-react';
 import {
   parseAsArrayOf,
@@ -19,6 +23,7 @@ import { Button } from '@/components/shadcn/button';
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger
@@ -59,7 +64,7 @@ function useColCount() {
 export default function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data: session } = useSession();
   const colCount = useColCount();
@@ -117,11 +122,11 @@ export default function RouteComponent() {
   const allItems = infiniteResults?.pages.flatMap((p) => p.data) ?? [];
   const rowCount = Math.ceil(allItems.length / colCount);
 
-  const virtualizer = useVirtualizer({
+  const virtualizer = useWindowVirtualizer({
     count: rowCount,
-    getScrollElement: () => scrollRef.current,
     estimateSize: () => 220,
-    overscan: 4
+    overscan: 4,
+    scrollMargin: listRef.current?.offsetTop ?? 0
   });
 
   const virtualItems = virtualizer.getVirtualItems();
@@ -146,7 +151,11 @@ export default function RouteComponent() {
     );
   };
 
+  const router = useRouter();
+
   const handleSubmit = (data: ScraperFormValues) => {
+    router.resetNextScroll = false;
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setKeywords(data.keywords);
     setMinPrice(data.minPrice);
     setMaxPrice(data.maxPrice);
@@ -168,127 +177,89 @@ export default function RouteComponent() {
   };
 
   return (
-    <main className="container relative mx-auto flex gap-4 p-4 overflow-hidden lg:overflow-hidden">
-      <div className="flex min-h-0 grow flex-col overflow-hidden lg:pr-2">
+    <main className="container relative mx-auto flex gap-4 p-4">
+      <div className="grow">
         <div className="mb-4 flex items-center justify-between">
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
-          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger asChild>
-              <Button
-                className="cursor-pointer lg:hidden"
-                variant="outline"
-                size="sm"
-              >
-                <Funnel className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle className="text-2xl font-semibold">
-                  Filter
-                </SheetTitle>
-                <ScraperSearchForm
-                  ref={mobileFormRef}
-                  onSubmit={handleSubmit}
-                  defaultValues={{
-                    keywords,
-                    minPrice,
-                    maxPrice
-                  }}
-                  keywordOptions={keywordOptions?.data ?? []}
-                />
-                <Button
-                  onClick={() => {
-                    triggerSubmit();
-                    setIsSheetOpen(false);
-                  }}
-                  className="mt-4"
-                >
-                  Apply
-                </Button>
-              </SheetHeader>
-            </SheetContent>
-          </Sheet>
         </div>
-        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
-          {resultsStatus === 'pending' ? (
-            <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-lg" />
-              ))}
-            </div>
-          ) : resultsStatus === 'error' ? (
-            <p className="text-center text-red-500">Error loading results.</p>
-          ) : (
-            <>
-              {allItems.length === 0 && (
-                <p className="text-center text-gray-500">No results found</p>
-              )}
-              {allItems.length > 0 && (
-                <div
-                  style={{
-                    height: virtualizer.getTotalSize(),
-                    position: 'relative'
-                  }}
-                >
-                  {virtualItems.map((vRow) => {
-                    const startIdx = vRow.index * colCount;
-                    const rowItems = allItems.slice(
-                      startIdx,
-                      startIdx + colCount
-                    );
 
-                    return (
-                      <div
-                        key={vRow.key}
-                        data-index={vRow.index}
-                        ref={virtualizer.measureElement}
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          transform: `translateY(${vRow.start}px)`
-                        }}
-                      >
-                        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
-                          {rowItems.map((result) => (
-                            <LinkCard
-                              key={result.id ?? result.title + result.url}
-                              showDelete={isAuthenticated}
-                              isDeleting={
-                                deletingId === result.id && isDeleting
-                              }
-                              onDelete={() => handleDelete(result.id)}
-                              url={result.url}
-                              title={result.title}
-                              imageUrl={result.imageUrl}
-                              price={result.price}
-                              currency={result.currency}
-                            />
-                          ))}
-                        </div>
+        {resultsStatus === 'pending' ? (
+          <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : resultsStatus === 'error' ? (
+          <p className="text-center text-red-500">Error loading results.</p>
+        ) : (
+          <>
+            {allItems.length === 0 && (
+              <p className="text-center text-gray-500">No results found</p>
+            )}
+            {allItems.length > 0 && (
+              <div
+                ref={listRef}
+                style={{
+                  height: virtualizer.getTotalSize(),
+                  position: 'relative'
+                }}
+              >
+                {virtualItems.map((vRow) => {
+                  const startIdx = vRow.index * colCount;
+                  const rowItems = allItems.slice(
+                    startIdx,
+                    startIdx + colCount
+                  );
+
+                  return (
+                    <div
+                      key={vRow.key}
+                      data-index={vRow.index}
+                      ref={virtualizer.measureElement}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`
+                      }}
+                    >
+                      <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
+                        {rowItems.map((result) => (
+                          <LinkCard
+                            key={result.id ?? result.title + result.url}
+                            showDelete={isAuthenticated}
+                            isDeleting={deletingId === result.id && isDeleting}
+                            onDelete={() => handleDelete(result.id)}
+                            url={result.url}
+                            title={result.title}
+                            imageUrl={result.imageUrl}
+                            price={result.price}
+                            currency={result.currency}
+                          />
+                        ))}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-              {isFetchingNextPage && (
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  Loading…
-                </p>
-              )}
-              {!hasNextPage && allItems.length > 0 && (
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  No more results
-                </p>
-              )}
-            </>
-          )}
-        </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {isFetchingNextPage && (
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                Loading…
+              </p>
+            )}
+            {!hasNextPage && allItems.length > 0 && (
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                No more results
+              </p>
+            )}
+          </>
+        )}
       </div>
-      <aside className="w-75 shrink-0 grow-0 hidden lg:flex flex-col gap-4 lg:overflow-y-auto">
+
+      {/* Desktop sidebar filter - sticky */}
+      <aside className="w-75 shrink-0 hidden lg:flex flex-col gap-4 sticky top-16 self-start">
         <div className="flex items-center justify-between">
           <h5 className="text-xl text-gray-400 font-semibold">Filter</h5>
           <Button
@@ -312,6 +283,46 @@ export default function RouteComponent() {
           keywordOptions={keywordOptions?.data ?? []}
         />
       </aside>
+
+      {/* Mobile FAB + Sheet filter */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetTrigger asChild>
+          <Button
+            className="fixed bottom-6 right-6 z-30 rounded-full shadow-lg lg:hidden h-14 w-14"
+            size="icon"
+          >
+            <Funnel className="h-6 w-6" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-semibold">Filter</SheetTitle>
+            <SheetDescription className="sr-only">
+              Filter results by keywords and price range.
+            </SheetDescription>
+            <hr />
+            <ScraperSearchForm
+              ref={mobileFormRef}
+              onSubmit={handleSubmit}
+              defaultValues={{
+                keywords,
+                minPrice,
+                maxPrice
+              }}
+              keywordOptions={keywordOptions?.data ?? []}
+            />
+            <Button
+              onClick={() => {
+                triggerSubmit();
+                setIsSheetOpen(false);
+              }}
+              className="mt-4"
+            >
+              Apply
+            </Button>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
     </main>
   );
 }

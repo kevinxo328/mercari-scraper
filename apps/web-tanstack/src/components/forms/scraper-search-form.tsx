@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useHydrated } from '@tanstack/react-router';
 import { Star } from 'lucide-react';
 import { useEffect } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
@@ -69,6 +70,7 @@ type Props = {
 };
 
 export default function ScraperResultForm(props: Props) {
+  const isHydrated = useHydrated();
   const form = useForm<ScraperFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: props.defaultValues || {
@@ -120,7 +122,7 @@ export default function ScraperResultForm(props: Props) {
               <FormLabel className="text-xl font-semibold">Keyword</FormLabel>
               <FormControl>
                 <Select
-                  defaultValue={field.value?.[0] || ''}
+                  value={isHydrated ? field.value?.[0] || '' : ''}
                   onValueChange={(value) => {
                     field.onChange(value ? [value] : []);
                   }}
