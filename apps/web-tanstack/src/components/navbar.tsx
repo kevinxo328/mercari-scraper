@@ -24,7 +24,7 @@ export const NavBar = ({
         isScrolled ? 'p-2' : 'p-4'
       )}
     >
-      <div className="container flex items-center gap-4 mx-auto">
+      <div className="container relative flex items-center gap-4 mx-auto">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
@@ -58,7 +58,11 @@ export const NavBar = ({
           </h1>
         </Link>
         {centerSlot && (
-          <div className="flex-1 flex justify-center">{centerSlot}</div>
+          <div className="absolute inset-x-0 flex justify-center pointer-events-none">
+            <div className="pointer-events-auto w-full max-w-125 px-4">
+              {centerSlot}
+            </div>
+          </div>
         )}
         <div className="flex items-center gap-4 shrink-0 ml-auto">
           {children}
