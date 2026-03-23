@@ -6,11 +6,7 @@
       "dependsOn": ["^build", "generate", "test"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".output/**"],
-      "env": [
-        "NODE_ENV",
-        "SLACK_WEBHOOK_URL",
-        "WEB_APP_URL"
-      ]
+      "env": ["NODE_ENV", "SLACK_WEBHOOK_URL", "WEB_APP_URL"]
     },
     "dev": {
       "dependsOn": ["^generate"],
