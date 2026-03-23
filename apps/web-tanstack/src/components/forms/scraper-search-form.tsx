@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useHydrated } from '@tanstack/react-router';
 import { Star } from 'lucide-react';
 import { useEffect } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
@@ -66,19 +65,42 @@ type Props = {
   ref?: React.Ref<HTMLFormElement>;
   onSubmit?: (data: ScraperFormValues) => void;
   keywordOptions?: { id: string; keyword: string; pinned: boolean }[];
-  defaultValues?: Partial<ScraperFormValues>;
+  defaultValues?: {
+    keywords?: string | string[];
+    minPrice?: number | null;
+    maxPrice?: number | null;
+  };
 };
 
 export default function ScraperResultForm(props: Props) {
-  const isHydrated = useHydrated();
+  const getDefaultKeywords = () => {
+    if (!props.defaultValues?.keywords) return [];
+    if (Array.isArray(props.defaultValues.keywords))
+      return props.defaultValues.keywords;
+    return [props.defaultValues.keywords];
+  };
+
   const form = useForm<ScraperFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: props.defaultValues || {
-      keywords: [],
-      minPrice: null,
-      maxPrice: null
+    defaultValues: {
+      keywords: getDefaultKeywords(),
+      minPrice: props.defaultValues?.minPrice ?? null,
+      maxPrice: props.defaultValues?.maxPrice ?? null
     }
   });
+
+  useEffect(() => {
+    form.reset({
+      keywords: getDefaultKeywords(),
+      minPrice: props.defaultValues?.minPrice ?? null,
+      maxPrice: props.defaultValues?.maxPrice ?? null
+    });
+  }, [
+    props.defaultValues?.keywords,
+    props.defaultValues?.minPrice,
+    props.defaultValues?.maxPrice,
+    form
+  ]);
 
   // Because in the form, the value is a string even if the type is number
   // So we need to convert it to number
@@ -122,7 +144,7 @@ export default function ScraperResultForm(props: Props) {
               <FormLabel className="text-xl font-semibold">Keyword</FormLabel>
               <FormControl>
                 <Select
-                  value={isHydrated ? field.value?.[0] || '' : ''}
+                  value={field.value?.[0] || ''}
                   onValueChange={(value) => {
                     field.onChange(value ? [value] : []);
                   }}
@@ -144,6 +166,15 @@ export default function ScraperResultForm(props: Props) {
                         </span>
                       </SelectItem>
                     ))}
+                    {field.value?.[0] &&
+                      (!props.keywordOptions ||
+                        !props.keywordOptions.some(
+                          (o) => o.keyword === field.value?.[0]
+                        )) && (
+                        <SelectItem value={field.value[0]} className="hidden">
+                          {field.value[0]}
+                        </SelectItem>
+                      )}
                   </SelectContent>
                 </Select>
               </FormControl>

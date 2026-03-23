@@ -7,7 +7,6 @@ import {
   Scripts,
   useLocation
 } from '@tanstack/react-router';
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router';
 import { lazy, Suspense, useLayoutEffect } from 'react';
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
@@ -89,11 +88,9 @@ function RootLayout() {
         <HeadContent />
       </head>
       <body className="min-h-dvh flex flex-col">
-        <NuqsAdapter>
-          <ScrollToTop />
-          <AppHeader />
-          <Outlet />
-        </NuqsAdapter>
+        <ScrollToTop />
+        <AppHeader />
+        <Outlet />
         <Toaster />
         <Suspense>
           <TanStackRouterDevtools position="bottom-right" />
