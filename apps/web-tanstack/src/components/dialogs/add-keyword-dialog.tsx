@@ -180,7 +180,7 @@ export default function AddKeywordDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? 'Edit Search Keyword' : 'Add Search Keyword'}
