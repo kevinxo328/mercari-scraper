@@ -24,38 +24,11 @@ function createTrpcProxy(
 }
 
 export async function createServerFetch(): Promise<typeof fetch> {
-  const [
-    { fetchRequestHandler },
-    { appRouter },
-    { createContext },
-    { getRequestHeaders }
-  ] = await Promise.all([
-    import('@trpc/server/adapters/fetch'),
-    import('./routers'),
-    import('./setup'),
-    import('@tanstack/react-start/server')
-  ]);
+  const { createServerFetch: createServerFetchImpl } = await import(
+    './proxy.server'
+  );
 
-  return async (input, init) => {
-    const serverHeaders = getRequestHeaders();
-    const requestHeaders = new Headers(serverHeaders as HeadersInit);
-
-    if (init?.headers) {
-      new Headers(init.headers).forEach((value, key) => {
-        requestHeaders.set(key, value);
-      });
-    }
-
-    return fetchRequestHandler({
-      req: new Request(new URL(input.toString(), 'http://localhost'), {
-        ...init,
-        headers: requestHeaders
-      }),
-      router: appRouter,
-      endpoint: '/api/trpc',
-      createContext: ({ req }) => createContext({ req })
-    });
-  };
+  return createServerFetchImpl();
 }
 
 export function createBrowserTrpc(queryClient: QueryClient) {
