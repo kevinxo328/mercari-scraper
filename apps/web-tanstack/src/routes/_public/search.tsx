@@ -36,6 +36,17 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_public/search')({
   validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ keyword: search.keyword }),
+  loader: ({ deps }) => ({ keyword: deps.keyword }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: loaderData?.keyword
+          ? `${loaderData.keyword} | Mercari Scraper`
+          : 'Search | Mercari Scraper'
+      }
+    ]
+  }),
   component: RouteComponent
 });
 
