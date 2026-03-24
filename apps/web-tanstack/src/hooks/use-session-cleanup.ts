@@ -6,13 +6,25 @@ import { useSession } from '@/lib/auth-client';
 export function useSessionCleanup() {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
-  const prevSessionRef = useRef(session);
+  const currentUserId = session?.user?.id ?? null;
+  const prevUserIdRef = useRef<string | null>(currentUserId);
+  const hasMountedRef = useRef(false);
 
   useEffect(() => {
-    // Only clear cache when transitioning from logged-in to logged-out
-    if (prevSessionRef.current && !session) {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      prevUserIdRef.current = currentUserId;
+      return;
+    }
+
+    // Clear cache when a logged-in user logs out or switches accounts.
+    if (
+      prevUserIdRef.current !== null &&
+      prevUserIdRef.current !== currentUserId
+    ) {
       queryClient.clear();
     }
-    prevSessionRef.current = session;
-  }, [session, queryClient]);
+
+    prevUserIdRef.current = currentUserId;
+  }, [currentUserId, queryClient]);
 }
