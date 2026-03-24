@@ -41,17 +41,13 @@ export default defineConfig({
     react(),
     // Run React Compiler via Babel separately, since plugin-react v6 dropped Babel.
     babel({
+      // The React Compiler Babel pass also runs on workspace packages that Vite
+      // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
+      // files and for TanStack Router split chunks that append a query string
+      // (e.g. index.tsx?tsr-split=component).
+      include: /\.(?:ts|tsx)(?:$|\?)/,
+      parserOpts: { plugins: ['typescript', 'jsx'] },
       presets: [reactCompilerPreset()],
-      overrides: [
-        {
-          // The React Compiler Babel pass also runs on workspace packages that Vite
-          // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
-          // files and for TanStack Router split chunks that append a query string
-          // (e.g. index.tsx?tsr-split=component).
-          include: /\.(?:ts|tsx)(?:$|\?)/,
-          parserOpts: { plugins: ['typescript', 'jsx'] }
-        }
-      ]
     }),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
