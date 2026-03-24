@@ -19,6 +19,6 @@
     "@mercari-scraper/typescript-config": "workspace:*",
     "@types/node": "^22.0.0",
     "dotenv": "^17.3.1",
-    "typescript": "5.7.2"
+    "typescript": "^6.0.0"
   }
 }

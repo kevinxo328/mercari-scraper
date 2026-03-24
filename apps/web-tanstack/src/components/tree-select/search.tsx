@@ -1,5 +1,4 @@
 import { Search } from 'lucide-react';
-import React from 'react';
 
 import { Input } from '@/components/shadcn/input';
 
