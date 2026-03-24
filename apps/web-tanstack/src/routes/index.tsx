@@ -1,7 +1,4 @@
-import {
-  useSuspenseInfiniteQuery,
-  useSuspenseQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
   ErrorComponent,
@@ -32,7 +29,7 @@ function Home() {
     hasNextPage,
     isFetchingNextPage,
     status
-  } = useSuspenseInfiniteQuery(
+  } = useInfiniteQuery(
     trpc.scraper.infiniteResults.infiniteQueryOptions(
       {
         limit: 48,
@@ -43,7 +40,7 @@ function Home() {
     )
   );
 
-  const allItems = infiniteData.pages.flatMap((p) => p.data) ?? [];
+  const allItems = infiniteData?.pages.flatMap((p) => p.data) ?? [];
 
   const isAuthenticated = !!session;
 
@@ -90,7 +87,7 @@ export const Route = createFileRoute('/')({
     const lastRun = await queryClient.ensureQueryData(
       trpc.scraper.getLastRun.queryOptions()
     );
-    await queryClient.ensureInfiniteQueryData(
+    void queryClient.prefetchInfiniteQuery(
       trpc.scraper.infiniteResults.infiniteQueryOptions(
         {
           limit: 48,

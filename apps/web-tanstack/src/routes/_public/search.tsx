@@ -46,7 +46,7 @@ export const Route = createFileRoute('/_public/search')({
         hasResults: true
       })
     );
-    await queryClient.ensureInfiniteQueryData(
+    void queryClient.prefetchInfiniteQuery(
       trpc.scraper.infiniteResults.infiniteQueryOptions(
         {
           keywords: deps.keyword ? [deps.keyword] : undefined,
