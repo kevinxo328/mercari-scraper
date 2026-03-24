@@ -7,6 +7,16 @@ import { nitro } from 'nitro/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
+const reactCompilerBabelOptions = {
+  // The React Compiler Babel pass also runs on workspace packages that Vite
+  // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
+  // files and for TanStack Router split chunks that append a query string
+  // (e.g. index.tsx?tsr-split=component).
+  include: /\.(?:ts|tsx)(?:$|\?)/,
+  parserOpts: { plugins: ['typescript', 'jsx'] },
+  presets: [reactCompilerPreset()]
+};
+
 export default defineConfig({
   resolve: {
     tsconfigPaths: true
@@ -40,15 +50,8 @@ export default defineConfig({
     // plugin-react v6: JSX transform and Fast Refresh are handled by Oxc (no Babel).
     react(),
     // Run React Compiler via Babel separately, since plugin-react v6 dropped Babel.
-    babel({
-      // The React Compiler Babel pass also runs on workspace packages that Vite
-      // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
-      // files and for TanStack Router split chunks that append a query string
-      // (e.g. index.tsx?tsr-split=component).
-      include: /\.(?:ts|tsx)(?:$|\?)/,
-      parserOpts: { plugins: ['typescript', 'jsx'] },
-      presets: [reactCompilerPreset()],
-    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    babel(reactCompilerBabelOptions as any),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
   ],
