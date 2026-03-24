@@ -27,6 +27,7 @@ const ReactQueryDevtools = import.meta.env.PROD
     );
 
 import AppHeader from '@/components/app-header';
+import { NotFound } from '@/components/not-found';
 import { Toaster } from '@/components/shadcn/sonner';
 
 import globalsCss from '../styles/globals.css?url';
@@ -41,6 +42,7 @@ function RootPending() {
 
 export const Route = createRootRoute({
   pendingComponent: RootPending,
+  notFoundComponent: NotFound,
   head: () => ({
     meta: [
       {

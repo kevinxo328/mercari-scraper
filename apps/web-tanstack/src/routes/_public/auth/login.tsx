@@ -13,6 +13,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_public/auth/login')({
   validateSearch: searchSchema,
+  head: () => ({ meta: [{ title: 'Login | Mercari Scraper' }] }),
   component: RouteComponent
 });
 

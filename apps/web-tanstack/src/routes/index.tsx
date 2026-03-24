@@ -64,7 +64,7 @@ function Home() {
 
   const listRef = useRef<HTMLDivElement>(null);
   const scrollEntry = useElementScrollRestoration({
-    getElement: () => window
+    getElement: () => (isHydrated ? window : null)
   });
 
   const virtualizer = useWindowVirtualizer({
