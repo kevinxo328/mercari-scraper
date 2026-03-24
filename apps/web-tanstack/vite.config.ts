@@ -44,13 +44,11 @@ export default defineConfig({
       presets: [reactCompilerPreset()],
       overrides: [
         {
-          // @rolldown/plugin-babel detects TypeScript files via the glob **/*.tsx.
-          // TanStack Router's code-splitting appends a query string to the module ID
-          // (e.g. index.tsx?tsr-split=component), causing the glob to miss it and
-          // Babel to parse the file without the TypeScript plugin — resulting in a
-          // syntax error on type annotations. This override re-enables TypeScript + JSX
-          // parsing for any module ID that contains ".tsx?".
-          include: /\.tsx\?/,
+          // The React Compiler Babel pass also runs on workspace packages that Vite
+          // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
+          // files and for TanStack Router split chunks that append a query string
+          // (e.g. index.tsx?tsr-split=component).
+          include: /\.(?:ts|tsx)(?:$|\?)/,
           parserOpts: { plugins: ['typescript', 'jsx'] }
         }
       ]
