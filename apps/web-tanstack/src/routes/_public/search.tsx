@@ -73,13 +73,13 @@ export default function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const scrollEntry = useElementScrollRestoration({
-    getElement: () => window
-  });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data: session } = useSession();
   const colCount = useColCount();
   const isHydrated = useHydrated();
+  const scrollEntry = useElementScrollRestoration({
+    getElement: () => (isHydrated ? window : null)
+  });
   const navigate = useNavigate({ from: Route.fullPath });
   const { keyword, minPrice, maxPrice } = Route.useSearch();
 
