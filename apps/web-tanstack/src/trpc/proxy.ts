@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { createServerOnlyFn } from '@tanstack/react-start';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
 
@@ -23,13 +24,15 @@ function createTrpcProxy(
   });
 }
 
-export async function createServerFetch(): Promise<typeof fetch> {
-  const { createServerFetch: createServerFetchImpl } = await import(
-    './proxy.server'
-  );
+export const createServerFetch = createServerOnlyFn(
+  async (): Promise<typeof fetch> => {
+    const { createServerFetch: createServerFetchImpl } = await import(
+      './proxy.server'
+    );
 
-  return createServerFetchImpl();
-}
+    return createServerFetchImpl();
+  }
+);
 
 export function createBrowserTrpc(queryClient: QueryClient) {
   return createTrpcProxy(queryClient);
