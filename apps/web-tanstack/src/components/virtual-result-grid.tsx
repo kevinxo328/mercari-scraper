@@ -68,9 +68,12 @@ export default function VirtualResultGrid({
     }
   }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (status === 'pending') {
+  const gridClassName =
+    'grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6';
+
+  if (!isHydrated || status === 'pending') {
     return (
-      <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
+      <div className={gridClassName}>
         {Array.from({ length: 24 }).map((_, i) => (
           <Skeleton key={i} className="aspect-square rounded-lg" />
         ))}
@@ -109,7 +112,7 @@ export default function VirtualResultGrid({
                   transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`
                 }}
               >
-                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
+                <div className={`${gridClassName} pb-6`}>
                   {rowItems.map((result) => (
                     <LinkCard
                       key={result.id ?? result.title + result.url}
