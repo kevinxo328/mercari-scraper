@@ -22,7 +22,7 @@ import {
   TableRow
 } from '@/components/shadcn/table';
 import { cn } from '@/lib/utils';
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 import { ScraperKeyword } from '@/types/scraper';
 
 import AddKeywordDialog from '../dialogs/add-keyword-dialog';
@@ -73,6 +73,7 @@ const formatPrice = (value: number | null) => {
 };
 
 export default function KeywordTable() {
+  const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

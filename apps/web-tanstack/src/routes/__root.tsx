@@ -1,12 +1,20 @@
 /// <reference types="vite/client" />
 
+import type { QueryClient } from '@tanstack/react-query';
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts
 } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
+
+import type { TrpcProxy } from '@/router';
+
+interface RouterContext {
+  queryClient: QueryClient;
+  trpc: TrpcProxy;
+}
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -29,6 +37,7 @@ const ReactQueryDevtools = import.meta.env.PROD
 import AppHeader from '@/components/app-header';
 import { NotFound } from '@/components/not-found';
 import { Toaster } from '@/components/shadcn/sonner';
+import { useSessionCleanup } from '@/hooks/use-session-cleanup';
 
 import globalsCss from '../styles/globals.css?url';
 
@@ -40,7 +49,7 @@ function RootPending() {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   pendingComponent: RootPending,
   notFoundComponent: NotFound,
   head: () => ({
@@ -75,6 +84,9 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+  // Add session cleanup functionality
+  useSessionCleanup();
+
   return (
     <html lang="en" className="dark">
       <head>

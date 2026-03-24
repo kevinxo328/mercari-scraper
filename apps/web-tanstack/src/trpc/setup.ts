@@ -1,5 +1,6 @@
 import { prisma } from '@mercari-scraper/database';
-import { initTRPC, TRPCError } from '@trpc/server';
+import { TRPCError } from '@trpc/server';
+import { initTRPC } from '@trpc/server';
 
 import { auth } from '@/lib/auth';
 
@@ -22,8 +23,26 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router;
 export const procedure = t.procedure;
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  if (!ctx.session?.user) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authentication required'
+    });
   }
-  return next({ ctx: { ...ctx, session: ctx.session } });
+
+  // Additional security: check session validity
+  if (!ctx.session.user.id || !ctx.session.user.email) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Invalid session data'
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      session: ctx.session,
+      userId: ctx.session.user.id // Ensure userId is available
+    }
+  });
 });

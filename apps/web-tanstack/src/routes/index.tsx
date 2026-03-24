@@ -1,41 +1,22 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
-  useElementScrollRestoration,
+  ErrorComponent,
   useHydrated
 } from '@tanstack/react-router';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-import LinkCard from '@/components/link-card';
-import { Skeleton } from '@/components/shadcn/skeleton';
 import TimeDisplay from '@/components/time-display';
+import VirtualResultGrid from '@/components/virtual-result-grid';
 import { useDeleteResult } from '@/hooks/use-delete-result';
 import { useSession } from '@/lib/auth-client';
-import { trpc } from '@/router';
-
-function useColCount() {
-  const [cols, setCols] = useState(2);
-
-  useEffect(() => {
-    function update() {
-      const w = window.innerWidth;
-      if (w >= 1280) setCols(6);
-      else if (w >= 768) setCols(4);
-      else if (w >= 400) setCols(3);
-      else setCols(2);
-    }
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  return cols;
-}
+import { useTRPC } from '@/router';
 
 function Home() {
-  const { data: lastRun } = useQuery(trpc.scraper.getLastRun.queryOptions());
-  const colCount = useColCount();
+  const trpc = useTRPC();
+  const { data: lastRun } = useSuspenseQuery(
+    trpc.scraper.getLastRun.queryOptions()
+  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { deleteResult, isDeleting } = useDeleteResult();
   const { data: session } = useSession();
@@ -60,32 +41,8 @@ function Home() {
   );
 
   const allItems = infiniteData?.pages.flatMap((p) => p.data) ?? [];
-  const rowCount = Math.ceil(allItems.length / colCount);
 
-  const listRef = useRef<HTMLDivElement>(null);
-  const scrollEntry = useElementScrollRestoration({
-    getElement: () => (isHydrated ? window : null)
-  });
-
-  const virtualizer = useWindowVirtualizer({
-    count: rowCount,
-    estimateSize: () => 220,
-    overscan: 4,
-    scrollMargin: listRef.current?.offsetTop ?? 0,
-    initialOffset: scrollEntry?.scrollY
-  });
-
-  const virtualItems = virtualizer.getVirtualItems();
   const isAuthenticated = !!session;
-
-  // Trigger next page when near the end
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    const last = virtualItems[virtualItems.length - 1];
-    if (last && last.index >= rowCount - 4) {
-      fetchNextPage();
-    }
-  }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleDelete = async (id: string) => {
     const shouldDelete = isHydrated
@@ -109,79 +66,37 @@ function Home() {
         </div>
       </div>
 
-      {status === 'pending' && (
-        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-square rounded-lg" />
-          ))}
-        </div>
-      )}
-
-      {status === 'error' && (
-        <p className="text-center text-red-500">Error loading results.</p>
-      )}
-
-      {status === 'success' && allItems.length === 0 && (
-        <p className="text-center text-gray-500">No results found</p>
-      )}
-
-      {status === 'success' && allItems.length > 0 && (
-        <div
-          ref={listRef}
-          style={{ height: virtualizer.getTotalSize(), position: 'relative' }}
-        >
-          {virtualItems.map((vRow) => {
-            const startIdx = vRow.index * colCount;
-            const rowItems = allItems.slice(startIdx, startIdx + colCount);
-
-            return (
-              <div
-                key={vRow.key}
-                data-index={vRow.index}
-                ref={virtualizer.measureElement}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`
-                }}
-              >
-                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
-                  {rowItems.map((result) => (
-                    <LinkCard
-                      key={result.id}
-                      showDelete={isAuthenticated}
-                      isDeleting={deletingId === result.id && isDeleting}
-                      onDelete={() => handleDelete(result.id)}
-                      url={result.url}
-                      title={result.title}
-                      imageUrl={result.imageUrl}
-                      price={result.price}
-                      currency={result.currency}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {isFetchingNextPage && (
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Loading…
-        </p>
-      )}
-      {!hasNextPage && allItems.length > 0 && (
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          No more results
-        </p>
-      )}
+      <VirtualResultGrid
+        items={allItems}
+        status={status}
+        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+        isAuthenticated={isAuthenticated}
+        deletingId={deletingId}
+        isDeleting={isDeleting}
+        onDelete={handleDelete}
+      />
     </main>
   );
 }
 
 export const Route = createFileRoute('/')({
+  errorComponent: ErrorComponent,
+  loader: async ({ context: { queryClient, trpc } }) => {
+    const lastRun = await queryClient.ensureQueryData(
+      trpc.scraper.getLastRun.queryOptions()
+    );
+    void queryClient.prefetchInfiniteQuery(
+      trpc.scraper.infiniteResults.infiniteQueryOptions(
+        {
+          limit: 48,
+          orderby: 'desc',
+          updatedSince: lastRun?.sinceDate ?? undefined
+        },
+        { getNextPageParam: (lastPage) => lastPage.nextCursor }
+      )
+    );
+  },
   component: Home
 });

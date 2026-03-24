@@ -33,7 +33,7 @@ import {
   TreeSelectGroup,
   TreeSelectTrigger
 } from '@/components/tree-select';
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 import { ScraperKeyword } from '@/types/scraper';
 
 const formSchema = z.object({
@@ -58,6 +58,7 @@ export default function AddKeywordDialog({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange
 }: AddKeywordDialogProps) {
+  const trpc = useTRPC();
   const [internalOpen, setInternalOpen] = useState(false);
   const queryClient = useQueryClient();
 

@@ -7,6 +7,16 @@ import { nitro } from 'nitro/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
+const reactCompilerBabelOptions = {
+  // The React Compiler Babel pass also runs on workspace packages that Vite
+  // bundles from source. Teach Babel to parse TypeScript for normal .ts/.tsx
+  // files and for TanStack Router split chunks that append a query string
+  // (e.g. index.tsx?tsr-split=component).
+  include: /\.(?:ts|tsx)(?:$|\?)/,
+  parserOpts: { plugins: ['typescript', 'jsx'] },
+  presets: [reactCompilerPreset()]
+};
+
 export default defineConfig({
   resolve: {
     tsconfigPaths: true
@@ -40,21 +50,8 @@ export default defineConfig({
     // plugin-react v6: JSX transform and Fast Refresh are handled by Oxc (no Babel).
     react(),
     // Run React Compiler via Babel separately, since plugin-react v6 dropped Babel.
-    babel({
-      presets: [reactCompilerPreset()],
-      overrides: [
-        {
-          // @rolldown/plugin-babel detects TypeScript files via the glob **/*.tsx.
-          // TanStack Router's code-splitting appends a query string to the module ID
-          // (e.g. index.tsx?tsr-split=component), causing the glob to miss it and
-          // Babel to parse the file without the TypeScript plugin — resulting in a
-          // syntax error on type annotations. This override re-enables TypeScript + JSX
-          // parsing for any module ID that contains ".tsx?".
-          include: /\.tsx\?/,
-          parserOpts: { plugins: ['typescript', 'jsx'] }
-        }
-      ]
-    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    babel(reactCompilerBabelOptions as any),
     process.env.ANALYZE === 'true' &&
       visualizer({ open: true, gzipSize: true, filename: 'stats.html' })
   ],
