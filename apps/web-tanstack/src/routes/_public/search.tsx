@@ -1,19 +1,16 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
-  useElementScrollRestoration,
   useHydrated,
   useNavigate
 } from '@tanstack/react-router';
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { Funnel } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { z } from 'zod';
 
 import ScraperSearchForm, {
   ScraperFormValues
 } from '@/components/forms/scraper-search-form';
-import LinkCard from '@/components/link-card';
 import { Button } from '@/components/shadcn/button';
 import {
   Sheet,
@@ -23,7 +20,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/shadcn/sheet';
-import { Skeleton } from '@/components/shadcn/skeleton';
+import VirtualResultGrid from '@/components/virtual-result-grid';
 import { useDeleteResult } from '@/hooks/use-delete-result';
 import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/router';
@@ -50,36 +47,12 @@ export const Route = createFileRoute('/_public/search')({
   component: RouteComponent
 });
 
-function useColCount() {
-  const [cols, setCols] = useState(2);
-
-  useEffect(() => {
-    function update() {
-      const w = window.innerWidth;
-      if (w >= 1280) setCols(6);
-      else if (w >= 768) setCols(4);
-      else if (w >= 400) setCols(3);
-      else setCols(2);
-    }
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  return cols;
-}
-
 export default function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { data: session } = useSession();
-  const colCount = useColCount();
   const isHydrated = useHydrated();
-  const scrollEntry = useElementScrollRestoration({
-    getElement: () => (isHydrated ? window : null)
-  });
   const navigate = useNavigate({ from: Route.fullPath });
   const { keyword, minPrice, maxPrice } = Route.useSearch();
 
@@ -124,27 +97,7 @@ export default function RouteComponent() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const isAuthenticated = !!session;
-
   const allItems = infiniteResults?.pages.flatMap((p) => p.data) ?? [];
-  const rowCount = Math.ceil(allItems.length / colCount);
-
-  const virtualizer = useWindowVirtualizer({
-    count: rowCount,
-    estimateSize: () => 220,
-    overscan: 4,
-    scrollMargin: listRef.current?.offsetTop ?? 0,
-    initialOffset: scrollEntry?.scrollY
-  });
-
-  const virtualItems = virtualizer.getVirtualItems();
-
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    const last = virtualItems[virtualItems.length - 1];
-    if (last && last.index >= rowCount - 4) {
-      fetchNextPage();
-    }
-  }, [virtualItems, rowCount, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const triggerSubmit = () => {
     const width = isHydrated ? window.innerWidth : undefined;
@@ -191,79 +144,17 @@ export default function RouteComponent() {
           <h4 className="text-xl md:text-3xl font-semibold">Results</h4>
         </div>
 
-        {resultsStatus === 'pending' ? (
-          <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <Skeleton key={i} className="aspect-square rounded-lg" />
-            ))}
-          </div>
-        ) : resultsStatus === 'error' ? (
-          <p className="text-center text-red-500">Error loading results.</p>
-        ) : (
-          <>
-            {allItems.length === 0 && (
-              <p className="text-center text-gray-500">No results found</p>
-            )}
-            {allItems.length > 0 && (
-              <div
-                ref={listRef}
-                style={{
-                  height: virtualizer.getTotalSize(),
-                  position: 'relative'
-                }}
-              >
-                {virtualItems.map((vRow) => {
-                  const startIdx = vRow.index * colCount;
-                  const rowItems = allItems.slice(
-                    startIdx,
-                    startIdx + colCount
-                  );
-
-                  return (
-                    <div
-                      key={vRow.key}
-                      data-index={vRow.index}
-                      ref={virtualizer.measureElement}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        transform: `translateY(${vRow.start - virtualizer.options.scrollMargin}px)`
-                      }}
-                    >
-                      <div className="grid grid-cols-2 min-[400px]:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-6 pb-6">
-                        {rowItems.map((result) => (
-                          <LinkCard
-                            key={result.id ?? result.title + result.url}
-                            showDelete={isAuthenticated}
-                            isDeleting={deletingId === result.id && isDeleting}
-                            onDelete={() => handleDelete(result.id)}
-                            url={result.url}
-                            title={result.title}
-                            imageUrl={result.imageUrl}
-                            price={result.price}
-                            currency={result.currency}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            {isFetchingNextPage && (
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                Loading…
-              </p>
-            )}
-            {!hasNextPage && allItems.length > 0 && (
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                No more results
-              </p>
-            )}
-          </>
-        )}
+        <VirtualResultGrid
+          items={allItems}
+          status={resultsStatus}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isAuthenticated={isAuthenticated}
+          deletingId={deletingId}
+          isDeleting={isDeleting}
+          onDelete={handleDelete}
+        />
       </div>
 
       {/* Desktop sidebar filter - sticky */}
