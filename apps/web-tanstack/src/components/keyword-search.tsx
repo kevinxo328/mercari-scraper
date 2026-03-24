@@ -182,7 +182,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
                 setOpen(false);
               }
             }}
-            placeholder="Search keywords…"
+            placeholder="Search keyword…"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
           />
           {filterText && (
