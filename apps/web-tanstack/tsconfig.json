@@ -1,19 +1,23 @@
 {
-  "extends": "@mercari-scraper/typescript-config/nextjs.json",
+  "extends": "@mercari-scraper/typescript-config/base.json",
   "compilerOptions": {
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "preserve",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]
     },
-    // TODO: Temporarily disable declaration files until we figure out a solution for Next.js
+    // TODO: Temporarily disable declaration files until we figure out a solution for library mode if needed
     "declaration": false,
     "declarationMap": false,
     "composite": false,
-    "types": ["vitest/globals"]
+    "types": ["node", "vitest/globals"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

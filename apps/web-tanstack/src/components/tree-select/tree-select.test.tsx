@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import React from 'react';
 
 import {
   TreeSelect,
