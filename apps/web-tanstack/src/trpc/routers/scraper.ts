@@ -1,4 +1,5 @@
 import { mercariCategories } from '@mercari-scraper/database';
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { procedure, protectedProcedure, router } from '../setup';
@@ -233,9 +234,24 @@ export const scraperRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.scraperResult.delete({
-        where: { id: input.id }
-      });
+      try {
+        await ctx.db.scraperResult.delete({
+          where: { id: input.id }
+        });
+      } catch (e) {
+        if (
+          typeof e === 'object' &&
+          e !== null &&
+          'code' in e &&
+          e.code === 'P2025'
+        ) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Result not found'
+          });
+        }
+        throw e;
+      }
       return { success: true };
     }),
   updateKeyword: protectedProcedure

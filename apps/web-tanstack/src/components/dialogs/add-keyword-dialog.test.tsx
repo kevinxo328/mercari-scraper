@@ -10,9 +10,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import AddKeywordDialog from './add-keyword-dialog';
 
-// Mock @/router so the component's `trpc` proxy is replaced with fixtures
+// Mock @/router so the component's `useTRPC` hook returns fixtures
 vi.mock('@/router', () => ({
-  trpc: {
+  useTRPC: () => ({
     scraper: {
       getCategories: {
         queryOptions: () => ({
@@ -40,7 +40,7 @@ vi.mock('@/router', () => ({
       },
       getKeywords: { pathFilter: () => ({ queryKey: ['keywords'] }) }
     }
-  }
+  })
 }));
 
 // Mock sonner toast helpers

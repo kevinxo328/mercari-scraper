@@ -1,15 +1,25 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { createFileRoute, useHydrated } from '@tanstack/react-router';
+import {
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery
+} from '@tanstack/react-query';
+import {
+  createFileRoute,
+  ErrorComponent,
+  useHydrated
+} from '@tanstack/react-router';
 import { useState } from 'react';
 
 import TimeDisplay from '@/components/time-display';
 import VirtualResultGrid from '@/components/virtual-result-grid';
 import { useDeleteResult } from '@/hooks/use-delete-result';
 import { useSession } from '@/lib/auth-client';
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 
 function Home() {
-  const { data: lastRun } = useQuery(trpc.scraper.getLastRun.queryOptions());
+  const trpc = useTRPC();
+  const { data: lastRun } = useSuspenseQuery(
+    trpc.scraper.getLastRun.queryOptions()
+  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { deleteResult, isDeleting } = useDeleteResult();
   const { data: session } = useSession();
@@ -22,7 +32,7 @@ function Home() {
     hasNextPage,
     isFetchingNextPage,
     status
-  } = useInfiniteQuery(
+  } = useSuspenseInfiniteQuery(
     trpc.scraper.infiniteResults.infiniteQueryOptions(
       {
         limit: 48,
@@ -33,7 +43,8 @@ function Home() {
     )
   );
 
-  const allItems = infiniteData?.pages.flatMap((p) => p.data) ?? [];
+  const allItems = infiniteData.pages.flatMap((p) => p.data) ?? [];
+
   const isAuthenticated = !!session;
 
   const handleDelete = async (id: string) => {
@@ -74,5 +85,21 @@ function Home() {
 }
 
 export const Route = createFileRoute('/')({
+  errorComponent: ErrorComponent,
+  loader: async ({ context: { queryClient, trpc } }) => {
+    const lastRun = await queryClient.ensureQueryData(
+      trpc.scraper.getLastRun.queryOptions()
+    );
+    await queryClient.ensureInfiniteQueryData(
+      trpc.scraper.infiniteResults.infiniteQueryOptions(
+        {
+          limit: 48,
+          orderby: 'desc',
+          updatedSince: lastRun?.sinceDate ?? undefined
+        },
+        { getNextPageParam: (lastPage) => lastPage.nextCursor }
+      )
+    );
+  },
   component: Home
 });

@@ -23,7 +23,7 @@ import {
 import VirtualResultGrid from '@/components/virtual-result-grid';
 import { useDeleteResult } from '@/hooks/use-delete-result';
 import { useSession } from '@/lib/auth-client';
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 
 const searchSchema = z.object({
   keyword: z.string().optional().catch(undefined),
@@ -33,8 +33,33 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_public/search')({
   validateSearch: searchSchema,
-  loaderDeps: ({ search }) => ({ keyword: search.keyword }),
-  loader: ({ deps }) => ({ keyword: deps.keyword }),
+  loaderDeps: ({ search }) => ({
+    keyword: search.keyword,
+    minPrice: search.minPrice,
+    maxPrice: search.maxPrice
+  }),
+  loader: async ({ context: { queryClient, trpc }, deps }) => {
+    void queryClient.prefetchQuery(
+      trpc.scraper.getKeywords.queryOptions({
+        orderby: 'desc',
+        orderByField: 'updatedAt',
+        hasResults: true
+      })
+    );
+    await queryClient.ensureInfiniteQueryData(
+      trpc.scraper.infiniteResults.infiniteQueryOptions(
+        {
+          keywords: deps.keyword ? [deps.keyword] : undefined,
+          minPrice: deps.minPrice,
+          maxPrice: deps.maxPrice,
+          limit: 48,
+          orderby: 'desc'
+        },
+        { getNextPageParam: (lastPage) => lastPage.nextCursor }
+      )
+    );
+    return { keyword: deps.keyword };
+  },
   head: ({ loaderData }) => ({
     meta: [
       {
@@ -48,6 +73,7 @@ export const Route = createFileRoute('/_public/search')({
 });
 
 export default function RouteComponent() {
+  const trpc = useTRPC();
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);

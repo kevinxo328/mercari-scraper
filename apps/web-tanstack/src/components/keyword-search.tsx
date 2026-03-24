@@ -12,9 +12,10 @@ import {
   CommandList
 } from '@/components/shadcn/command';
 import { cn } from '@/lib/utils';
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 
 export default function KeywordSearch({ className }: { className?: string }) {
+  const trpc = useTRPC();
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
   const [selected, setSelected] = useState<string | null>(null);

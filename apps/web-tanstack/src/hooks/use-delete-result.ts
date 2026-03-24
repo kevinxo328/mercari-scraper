@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { trpc } from '@/router';
+import { useTRPC } from '@/router';
 
 type InfiniteResultsPage = {
   data: { id: string }[];
@@ -13,6 +13,7 @@ type InfiniteResultsPage = {
 };
 
 export function useDeleteResult() {
+  const trpc = useTRPC();
   const queryClient = useQueryClient();
 
   const removeFromCaches = (id: string) => {
