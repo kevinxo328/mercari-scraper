@@ -5,7 +5,10 @@ import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
 import type { AppRouter } from './routers';
 import { transformer } from './shared/transformer';
 
-function createTrpcProxy(queryClient: QueryClient, fetchOverride?: typeof fetch) {
+function createTrpcProxy(
+  queryClient: QueryClient,
+  fetchOverride?: typeof fetch
+) {
   return createTRPCOptionsProxy<AppRouter>({
     client: createTRPCClient({
       links: [
@@ -21,20 +24,38 @@ function createTrpcProxy(queryClient: QueryClient, fetchOverride?: typeof fetch)
 }
 
 export async function createServerFetch(): Promise<typeof fetch> {
-  const [{ fetchRequestHandler }, { appRouter }, { createContext }] =
-    await Promise.all([
-      import('@trpc/server/adapters/fetch'),
-      import('./routers'),
-      import('./setup')
-    ]);
+  const [
+    { fetchRequestHandler },
+    { appRouter },
+    { createContext },
+    { getRequestHeaders }
+  ] = await Promise.all([
+    import('@trpc/server/adapters/fetch'),
+    import('./routers'),
+    import('./setup'),
+    import('@tanstack/react-start/server')
+  ]);
 
-  return async (input, init) =>
-    fetchRequestHandler({
-      req: new Request(new URL(input.toString(), 'http://localhost'), init),
+  return async (input, init) => {
+    const serverHeaders = getRequestHeaders();
+    const requestHeaders = new Headers(serverHeaders as HeadersInit);
+
+    if (init?.headers) {
+      new Headers(init.headers).forEach((value, key) => {
+        requestHeaders.set(key, value);
+      });
+    }
+
+    return fetchRequestHandler({
+      req: new Request(new URL(input.toString(), 'http://localhost'), {
+        ...init,
+        headers: requestHeaders
+      }),
       router: appRouter,
       endpoint: '/api/trpc',
       createContext: ({ req }) => createContext({ req })
     });
+  };
 }
 
 export function createBrowserTrpc(queryClient: QueryClient) {

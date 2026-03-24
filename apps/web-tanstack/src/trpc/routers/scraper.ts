@@ -82,14 +82,10 @@ export const scraperRouter = router({
       const { db } = ctx;
 
       const where = {} as Record<string, any>;
-      if (input.minPrice) {
+      if (input.minPrice || input.maxPrice) {
         where.price = {
-          gte: input.minPrice
-        };
-      }
-      if (input.maxPrice) {
-        where.price = {
-          lte: input.maxPrice
+          ...(input.minPrice && { gte: input.minPrice }),
+          ...(input.maxPrice && { lte: input.maxPrice })
         };
       }
       if (input.keywords) {
@@ -127,11 +123,11 @@ export const scraperRouter = router({
 
       // Build price/date filters (no keywords here — handled per phase)
       const baseFilters: Record<string, any> = {};
-      if (input.minPrice !== null && input.minPrice !== undefined) {
-        baseFilters.price = { gte: input.minPrice };
-      }
-      if (input.maxPrice !== null && input.maxPrice !== undefined) {
-        baseFilters.price = { lte: input.maxPrice };
+      if (input.minPrice != null || input.maxPrice != null) {
+        baseFilters.price = {
+          ...(input.minPrice != null && { gte: input.minPrice }),
+          ...(input.maxPrice != null && { lte: input.maxPrice })
+        };
       }
       if (input.updatedSince) {
         baseFilters.updatedAt = { gte: input.updatedSince };
@@ -273,7 +269,10 @@ export const scraperRouter = router({
         maxPrice !== undefined &&
         minPrice > maxPrice
       ) {
-        throw new Error('Min price must be less than or equal to max price');
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Min price must be less than or equal to max price'
+        });
       }
 
       return await ctx.db.scraperKeyword.update({
@@ -379,7 +378,10 @@ export const scraperRouter = router({
         maxPrice !== undefined &&
         minPrice > maxPrice
       ) {
-        throw new Error('Min price must be less than or equal to max price');
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Min price must be less than or equal to max price'
+        });
       }
 
       return await ctx.db.scraperKeyword.create({
