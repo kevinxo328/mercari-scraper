@@ -445,55 +445,61 @@ export default function KeywordTable() {
                 </Button>
               )}
             </div>
-            <div className="flex items-center gap-2 shrink-0 text-sm text-gray-500">
-              <span>Sort by</span>
-              <Select
-                value={sortField}
-                onValueChange={(value) => setSortField(value as SortableField)}
-              >
-                <SelectTrigger className="w-[150px]" size="sm">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SORTABLE_COLUMNS.map((column) => (
-                    <SelectItem key={column.key} value={column.key}>
-                      {column.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9 shrink-0"
-                    onClick={() =>
-                      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                    }
-                    aria-label={
-                      sortOrder === 'asc' ? 'Ascending' : 'Descending'
-                    }
-                  >
-                    {sortOrder === 'asc' ? (
-                      <ArrowUp className="h-4 w-4" />
-                    ) : (
-                      <ArrowDown className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                </TooltipContent>
-              </Tooltip>
+            <div className="flex items-center justify-between gap-2 sm:contents">
+              <div className="flex items-center gap-2 shrink-0 text-sm text-gray-500">
+                <span className="hidden sm:inline">Sort by</span>
+                <Select
+                  value={sortField}
+                  onValueChange={(value) =>
+                    setSortField(value as SortableField)
+                  }
+                >
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SORTABLE_COLUMNS.map((column) => (
+                      <SelectItem key={column.key} value={column.key}>
+                        {column.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 shrink-0"
+                      onClick={() =>
+                        setSortOrder((prev) =>
+                          prev === 'asc' ? 'desc' : 'asc'
+                        )
+                      }
+                      aria-label={
+                        sortOrder === 'asc' ? 'Ascending' : 'Descending'
+                      }
+                    >
+                      {sortOrder === 'asc' ? (
+                        <ArrowUp className="h-4 w-4" />
+                      ) : (
+                        <ArrowDown className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <AddKeywordDialog>
+                <Button className="shrink-0">
+                  <PlusIcon className="h-4 w-4" />
+                  Add Keyword
+                </Button>
+              </AddKeywordDialog>
             </div>
-            <AddKeywordDialog>
-              <Button size="sm" className="shrink-0">
-                <PlusIcon className="h-4 w-4" />
-                Add Keyword
-              </Button>
-            </AddKeywordDialog>
           </div>
         </div>
       </div>
