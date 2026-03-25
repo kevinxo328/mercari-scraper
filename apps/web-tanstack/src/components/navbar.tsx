@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { useEffect, useRef } from 'react';
 
 import { useScroll } from '@/hooks/use-scroll';
 import { cn } from '@/lib/utils';
@@ -16,9 +17,24 @@ export const NavBar = ({
 }: Props) => {
   const internalIsScrolled = useScroll();
   const isScrolled = propIsScrolled ?? internalIsScrolled;
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        `${el.offsetHeight}px`
+      );
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <header
+      ref={headerRef}
       className={cn(
         'sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70',
         isScrolled ? 'p-2' : 'p-4'

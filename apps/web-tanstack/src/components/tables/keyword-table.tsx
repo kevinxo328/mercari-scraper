@@ -7,7 +7,15 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import { Check, Pencil, Star, Tag, Trash2, XIcon } from 'lucide-react';
+import {
+  Check,
+  Pencil,
+  PlusIcon,
+  Star,
+  Tag,
+  Trash2,
+  XIcon
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/shadcn/button';
@@ -442,254 +450,265 @@ export default function KeywordTable() {
   });
 
   return (
-    <section className="mt-6 space-y-4">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Input
-              type="text"
-              placeholder="Search keywords"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onCompositionStart={() => setIsComposing(true)}
-              onCompositionEnd={(event) => {
-                setIsComposing(false);
-                setSearchInput(event.currentTarget.value);
-              }}
-              className="w-full pr-10"
-            />
-            {searchInput && (
+    <div>
+      <div
+        className="sticky z-20 bg-white dark:bg-gray-950 border-b"
+        style={{ top: 'var(--header-height, 64px)' }}
+      >
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+            <div className="relative flex-1">
+              <Input
+                type="text"
+                placeholder="Search keywords"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                onCompositionStart={() => setIsComposing(true)}
+                onCompositionEnd={(event) => {
+                  setIsComposing(false);
+                  setSearchInput(event.currentTarget.value);
+                }}
+                className="w-full pr-10"
+              />
+              {searchInput && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute inset-y-0 right-2 my-auto h-6 w-6"
+                  onClick={handleClearSearch}
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                  <span className="sr-only">Clear search</span>
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0 text-sm text-gray-500">
+              <span>Sort by</span>
+              <Select
+                value={sortField}
+                onValueChange={(value) => setSortField(value as SortableField)}
+              >
+                <SelectTrigger className="w-[150px]" size="sm">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SORTABLE_COLUMNS.map((column) => (
+                    <SelectItem key={column.key} value={column.key}>
+                      {column.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button
                 type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute inset-y-0 right-2 my-auto h-6 w-6"
-                onClick={handleClearSearch}
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                }
+                className="px-3 py-1"
               >
-                <XIcon className="h-3.5 w-3.5" />
-                <span className="sr-only">Clear search</span>
+                {sortOrder === 'asc' ? 'Asc' : 'Desc'}
               </Button>
-            )}
+            </div>
+            <AddKeywordDialog>
+              <Button size="sm" className="shrink-0">
+                <PlusIcon className="h-4 w-4" />
+                Add Keyword
+              </Button>
+            </AddKeywordDialog>
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap justify-end items-center gap-3 text-sm text-gray-500">
-        <div className="flex items-center gap-2">
-          <span>Sort by</span>
-          <Select
-            value={sortField}
-            onValueChange={(value) => setSortField(value as SortableField)}
-          >
-            <SelectTrigger className="w-[150px]" size="sm">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {SORTABLE_COLUMNS.map((column) => (
-                <SelectItem key={column.key} value={column.key}>
-                  {column.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-            }
-            className="px-3 py-1"
-          >
-            {sortOrder === 'asc' ? 'Asc' : 'Desc'}
-          </Button>
-        </div>
-      </div>
-      <div
-        className={cn(
-          'overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 transition-opacity duration-200',
-          isFetching && !isPending && 'opacity-60'
-        )}
-      >
-        <Table className="min-w-[900px]">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const meta = header.column.columnDef.meta as
-                    | { className?: string }
-                    | undefined;
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={`align-middle ${meta?.className || ''}`}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {isPending ? (
-              Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell className="sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
-                    <div className="flex items-center gap-2">
-                      <Skeleton className="h-4 w-4 rounded-full shrink-0" />
-                      <Skeleton className="h-4 w-28" />
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-14 ml-auto" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-14 ml-auto" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-24" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-20" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-20" />
-                  </TableCell>
-                  <TableCell className="sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]">
-                    <div className="flex items-center justify-center gap-2">
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : isError ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center text-red-500"
-                >
-                  Failed to load keywords:{' '}
-                  {error instanceof Error ? error.message : ''}
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => {
-                    const meta = cell.column.columnDef.meta as
+      <div className="container mx-auto px-4 py-4 space-y-4">
+        <div
+          className={cn(
+            'overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 transition-opacity duration-200',
+            isFetching && !isPending && 'opacity-60'
+          )}
+        >
+          <Table className="min-w-[900px]">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    const meta = header.column.columnDef.meta as
                       | { className?: string }
                       | undefined;
                     return (
-                      <TableCell
-                        key={cell.id}
+                      <TableHead
+                        key={header.id}
                         className={`align-middle ${meta?.className || ''}`}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
                     );
                   })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="py-16">
-                  <div className="flex flex-col items-center gap-3 text-gray-400">
-                    <Tag className="h-8 w-8 opacity-40" />
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-500">
-                        {searchTerm
-                          ? 'No keywords match your search'
-                          : 'No keywords yet'}
-                      </p>
-                      {!searchTerm && (
-                        <p className="mt-1 text-xs">
-                          Add a keyword to start tracking Mercari listings.
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isPending ? (
+                Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full shrink-0" />
+                        <Skeleton className="h-4 w-28" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-14 ml-auto" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-14 ml-auto" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell className="sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]">
+                      <div className="flex items-center justify-center gap-2">
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                        <Skeleton className="h-8 w-8 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="text-center text-red-500"
+                  >
+                    Failed to load keywords:{' '}
+                    {error instanceof Error ? error.message : ''}
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => {
+                      const meta = cell.column.columnDef.meta as
+                        | { className?: string }
+                        | undefined;
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={`align-middle ${meta?.className || ''}`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="py-16">
+                    <div className="flex flex-col items-center gap-3 text-gray-400">
+                      <Tag className="h-8 w-8 opacity-40" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-500">
+                          {searchTerm
+                            ? 'No keywords match your search'
+                            : 'No keywords yet'}
                         </p>
+                        {!searchTerm && (
+                          <p className="mt-1 text-xs">
+                            Add a keyword to start tracking Mercari listings.
+                          </p>
+                        )}
+                      </div>
+                      {searchTerm && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClearSearch}
+                        >
+                          Clear search
+                        </Button>
                       )}
                     </div>
-                    {searchTerm && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearSearch}
-                      >
-                        Clear search
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-500">Rows per page</label>
-            <Select
-              value={pageSize.toString()}
-              onValueChange={(value) => {
-                setPageSize(Number(value));
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="w-[70px]">
-                <SelectValue placeholder="Size" />
-              </SelectTrigger>
-              <SelectContent>
-                {PAGE_SIZES.map((size) => (
-                  <SelectItem key={size} value={size.toString()}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-500">Rows per page</label>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(value) => {
+                  setPageSize(Number(value));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[70px]">
+                  <SelectValue placeholder="Size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAGE_SIZES.map((size) => (
+                    <SelectItem key={size} value={size.toString()}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-sm text-gray-500">
+              {total > 0
+                ? `${rangeStart}–${rangeEnd} of ${total}`
+                : `Page ${page} of ${totalPages}`}
+            </p>
           </div>
-          <p className="text-sm text-gray-500">
-            {total > 0
-              ? `${rangeStart}–${rangeEnd} of ${total}`
-              : `Page ${page} of ${totalPages}`}
-          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={page <= 1 || isFetching}
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={page >= totalPages || isFetching}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={page <= 1 || isFetching}
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-          >
-            Previous
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={page >= totalPages || isFetching}
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <AddKeywordDialog
+          keywordToEdit={keywordToEdit ?? undefined}
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open);
+            if (!open) {
+              setKeywordToEdit(null);
+            }
+          }}
+        />
       </div>
-      <AddKeywordDialog
-        keywordToEdit={keywordToEdit ?? undefined}
-        open={editDialogOpen}
-        onOpenChange={(open) => {
-          setEditDialogOpen(open);
-          if (!open) {
-            setKeywordToEdit(null);
-          }
-        }}
-      />
-    </section>
+    </div>
   );
 }
