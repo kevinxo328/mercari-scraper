@@ -121,7 +121,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
                 selected ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
-              {selected ?? 'Search keywords…'}
+              {selected ?? 'Search'}
             </span>
             {selected && (
               <X
@@ -140,7 +140,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
         <CommandInput
           value={mobileFilter}
           onValueChange={setMobileFilter}
-          placeholder="Search keywords…"
+          placeholder="Search"
         />
         <CommandList className="max-h-none flex-1">
           <CommandEmpty>No keywords found</CommandEmpty>
@@ -183,7 +183,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
                 setOpen(false);
               }
             }}
-            placeholder="Search keyword…"
+            placeholder="Search"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
           />
           {filterText && (
