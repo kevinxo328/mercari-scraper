@@ -498,9 +498,189 @@ export default function KeywordTable() {
         </div>
       </div>
       <div className="container mx-auto px-4 py-4 space-y-4">
+        {/* Mobile card list */}
         <div
           className={cn(
-            'overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 transition-opacity duration-200',
+            'block sm:hidden space-y-3 transition-opacity duration-200',
+            isFetching && !isPending && 'opacity-60'
+          )}
+        >
+          {isPending ? (
+            Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 space-y-3"
+              >
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-full shrink-0" />
+                  <Skeleton className="h-5 w-32 flex-1" />
+                  <Skeleton className="h-10 w-10 rounded-md" />
+                  <Skeleton className="h-10 w-10 rounded-md" />
+                </div>
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-4 w-28" />
+              </div>
+            ))
+          ) : isError ? (
+            <div className="rounded-lg border border-red-200 dark:border-red-900 p-8 text-center text-sm text-red-500">
+              Failed to load keywords:{' '}
+              {error instanceof Error ? error.message : ''}
+            </div>
+          ) : keywords.length > 0 ? (
+            keywords.map((keyword) => {
+              const isRowDeleting = deletingId === keyword.id && isDeleting;
+              const isConfirming = confirmingId === keyword.id;
+              const MAX_VISIBLE = 2;
+              const visibleCats = keyword.categoryNames.slice(0, MAX_VISIBLE);
+              const hiddenCats = keyword.categoryNames.slice(MAX_VISIBLE);
+              return (
+                <div
+                  key={keyword.id}
+                  className={cn(
+                    'rounded-lg border border-gray-200 dark:border-gray-800 p-4 space-y-2 transition-opacity duration-200',
+                    isRowDeleting && 'opacity-50'
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={keyword.pinned ? 'Unpin' : 'Pin'}
+                      onClick={() =>
+                        pinMutation.mutate({
+                          id: keyword.id,
+                          pinned: !keyword.pinned
+                        })
+                      }
+                      disabled={pinMutation.isPending}
+                      className={`shrink-0 disabled:opacity-40 ${keyword.pinned ? 'text-yellow-400' : 'text-gray-300'}`}
+                    >
+                      <Star
+                        className="h-5 w-5"
+                        fill={keyword.pinned ? 'currentColor' : 'none'}
+                      />
+                    </button>
+                    <span className="flex-1 font-medium">
+                      {keyword.keyword}
+                    </span>
+                    {isConfirming ? (
+                      <div className="flex items-center gap-1">
+                        <span className="mr-1 text-xs text-gray-500">
+                          Delete?
+                        </span>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          onClick={() => handleDelete(keyword)}
+                          disabled={isRowDeleting}
+                          aria-label="Confirm delete"
+                          className="h-10 w-10"
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setConfirmingId(null)}
+                          disabled={isRowDeleting}
+                          aria-label="Cancel delete"
+                          className="h-10 w-10"
+                        >
+                          <XIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          onClick={() => handleEdit(keyword)}
+                          disabled={isRowDeleting}
+                          aria-label="Edit"
+                          className="h-10 w-10"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setConfirmingId(keyword.id)}
+                          disabled={isRowDeleting}
+                          aria-label="Delete"
+                          className="h-10 w-10 text-gray-400"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <span className="tabular-nums">
+                      {formatPriceRange(keyword.minPrice, keyword.maxPrice)}
+                    </span>
+                    <span>·</span>
+                    <span>{formatDate(keyword.createdAt)}</span>
+                  </div>
+                  {keyword.categoryNames.length > 0 && (
+                    <div className="flex flex-wrap gap-1 text-xs">
+                      {visibleCats.map((name) => (
+                        <span
+                          key={name}
+                          className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                        >
+                          {name}
+                        </span>
+                      ))}
+                      {hiddenCats.length > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-default rounded-full bg-gray-200 px-2 py-0.5 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                              +{hiddenCats.length}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="flex flex-col gap-1">
+                              {hiddenCats.map((name) => (
+                                <span key={name}>{name}</span>
+                              ))}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 py-16">
+              <div className="flex flex-col items-center gap-3 text-gray-400">
+                <Tag className="h-8 w-8 opacity-40" />
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-500">
+                    {searchTerm
+                      ? 'No keywords match your search'
+                      : 'No keywords yet'}
+                  </p>
+                  {!searchTerm && (
+                    <p className="mt-1 text-xs">
+                      Add a keyword to start tracking Mercari listings.
+                    </p>
+                  )}
+                </div>
+                {searchTerm && (
+                  <Button variant="ghost" size="sm" onClick={handleClearSearch}>
+                    Clear search
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div
+          className={cn(
+            'hidden sm:block overflow-x-auto rounded-md border border-gray-200 dark:border-gray-800 transition-opacity duration-200',
             isFetching && !isPending && 'opacity-60'
           )}
         >
