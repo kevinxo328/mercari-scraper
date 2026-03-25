@@ -18,7 +18,7 @@ import {
   Trash2,
   XIcon
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -185,225 +185,243 @@ export default function KeywordTable() {
     };
   }, [isComposing, trimmedSearchValue, searchTerm]);
 
-  const handleEdit = (keyword: ScraperKeyword) => {
+  const handleEdit = useCallback((keyword: ScraperKeyword) => {
     setKeywordToEdit(keyword);
     setEditDialogOpen(true);
-  };
+  }, []);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchInput('');
     setSearchTerm('');
     setPage(1);
-  };
+  }, []);
 
-  const handleDelete = (keyword: ScraperKeyword) => {
-    setDeletingId(keyword.id);
-    setConfirmingId(null);
-    deleteMutation.mutate(
-      { id: keyword.id },
-      {
-        onSettled: () => setDeletingId(null)
-      }
-    );
-  };
+  const handleDelete = useCallback(
+    (keyword: ScraperKeyword) => {
+      setDeletingId(keyword.id);
+      setConfirmingId(null);
+      deleteMutation.mutate(
+        { id: keyword.id },
+        {
+          onSettled: () => setDeletingId(null)
+        }
+      );
+    },
+    [deleteMutation]
+  );
 
   const isDeleting = deleteMutation.isPending;
 
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, total);
 
-  const columns: ColumnDef<ScraperKeyword>[] = [
-    {
-      accessorKey: 'keyword',
-      header: () => (
-        <div className="flex items-center gap-1">
-          Keyword
-          {sortField === 'keyword' &&
-            (sortOrder === 'asc' ? (
-              <ArrowUp className="h-3 w-3 shrink-0" />
-            ) : (
-              <ArrowDown className="h-3 w-3 shrink-0" />
-            ))}
-        </div>
-      ),
-      cell: ({ row }) => {
-        const keyword = row.original;
-        return (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label={keyword.pinned ? 'Unpin' : 'Pin'}
-              onClick={() =>
-                pinMutation.mutate({ id: keyword.id, pinned: !keyword.pinned })
-              }
-              className={`disabled:opacity-40 shrink-0 ${keyword.pinned ? 'text-yellow-400 hover:text-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
-              disabled={pinMutation.isPending}
-            >
-              <Star
-                className="h-4 w-4"
-                fill={keyword.pinned ? 'currentColor' : 'none'}
-              />
-            </button>
-            <span className="font-medium">{keyword.keyword}</span>
+  const columns = useMemo<ColumnDef<ScraperKeyword>[]>(
+    () => [
+      {
+        accessorKey: 'keyword',
+        header: () => (
+          <div className="flex items-center gap-1">
+            Keyword
+            {sortField === 'keyword' &&
+              (sortOrder === 'asc' ? (
+                <ArrowUp className="h-3 w-3 shrink-0" />
+              ) : (
+                <ArrowDown className="h-3 w-3 shrink-0" />
+              ))}
           </div>
-        );
-      },
-      meta: {
-        className:
-          'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
-      }
-    },
-    {
-      id: 'priceRange',
-      header: () => <div className="text-right">Price Range</div>,
-      cell: ({ row }) => (
-        <div className="text-right tabular-nums text-sm">
-          {formatPriceRange(row.original.minPrice, row.original.maxPrice)}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'categoryNames',
-      header: () => <span>Categories</span>,
-      cell: ({ row }) => {
-        const keyword = row.original;
-        const MAX_VISIBLE = 2;
-        const visible = keyword.categoryNames.slice(0, MAX_VISIBLE);
-        const hidden = keyword.categoryNames.slice(MAX_VISIBLE);
-        return keyword.categoryNames.length > 0 ? (
-          <div className="flex flex-wrap gap-1 text-xs">
-            {visible.map((name) => (
-              <span
-                key={name}
-                className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
-              >
-                {name}
-              </span>
-            ))}
-            {hidden.length > 0 && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="cursor-default rounded-full bg-gray-200 px-2 py-0.5 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-                    +{hidden.length}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div className="flex flex-col gap-1">
-                    {hidden.map((name) => (
-                      <span key={name}>{name}</span>
-                    ))}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
-        ) : (
-          <span className="text-gray-400">—</span>
-        );
-      }
-    },
-    {
-      accessorKey: 'createdAt',
-      header: () => (
-        <div className="flex items-center gap-1">
-          Created
-          {sortField === 'createdAt' &&
-            (sortOrder === 'asc' ? (
-              <ArrowUp className="h-3 w-3 shrink-0" />
-            ) : (
-              <ArrowDown className="h-3 w-3 shrink-0" />
-            ))}
-        </div>
-      ),
-      cell: ({ row }) => formatDate(row.original.createdAt)
-    },
-    {
-      id: 'actions',
-      header: () => <div className="text-center">Actions</div>,
-      cell: ({ row }) => {
-        const keyword = row.original;
-        const isRowDeleting = deletingId === keyword.id && isDeleting;
-        const isConfirming = confirmingId === keyword.id;
-
-        if (isConfirming) {
+        ),
+        cell: ({ row }) => {
+          const keyword = row.original;
           return (
-            <div className="flex items-center justify-center gap-1">
-              <span className="mr-1 text-xs text-gray-500">Delete?</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-label={keyword.pinned ? 'Unpin' : 'Pin'}
+                onClick={() =>
+                  pinMutation.mutate({
+                    id: keyword.id,
+                    pinned: !keyword.pinned
+                  })
+                }
+                className={`disabled:opacity-40 shrink-0 ${keyword.pinned ? 'text-yellow-400 hover:text-yellow-500' : 'text-gray-300 hover:text-yellow-400'}`}
+                disabled={pinMutation.isPending}
+              >
+                <Star
+                  className="h-4 w-4"
+                  fill={keyword.pinned ? 'currentColor' : 'none'}
+                />
+              </button>
+              <span className="font-medium">{keyword.keyword}</span>
+            </div>
+          );
+        },
+        meta: {
+          className:
+            'sticky left-0 bg-white dark:bg-gray-950 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(0,0,0,0.3)]'
+        }
+      },
+      {
+        id: 'priceRange',
+        header: () => <div className="text-right">Price Range</div>,
+        cell: ({ row }) => (
+          <div className="text-right tabular-nums text-sm">
+            {formatPriceRange(row.original.minPrice, row.original.maxPrice)}
+          </div>
+        )
+      },
+      {
+        accessorKey: 'categoryNames',
+        header: () => <span>Categories</span>,
+        cell: ({ row }) => {
+          const keyword = row.original;
+          const MAX_VISIBLE = 2;
+          const visible = keyword.categoryNames.slice(0, MAX_VISIBLE);
+          const hidden = keyword.categoryNames.slice(MAX_VISIBLE);
+          return keyword.categoryNames.length > 0 ? (
+            <div className="flex flex-wrap gap-1 text-xs">
+              {visible.map((name) => (
+                <span
+                  key={name}
+                  className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                >
+                  {name}
+                </span>
+              ))}
+              {hidden.length > 0 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="cursor-default rounded-full bg-gray-200 px-2 py-0.5 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                      +{hidden.length}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="flex flex-col gap-1">
+                      {hidden.map((name) => (
+                        <span key={name}>{name}</span>
+                      ))}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          ) : (
+            <span className="text-gray-400">—</span>
+          );
+        }
+      },
+      {
+        accessorKey: 'createdAt',
+        header: () => (
+          <div className="flex items-center gap-1">
+            Created
+            {sortField === 'createdAt' &&
+              (sortOrder === 'asc' ? (
+                <ArrowUp className="h-3 w-3 shrink-0" />
+              ) : (
+                <ArrowDown className="h-3 w-3 shrink-0" />
+              ))}
+          </div>
+        ),
+        cell: ({ row }) => formatDate(row.original.createdAt)
+      },
+      {
+        id: 'actions',
+        header: () => <div className="text-center">Actions</div>,
+        cell: ({ row }) => {
+          const keyword = row.original;
+          const isRowDeleting = deletingId === keyword.id && isDeleting;
+          const isConfirming = confirmingId === keyword.id;
+
+          if (isConfirming) {
+            return (
+              <div className="flex items-center justify-center gap-1">
+                <span className="mr-1 text-xs text-gray-500">Delete?</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={() => handleDelete(keyword)}
+                      disabled={isRowDeleting}
+                      aria-label="Confirm delete"
+                      className="h-8 w-8"
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Confirm</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setConfirmingId(null)}
+                      disabled={isRowDeleting}
+                      aria-label="Cancel delete"
+                      className="h-8 w-8"
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Cancel</TooltipContent>
+                </Tooltip>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex items-center justify-center gap-2">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="destructive"
-                    onClick={() => handleDelete(keyword)}
+                    variant="outline"
+                    onClick={() => handleEdit(keyword)}
                     disabled={isRowDeleting}
-                    aria-label="Confirm delete"
+                    aria-label="Edit"
                     className="h-8 w-8"
                   >
-                    <Check className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Confirm</TooltipContent>
+                <TooltipContent>Edit</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => setConfirmingId(null)}
+                    onClick={() => setConfirmingId(keyword.id)}
                     disabled={isRowDeleting}
-                    aria-label="Cancel delete"
-                    className="h-8 w-8"
+                    aria-label="Delete"
+                    className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                   >
-                    <XIcon className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Cancel</TooltipContent>
+                <TooltipContent>Delete</TooltipContent>
               </Tooltip>
             </div>
           );
+        },
+        meta: {
+          className:
+            'sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]'
         }
-
-        return (
-          <div className="flex items-center justify-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => handleEdit(keyword)}
-                  disabled={isRowDeleting}
-                  aria-label="Edit"
-                  className="h-8 w-8"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setConfirmingId(keyword.id)}
-                  disabled={isRowDeleting}
-                  aria-label="Delete"
-                  className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete</TooltipContent>
-            </Tooltip>
-          </div>
-        );
-      },
-      meta: {
-        className:
-          'sticky right-0 bg-white dark:bg-gray-950 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_4px_rgba(0,0,0,0.3)]'
       }
-    }
-  ];
+    ],
+    [
+      sortField,
+      sortOrder,
+      deletingId,
+      confirmingId,
+      isDeleting,
+      pinMutation,
+      handleEdit,
+      handleDelete
+    ]
+  );
 
   const table = useReactTable({
     data: keywords,
