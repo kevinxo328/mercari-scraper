@@ -43,12 +43,7 @@ import {
 } from '../shadcn/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../shadcn/tooltip';
 
-type SortableField =
-  | 'keyword'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'minPrice'
-  | 'maxPrice';
+type SortableField = 'keyword' | 'createdAt';
 
 const PAGE_SIZES = [10, 20, 50];
 const SEARCH_DEBOUNCE_MS = 500;
@@ -58,10 +53,7 @@ const SORTABLE_COLUMNS: {
   label: string;
 }[] = [
   { key: 'keyword', label: 'Keyword' },
-  { key: 'minPrice', label: 'Min Price' },
-  { key: 'maxPrice', label: 'Max Price' },
-  { key: 'createdAt', label: 'Created' },
-  { key: 'updatedAt', label: 'Updated' }
+  { key: 'createdAt', label: 'Created' }
 ];
 
 const SKELETON_ROW_COUNT = 5;
@@ -75,9 +67,12 @@ const formatDate = (date: Date | string) => {
   return `${year}-${month}-${day}`;
 };
 
-const formatPrice = (value: number | null) => {
-  if (value === null || value === undefined) return '-';
-  return value.toLocaleString();
+const formatPriceRange = (min: number | null, max: number | null): string => {
+  if (min === null && max === null) return '—';
+  if (min !== null && max !== null)
+    return `${min.toLocaleString()} – ${max.toLocaleString()}`;
+  if (min !== null) return `≥ ${min.toLocaleString()}`;
+  return `≤ ${max!.toLocaleString()}`;
 };
 
 export default function KeywordTable() {
@@ -85,7 +80,7 @@ export default function KeywordTable() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [sortField, setSortField] = useState<SortableField>('updatedAt');
+  const [sortField, setSortField] = useState<SortableField>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -267,39 +262,12 @@ export default function KeywordTable() {
       }
     },
     {
-      accessorKey: 'minPrice',
-      header: () => (
-        <button
-          type="button"
-          onClick={() => handleSort('minPrice')}
-          className="flex w-full items-center justify-end gap-1"
-        >
-          Min Price
-          {sortField === 'minPrice' && (
-            <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
-          )}
-        </button>
-      ),
+      id: 'priceRange',
+      header: () => <div className="text-right">Price Range</div>,
       cell: ({ row }) => (
-        <div className="text-right">{formatPrice(row.original.minPrice)}</div>
-      )
-    },
-    {
-      accessorKey: 'maxPrice',
-      header: () => (
-        <button
-          type="button"
-          onClick={() => handleSort('maxPrice')}
-          className="flex w-full items-center justify-end gap-1"
-        >
-          Max Price
-          {sortField === 'maxPrice' && (
-            <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
-          )}
-        </button>
-      ),
-      cell: ({ row }) => (
-        <div className="text-right">{formatPrice(row.original.maxPrice)}</div>
+        <div className="text-right tabular-nums text-sm">
+          {formatPriceRange(row.original.minPrice, row.original.maxPrice)}
+        </div>
       )
     },
     {
@@ -338,22 +306,6 @@ export default function KeywordTable() {
         </button>
       ),
       cell: ({ row }) => formatDate(row.original.createdAt)
-    },
-    {
-      accessorKey: 'updatedAt',
-      header: () => (
-        <button
-          type="button"
-          onClick={() => handleSort('updatedAt')}
-          className="flex w-full items-center gap-1"
-        >
-          Updated
-          {sortField === 'updatedAt' && (
-            <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
-          )}
-        </button>
-      ),
-      cell: ({ row }) => formatDate(row.original.updatedAt)
     },
     {
       id: 'actions',
@@ -528,7 +480,7 @@ export default function KeywordTable() {
             isFetching && !isPending && 'opacity-60'
           )}
         >
-          <Table className="min-w-[900px]">
+          <Table className="min-w-[560px]">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -564,16 +516,10 @@ export default function KeywordTable() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Skeleton className="h-4 w-14 ml-auto" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-14 ml-auto" />
+                      <Skeleton className="h-4 w-24 ml-auto" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-24" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-20" />
                     </TableCell>
                     <TableCell>
                       <Skeleton className="h-4 w-20" />
