@@ -8,6 +8,8 @@ import {
   useReactTable
 } from '@tanstack/react-table';
 import {
+  ArrowDown,
+  ArrowUp,
   Check,
   Pencil,
   PlusIcon,
@@ -183,15 +185,6 @@ export default function KeywordTable() {
     };
   }, [isComposing, trimmedSearchValue, searchTerm]);
 
-  const handleSort = (field: SortableField) => {
-    if (sortField === field) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
-
   const handleEdit = (keyword: ScraperKeyword) => {
     setKeywordToEdit(keyword);
     setEditDialogOpen(true);
@@ -223,16 +216,15 @@ export default function KeywordTable() {
     {
       accessorKey: 'keyword',
       header: () => (
-        <button
-          type="button"
-          onClick={() => handleSort('keyword')}
-          className="flex w-full items-center gap-1"
-        >
+        <div className="flex items-center gap-1">
           Keyword
-          {sortField === 'keyword' && (
-            <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
-          )}
-        </button>
+          {sortField === 'keyword' &&
+            (sortOrder === 'asc' ? (
+              <ArrowUp className="h-3 w-3 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 shrink-0" />
+            ))}
+        </div>
       ),
       cell: ({ row }) => {
         const keyword = row.original;
@@ -275,9 +267,12 @@ export default function KeywordTable() {
       header: () => <span>Categories</span>,
       cell: ({ row }) => {
         const keyword = row.original;
+        const MAX_VISIBLE = 2;
+        const visible = keyword.categoryNames.slice(0, MAX_VISIBLE);
+        const hidden = keyword.categoryNames.slice(MAX_VISIBLE);
         return keyword.categoryNames.length > 0 ? (
           <div className="flex flex-wrap gap-1 text-xs">
-            {keyword.categoryNames.map((name) => (
+            {visible.map((name) => (
               <span
                 key={name}
                 className="rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 dark:bg-gray-800 dark:text-gray-200"
@@ -285,6 +280,22 @@ export default function KeywordTable() {
                 {name}
               </span>
             ))}
+            {hidden.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-default rounded-full bg-gray-200 px-2 py-0.5 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                    +{hidden.length}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex flex-col gap-1">
+                    {hidden.map((name) => (
+                      <span key={name}>{name}</span>
+                    ))}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         ) : (
           <span className="text-gray-400">—</span>
@@ -294,16 +305,15 @@ export default function KeywordTable() {
     {
       accessorKey: 'createdAt',
       header: () => (
-        <button
-          type="button"
-          onClick={() => handleSort('createdAt')}
-          className="flex w-full items-center gap-1"
-        >
+        <div className="flex items-center gap-1">
           Created
-          {sortField === 'createdAt' && (
-            <span>{sortOrder === 'asc' ? '▲' : '▼'}</span>
-          )}
-        </button>
+          {sortField === 'createdAt' &&
+            (sortOrder === 'asc' ? (
+              <ArrowUp className="h-3 w-3 shrink-0" />
+            ) : (
+              <ArrowDown className="h-3 w-3 shrink-0" />
+            ))}
+        </div>
       ),
       cell: ({ row }) => formatDate(row.original.createdAt)
     },
@@ -452,17 +462,31 @@ export default function KeywordTable() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                }
-                className="px-3 py-1"
-              >
-                {sortOrder === 'asc' ? 'Asc' : 'Desc'}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 shrink-0"
+                    onClick={() =>
+                      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                    }
+                    aria-label={
+                      sortOrder === 'asc' ? 'Ascending' : 'Descending'
+                    }
+                  >
+                    {sortOrder === 'asc' ? (
+                      <ArrowUp className="h-4 w-4" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+                </TooltipContent>
+              </Tooltip>
             </div>
             <AddKeywordDialog>
               <Button size="sm" className="shrink-0">
