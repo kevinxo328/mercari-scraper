@@ -64,11 +64,7 @@ pnpm --filter @mercari-scraper/database db:migrate:dev
 
 > **Note:** For production, use `prisma migrate deploy`.
 >
-> **Troubleshooting (Supabase):** If `db:migrate:dev` fails with a shadow database error, use `prisma migrate deploy` instead:
->
-> ```bash
-> cd packages/database && pnpm prisma migrate deploy
-> ```
+> **Supabase setup:** Supabase does not allow automatic shadow database creation, which is required by `prisma migrate dev`. Create a second Supabase project to use as the shadow database and set `SHADOW_DATABASE_URL` in `packages/database/.env` to its direct connection string.
 
 ### 5. Generate Prisma Client
 
