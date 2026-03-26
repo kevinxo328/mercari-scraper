@@ -6,7 +6,7 @@ A Turborepo monorepo for scraping Mercari Japan listings.
 
 - **`apps/scraper`** - Playwright-based scraper, runs daily via GitHub Actions
 - **`packages/database`** - Shared Prisma ORM layer (PostgreSQL via Supabase)
-- **`packages/config-eslint`** / **`packages/config-typescript`** - Shared configs
+- **`packages/config-typescript`** - Shared TypeScript config
 
 ## Common Commands
 
@@ -16,9 +16,10 @@ pnpm dev             # Start all apps
 
 # Build & Lint
 pnpm build           # Build all packages
-pnpm lint            # Lint all packages
-pnpm lint:fix        # Lint + auto-fix
-pnpm format          # Prettier format
+pnpm check           # Lint (oxlint) + type-check all packages
+pnpm lint            # Lint all packages (oxlint)
+pnpm lint:fix        # Lint + auto-fix (oxlint)
+pnpm format          # Format code (oxfmt)
 
 # Scraper (run directly in apps/scraper, not via Turbo)
 pnpm --filter scraper scraper         # Run scraper
@@ -39,12 +40,12 @@ pnpm --filter @mercari-scraper/database db:seed           # Seed initial data
 - **Package manager**: pnpm — do not use npm or yarn
 - **Monorepo runner**: Turbo — always run scripts from the repo root
 
-### Formatting (Prettier)
+### Formatting (oxfmt)
 - `printWidth: 80`, `trailingComma: "none"`, `singleQuote: true`
 
-### ESLint
-- Shared config from `packages/config-eslint`
-- All ESLint issues are warnings (not errors) via `eslint-plugin-only-warn`
+### Linting (oxlint)
+- Config per package via `.oxlintrc.json`
+- Run with `--deny-warnings` (warnings are treated as errors)
 
 ## Branch Strategy
 - `main` — production, triggers scheduled scraper (daily, UTC 04:00)
