@@ -181,7 +181,7 @@ export default function AddKeywordDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="flex flex-col h-[580px]">
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? 'Edit Search Keyword' : 'Add Search Keyword'}
@@ -193,89 +193,96 @@ export default function AddKeywordDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="keyword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Keyword</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter keyword" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="minPrice"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Min Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      placeholder="Optional"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="maxPrice"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      placeholder="Optional"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="categoryIds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categories</FormLabel>
-                  <FormControl>
-                    {isLoadingCategories ? (
-                      <Skeleton className="h-10 w-full" />
-                    ) : (
-                      <TreeSelect
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        flatMap={categoryFlatMap}
-                        tree={categoriesData?.tree ?? []}
-                      >
-                        <TreeSelectTrigger
-                          placeholder="Select categories"
-                          className="w-full"
-                        />
-                        <TreeSelectContent>
-                          <TreeSelectGroup items={categoriesData?.tree ?? []} />
-                        </TreeSelectContent>
-                      </TreeSelect>
-                    )}
-                  </FormControl>
-                  <FormDescription>
-                    Select one or more categories.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col flex-1 min-h-0"
+          >
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+              <FormField
+                control={form.control}
+                name="keyword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Keyword</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter keyword" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="minPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Min Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="Optional"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="maxPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="Optional"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="categoryIds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categories</FormLabel>
+                    <FormControl>
+                      {isLoadingCategories ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <TreeSelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          flatMap={categoryFlatMap}
+                          tree={categoriesData?.tree ?? []}
+                        >
+                          <TreeSelectTrigger
+                            placeholder="Select categories"
+                            className="w-full"
+                          />
+                          <TreeSelectContent>
+                            <TreeSelectGroup
+                              items={categoriesData?.tree ?? []}
+                            />
+                          </TreeSelectContent>
+                        </TreeSelect>
+                      )}
+                    </FormControl>
+                    <FormDescription>
+                      Select one or more categories.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <DialogFooter>
               <Button
                 type="button"
