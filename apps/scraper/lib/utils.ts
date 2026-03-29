@@ -22,7 +22,7 @@ export function getMercariUrl({
   const params = new URLSearchParams({
     keyword,
     status,
-    category_id: categoryIds ? categoryIds.join('&') : '',
+    ...(categoryIds?.length && { category_id: categoryIds.join(',') }),
     ...(!!minPrice && { price_min: minPrice.toString() }),
     ...(!!maxPrice && { price_max: maxPrice.toString() })
   });
