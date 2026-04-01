@@ -57,7 +57,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
         to: '/search',
         resetScroll: true,
         search: {
-          keyword: encodeURIComponent(target)
+          keyword: target
         }
       });
     } else {
@@ -80,7 +80,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
     navigate({
       to: '/search',
       resetScroll: true,
-      search: { keyword: encodeURIComponent(keyword) }
+      search: { keyword: keyword }
     });
   };
 
