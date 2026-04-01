@@ -10,7 +10,6 @@ import {
 import {
   ArrowDown,
   ArrowUp,
-  Check,
   Pencil,
   PlusIcon,
   Star,
@@ -18,7 +17,8 @@ import {
   Trash2,
   XIcon
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -59,6 +59,7 @@ const SORTABLE_COLUMNS: {
 ];
 
 const SKELETON_ROW_COUNT = 5;
+const UNDO_DURATION_MS = 5000;
 
 const formatDate = (date: Date | string) => {
   const value = new Date(date);
@@ -87,8 +88,12 @@ export default function KeywordTable() {
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isComposing, setIsComposing] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
+    new Set()
+  );
+  const deleteTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map()
+  );
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [keywordToEdit, setKeywordToEdit] = useState<ScraperKeyword | null>(
     null
@@ -169,6 +174,14 @@ export default function KeywordTable() {
     }
   }, [keywordsData, page, totalPages]);
 
+  useEffect(() => {
+    return () => {
+      for (const timer of deleteTimers.current.values()) {
+        clearTimeout(timer);
+      }
+    };
+  }, []);
+
   const trimmedSearchValue = searchInput.trim();
 
   useEffect(() => {
@@ -196,21 +209,53 @@ export default function KeywordTable() {
     setPage(1);
   }, []);
 
+  const handleUndoDelete = useCallback((id: string) => {
+    const timer = deleteTimers.current.get(id);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      deleteTimers.current.delete(id);
+    }
+    setPendingDeleteIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+
   const handleDelete = useCallback(
     (keyword: ScraperKeyword) => {
-      setDeletingId(keyword.id);
-      setConfirmingId(null);
-      deleteMutation.mutate(
-        { id: keyword.id },
-        {
-          onSettled: () => setDeletingId(null)
-        }
-      );
+      const existing = deleteTimers.current.get(keyword.id);
+      if (existing !== undefined) clearTimeout(existing);
+      setPendingDeleteIds((prev) => new Set(prev).add(keyword.id));
+      toast(`"${keyword.keyword}" deleted`, {
+        action: { label: 'Undo', onClick: () => handleUndoDelete(keyword.id) },
+        duration: UNDO_DURATION_MS
+      });
+      const timer = setTimeout(() => {
+        deleteTimers.current.delete(keyword.id);
+        deleteMutation.mutate(
+          { id: keyword.id },
+          {
+            // Clean up the pending set regardless of success/error,
+            // since the item no longer exists in the backend after this point.
+            onSettled: () =>
+              setPendingDeleteIds((prev) => {
+                const next = new Set(prev);
+                next.delete(keyword.id);
+                return next;
+              })
+          }
+        );
+      }, UNDO_DURATION_MS);
+      deleteTimers.current.set(keyword.id, timer);
     },
-    [deleteMutation]
+    [deleteMutation, handleUndoDelete]
   );
 
-  const isDeleting = deleteMutation.isPending;
+  const displayedKeywords = useMemo(
+    () => keywords.filter((kw) => !pendingDeleteIds.has(kw.id)),
+    [keywords, pendingDeleteIds]
+  );
 
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = Math.min(page * pageSize, total);
@@ -329,46 +374,6 @@ export default function KeywordTable() {
         header: () => <div className="text-center">Actions</div>,
         cell: ({ row }) => {
           const keyword = row.original;
-          const isRowDeleting = deletingId === keyword.id && isDeleting;
-          const isConfirming = confirmingId === keyword.id;
-
-          if (isConfirming) {
-            return (
-              <div className="flex items-center justify-center gap-1">
-                <span className="mr-1 text-xs text-gray-500">Delete?</span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      onClick={() => handleDelete(keyword)}
-                      disabled={isRowDeleting}
-                      aria-label="Confirm delete"
-                      className="h-8 w-8"
-                    >
-                      <Check className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Confirm</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => setConfirmingId(null)}
-                      disabled={isRowDeleting}
-                      aria-label="Cancel delete"
-                      className="h-8 w-8"
-                    >
-                      <XIcon className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Cancel</TooltipContent>
-                </Tooltip>
-              </div>
-            );
-          }
 
           return (
             <div className="flex items-center justify-center gap-2">
@@ -378,7 +383,6 @@ export default function KeywordTable() {
                     size="icon"
                     variant="outline"
                     onClick={() => handleEdit(keyword)}
-                    disabled={isRowDeleting}
                     aria-label="Edit"
                     className="h-8 w-8"
                   >
@@ -392,8 +396,7 @@ export default function KeywordTable() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => setConfirmingId(keyword.id)}
-                    disabled={isRowDeleting}
+                    onClick={() => handleDelete(keyword)}
                     aria-label="Delete"
                     className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
                   >
@@ -411,20 +414,11 @@ export default function KeywordTable() {
         }
       }
     ],
-    [
-      sortField,
-      sortOrder,
-      deletingId,
-      confirmingId,
-      isDeleting,
-      pinMutation,
-      handleEdit,
-      handleDelete
-    ]
+    [sortField, sortOrder, pinMutation, handleEdit, handleDelete]
   );
 
   const table = useReactTable({
-    data: keywords,
+    data: displayedKeywords,
     columns,
     getCoreRowModel: getCoreRowModel()
   });
@@ -550,20 +544,15 @@ export default function KeywordTable() {
               Failed to load keywords:{' '}
               {error instanceof Error ? error.message : ''}
             </div>
-          ) : keywords.length > 0 ? (
-            keywords.map((keyword) => {
-              const isRowDeleting = deletingId === keyword.id && isDeleting;
-              const isConfirming = confirmingId === keyword.id;
+          ) : displayedKeywords.length > 0 ? (
+            displayedKeywords.map((keyword) => {
               const MAX_VISIBLE = 2;
               const visibleCats = keyword.categoryNames.slice(0, MAX_VISIBLE);
               const hiddenCats = keyword.categoryNames.slice(MAX_VISIBLE);
               return (
                 <div
                   key={keyword.id}
-                  className={cn(
-                    'rounded-lg border border-gray-200 dark:border-gray-800 p-4 space-y-2 transition-opacity duration-200',
-                    isRowDeleting && 'opacity-50'
-                  )}
+                  className="rounded-lg border border-gray-200 dark:border-gray-800 p-4 space-y-2"
                 >
                   <div className="flex items-center gap-2">
                     <button
@@ -586,56 +575,26 @@ export default function KeywordTable() {
                     <span className="flex-1 font-medium">
                       {keyword.keyword}
                     </span>
-                    {isConfirming ? (
-                      <div className="flex items-center gap-1">
-                        <span className="mr-1 text-xs text-gray-500">
-                          Delete?
-                        </span>
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          onClick={() => handleDelete(keyword)}
-                          disabled={isRowDeleting}
-                          aria-label="Confirm delete"
-                          className="h-10 w-10"
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setConfirmingId(null)}
-                          disabled={isRowDeleting}
-                          aria-label="Cancel delete"
-                          className="h-10 w-10"
-                        >
-                          <XIcon className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1">
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          onClick={() => handleEdit(keyword)}
-                          disabled={isRowDeleting}
-                          aria-label="Edit"
-                          className="h-10 w-10"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setConfirmingId(keyword.id)}
-                          disabled={isRowDeleting}
-                          aria-label="Delete"
-                          className="h-10 w-10 text-gray-400"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => handleEdit(keyword)}
+                        aria-label="Edit"
+                        className="h-10 w-10"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDelete(keyword)}
+                        aria-label="Delete"
+                        className="h-10 w-10 text-gray-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <span className="tabular-nums">
