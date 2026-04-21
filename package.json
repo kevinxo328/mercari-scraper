@@ -1,6 +1,7 @@
 {
   "name": "mercari-scraper",
   "private": true,
+  "author": "kevinxo328",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -23,6 +24,7 @@
     "turbo": "^2.5.2",
     "typescript": "^6.0.0"
   },
+  "license": "MIT",
   "engines": {
     "node": ">=22"
   },
