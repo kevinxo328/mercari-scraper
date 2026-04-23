@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.agents/hooks/post-edit.sh\"",
+            "statusMessage": "Running post-edit hook",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
