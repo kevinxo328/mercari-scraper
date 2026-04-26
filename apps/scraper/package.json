@@ -11,14 +11,14 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@playwright/test": "^1.52.0",
+    "@playwright/test": "^1.59.1",
     "p-limit": "^7.3.0"
   },
   "devDependencies": {
     "@mercari-scraper/database": "workspace:*",
     "@mercari-scraper/typescript-config": "workspace:*",
-    "@types/node": "^22.0.0",
-    "dotenv": "^17.3.1",
-    "typescript": "^6.0.0"
+    "@types/node": "^22.19.17",
+    "dotenv": "^17.4.2",
+    "typescript": "^6.0.3"
   }
 }
