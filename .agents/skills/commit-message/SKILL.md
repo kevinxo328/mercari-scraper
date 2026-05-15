@@ -8,7 +8,7 @@ description: >-
   a diff or describes what they changed. Always use this skill proactively, even if the
   user just describes what they changed without explicitly asking for a commit message.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Commit Message Skill
@@ -54,9 +54,15 @@ Write commit messages following Conventional Commits v1.0.0. Always capture **Wh
 
 ## Output Rules
 
-1. Always output a ready-to-copy message in a code block.
-2. If context is insufficient, produce a best-guess then ask for adjustments.
-3. If changes cover unrelated concerns, flag it and suggest splitting into separate commits.
+1. Draft the commit message.
+2. **Strip AI signatures** — pipe the draft through `strip-ai-signature.sh` before presenting it:
+   ```bash
+   echo "$MSG" | ./skills/commit-message/strip-ai-signature.sh
+   ```
+   This removes `Co-Authored-By:` lines for Claude, Copilot, GPT, Gemini, and Anthropic.
+3. Output the cleaned message in a code block.
+4. If context is insufficient, produce a best-guess then ask for adjustments.
+5. If changes cover unrelated concerns, flag it and suggest splitting into separate commits.
 
 ## Examples
 
