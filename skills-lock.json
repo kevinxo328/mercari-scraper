@@ -24,6 +24,12 @@
       "sourceType": "github",
       "skillPath": "skills/web-design-guidelines/SKILL.md",
       "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    },
+    "write-changelog": {
+      "source": "kevinxo328/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/write-changelog/SKILL.md",
+      "computedHash": "28b6d3d224b00f2706f27f87be330ac45440cfa2e2492e8948289f5796f43694"
     }
   }
 }
