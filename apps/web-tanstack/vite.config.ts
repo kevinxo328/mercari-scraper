@@ -43,8 +43,9 @@ export default defineConfig({
       manifest: {
         name: 'Mercari Scraper',
         short_name: 'Mercari Scraper',
-        description: 'A web application for scraping Mercari listings.',
-        theme_color: 'oklch(0.13 0.028 261.692)',
+        description: 'This website shows the scraped data from Mercari',
+        theme_color: '#030712',
+        background_color: '#030712',
         icons: [
           {
             src: 'pwa-192.png',
