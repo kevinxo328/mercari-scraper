@@ -1,6 +1,7 @@
 {
   "name": "mercari-scraper",
   "private": true,
+  "license": "MIT",
   "author": "kevinxo328",
   "scripts": {
     "build": "turbo run build",
@@ -24,6 +25,10 @@
     "turbo": "^2.9.6",
     "typescript": "^6.0.3"
   },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.9.0",
   "pnpm": {
     "overrides": {
       "next": "^16.2.3",
@@ -36,10 +41,5 @@
       "drizzle-orm": "^0.45.2",
       "h3": "^2.0.1-rc.18"
     }
-  },
-  "license": "MIT",
-  "engines": {
-    "node": ">=22"
-  },
-  "packageManager": "pnpm@10.9.0"
+  }
 }
