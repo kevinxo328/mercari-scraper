@@ -37,6 +37,8 @@ const ReactQueryDevtools = import.meta.env.PROD
 import AppHeader from '@/components/app-header';
 import { NotFound } from '@/components/not-found';
 import { Toaster } from '@/components/shadcn/sonner';
+import { usePwaUpdatePrompt } from '@/hooks/use-pwa-update-prompt';
+import { useScraperForegroundRefresh } from '@/hooks/use-scraper-foreground-refresh';
 import { useSessionCleanup } from '@/hooks/use-session-cleanup';
 
 import globalsCss from '../styles/globals.css?url';
@@ -106,6 +108,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
   // Add session cleanup functionality
   useSessionCleanup();
+  usePwaUpdatePrompt();
+  useScraperForegroundRefresh();
 
   return (
     <html lang="en" className="dark">
