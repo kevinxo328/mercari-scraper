@@ -6,6 +6,7 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const reactCompilerBabelOptions = {
   // The React Compiler Babel pass also runs on workspace packages that Vite
@@ -35,6 +36,29 @@ export default defineConfig({
         : []
   },
   plugins: [
+    VitePWA({
+      registerType: 'autoUpdate',
+      outDir: '.output/public',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Mercari Scraper',
+        short_name: 'Mercari Scraper',
+        description: 'A web application for scraping Mercari listings.',
+        theme_color: 'oklch(0.13 0.028 261.692)',
+        icons: [
+          {
+            src: 'pwa-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'pwa-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    }),
     tailwindcss(),
     // Enables Vite to resolve imports using path aliases.
     tanstackStart({
