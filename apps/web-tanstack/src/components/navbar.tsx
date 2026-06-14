@@ -27,7 +27,7 @@ export const NavBar = ({ children, centerSlot }: Props) => {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-40 border-b px-4 py-2 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70"
+      className="sticky top-0 z-40 border-b px-4 py-2 dark:border-gray-800 bg-background"
     >
       <div
         className={cn(
