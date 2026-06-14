@@ -1,5 +1,5 @@
 import { Image } from '@unpic/react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Triangle } from 'lucide-react';
 export type Props = {
   url: string;
   title: string;
@@ -29,11 +29,11 @@ const LinkCard = (props: Props) => {
       ? null
       : {
           direction: priceDiff < 0 ? 'down' : 'up',
-          text: `${priceDiff < 0 ? '↓' : '↑'} ${Math.abs(priceDiff).toLocaleString()} ${props.currency}`,
+          amount: Math.abs(priceDiff).toLocaleString(),
           className:
             priceDiff < 0
-              ? 'bg-emerald-600/90 text-white'
-              : 'bg-rose-600/90 text-white'
+              ? 'bg-gray-700/50 dark:bg-gray-950/80 text-emerald-400'
+              : 'bg-gray-700/50 dark:bg-gray-950/80 text-rose-400'
         };
 
   return (
@@ -58,9 +58,12 @@ const LinkCard = (props: Props) => {
                 ? 'Price decreased'
                 : 'Price increased'
             }
-            className={`absolute left-2 top-2 z-10 rounded-md px-2 py-1 text-xs font-semibold shadow-sm ${priceBadge.className}`}
+            className={`absolute left-2 top-2 z-10 flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold shadow-sm ${priceBadge.className}`}
           >
-            {priceBadge.text}
+            <Triangle
+              className={`h-3 w-3 fill-current ${priceBadge.direction === 'down' ? 'rotate-180' : ''}`}
+            />
+            {priceBadge.amount}
           </span>
         )}
         {shouldShowDelete && (

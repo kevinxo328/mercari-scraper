@@ -81,9 +81,7 @@ describe('ScraperResultCard', () => {
       />
     );
 
-    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent(
-      '↓ 300 JPY'
-    );
+    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent('300');
   });
 
   it('shows an increase badge when the latest run raised the price so users can distinguish direction', () => {
@@ -97,9 +95,7 @@ describe('ScraperResultCard', () => {
       />
     );
 
-    expect(screen.getByLabelText(/price increased/i)).toHaveTextContent(
-      '↑ 300 JPY'
-    );
+    expect(screen.getByLabelText(/price increased/i)).toHaveTextContent('300');
   });
 
   it('uses the price-change badge when an item is both first-seen and price-changed in the latest run', () => {
@@ -115,8 +111,6 @@ describe('ScraperResultCard', () => {
     );
 
     expect(screen.queryByText(/new/i)).toBeNull();
-    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent(
-      '↓ 300 JPY'
-    );
+    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent('300');
   });
 });
