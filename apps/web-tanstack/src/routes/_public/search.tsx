@@ -21,8 +21,6 @@ import {
   SheetTrigger
 } from '@/components/shadcn/sheet';
 import VirtualResultGrid from '@/components/virtual-result-grid';
-import { useDeleteResult } from '@/hooks/use-delete-result';
-import { useSession } from '@/lib/auth-client';
 import { useTRPC } from '@/router';
 
 const searchSchema = z.object({
@@ -77,7 +75,6 @@ export default function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const mobileFormRef = useRef<HTMLFormElement>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { data: session } = useSession();
   const isHydrated = useHydrated();
   const navigate = useNavigate({ from: Route.fullPath });
   const { keyword, minPrice, maxPrice } = Route.useSearch();
@@ -119,10 +116,6 @@ export default function RouteComponent() {
       }
     )
   );
-  const { deleteResult, isDeleting } = useDeleteResult();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const isAuthenticated = !!session;
   const allItems = infiniteResults?.pages.flatMap((p) => p.data) ?? [];
 
   const triggerSubmit = () => {
@@ -148,21 +141,6 @@ export default function RouteComponent() {
     });
   };
 
-  const handleDelete = async (id: string) => {
-    const shouldDelete = isHydrated
-      ? window.confirm('Are you sure you want to delete this item?')
-      : true;
-
-    if (!shouldDelete) return;
-
-    setDeletingId(id);
-    try {
-      await deleteResult(id);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   return (
     <main className="container relative mx-auto flex gap-4 p-4">
       <div className="grow">
@@ -176,10 +154,6 @@ export default function RouteComponent() {
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
-          isAuthenticated={isAuthenticated}
-          deletingId={deletingId}
-          isDeleting={isDeleting}
-          onDelete={handleDelete}
         />
       </div>
 

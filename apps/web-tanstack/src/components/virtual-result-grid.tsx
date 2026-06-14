@@ -27,10 +27,6 @@ type Props = {
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   fetchNextPage: () => void;
-  isAuthenticated: boolean;
-  deletingId: string | null;
-  isDeleting: boolean;
-  onDelete: (id: string) => void;
   latestRunId?: string;
 };
 
@@ -40,10 +36,6 @@ export default function VirtualResultGrid({
   isFetchingNextPage,
   hasNextPage,
   fetchNextPage,
-  isAuthenticated,
-  deletingId,
-  isDeleting,
-  onDelete,
   latestRunId
 }: Props) {
   const colCount = useColCount();
@@ -121,9 +113,6 @@ export default function VirtualResultGrid({
                   {rowItems.map((result) => (
                     <LinkCard
                       key={result.id ?? result.title + result.url}
-                      showDelete={isAuthenticated}
-                      isDeleting={deletingId === result.id && isDeleting}
-                      onDelete={() => onDelete(result.id)}
                       url={result.url}
                       title={result.title}
                       imageUrl={result.imageUrl}

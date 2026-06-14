@@ -1,5 +1,5 @@
 import { Image } from '@unpic/react';
-import { Trash2, Triangle } from 'lucide-react';
+import { Triangle } from 'lucide-react';
 export type Props = {
   url: string;
   title: string;
@@ -10,14 +10,9 @@ export type Props = {
   firstSeenRunId?: string | null;
   priceChangedRunId?: string | null;
   latestRunId?: string;
-  showDelete?: boolean;
-  isDeleting?: boolean;
-  onDelete?: () => void;
 };
 
 const LinkCard = (props: Props) => {
-  const shouldShowDelete =
-    props.showDelete && typeof props.onDelete === 'function';
   const priceDiff =
     props.latestRunId &&
     props.priceChangedRunId === props.latestRunId &&
@@ -65,22 +60,6 @@ const LinkCard = (props: Props) => {
             />
             {priceBadge.amount}
           </span>
-        )}
-        {shouldShowDelete && (
-          <button
-            type="button"
-            aria-label="Delete item"
-            disabled={props.isDeleting}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              props.onDelete?.();
-            }}
-            className="absolute right-2 top-2 z-10 rounded-md bg-black/60 px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer flex items-center gap-1"
-          >
-            <Trash2 className="h-4 w-4" />
-            {props.isDeleting ? 'Deleting…' : 'Delete'}
-          </button>
         )}
       </div>
       <p className="absolute bottom-2 left-0 bg-gray-700/50 dark:bg-gray-950/80 py-2 px-3 text:lg sm:text-xl font-semibold text-white rounded-r-full">

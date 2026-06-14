@@ -1,15 +1,8 @@
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
-import {
-  createFileRoute,
-  ErrorComponent,
-  useHydrated
-} from '@tanstack/react-router';
-import { useState } from 'react';
+import { createFileRoute, ErrorComponent } from '@tanstack/react-router';
 
 import TimeDisplay from '@/components/time-display';
 import VirtualResultGrid from '@/components/virtual-result-grid';
-import { useDeleteResult } from '@/hooks/use-delete-result';
-import { useSession } from '@/lib/auth-client';
 import { useTRPC } from '@/router';
 
 function Home() {
@@ -17,10 +10,6 @@ function Home() {
   const { data: lastRun } = useSuspenseQuery(
     trpc.scraper.getLastRun.queryOptions()
   );
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const { deleteResult, isDeleting } = useDeleteResult();
-  const { data: session } = useSession();
-  const isHydrated = useHydrated();
 
   const latestUpdateTime = lastRun?.completedAt;
   const latestRunId = lastRun?.id;
@@ -43,21 +32,6 @@ function Home() {
 
   const allItems = infiniteData?.pages.flatMap((p) => p.data) ?? [];
 
-  const isAuthenticated = !!session;
-
-  const handleDelete = async (id: string) => {
-    const shouldDelete = isHydrated
-      ? window.confirm('Are you sure you want to delete this item?')
-      : true;
-    if (!shouldDelete) return;
-    setDeletingId(id);
-    try {
-      await deleteResult(id);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   return (
     <main className="mx-auto p-4 container relative">
       <div className="flex justify-end items-center mb-4">
@@ -73,10 +47,6 @@ function Home() {
         isFetchingNextPage={isFetchingNextPage}
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
-        isAuthenticated={isAuthenticated}
-        deletingId={deletingId}
-        isDeleting={isDeleting}
-        onDelete={handleDelete}
         latestRunId={latestRunId}
       />
     </main>
