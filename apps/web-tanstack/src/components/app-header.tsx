@@ -13,20 +13,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/shadcn/dropdown-menu';
-import { useScroll } from '@/hooks/use-scroll';
 import { signOut, useSession } from '@/lib/auth-client';
-import { cn } from '@/lib/utils';
 
 export default function AppHeader() {
   const session = useSession();
-  const isScrolled = useScroll();
   const location = useLocation();
   const showSearch = !location.pathname.startsWith('/search');
   const navigate = useNavigate();
 
   return (
     <NavBar
-      isScrolled={isScrolled}
       centerSlot={
         showSearch ? <KeywordSearch className="w-full max-w-125" /> : undefined
       }
@@ -35,14 +31,9 @@ export default function AppHeader() {
         <>
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Avatar
-                className={cn(
-                  'transition-all duration-300',
-                  isScrolled ? 'size-6' : 'size-8'
-                )}
-              >
+              <Avatar className="size-8">
                 <AvatarImage src={session.data?.user?.image || undefined} />
-                <AvatarFallback className={isScrolled ? 'text-xs' : 'text-sm'}>
+                <AvatarFallback className="text-sm">
                   {session.data?.user?.name
                     ? session.data.user.name.charAt(0)
                     : 'U'}
