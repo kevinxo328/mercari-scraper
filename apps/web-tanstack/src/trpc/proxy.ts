@@ -26,9 +26,8 @@ function createTrpcProxy(
 
 export const createServerFetch = createServerOnlyFn(
   async (): Promise<typeof fetch> => {
-    const { createServerFetch: createServerFetchImpl } = await import(
-      './proxy.server'
-    );
+    const { createServerFetch: createServerFetchImpl } =
+      await import('./proxy.server');
 
     return createServerFetchImpl();
   }

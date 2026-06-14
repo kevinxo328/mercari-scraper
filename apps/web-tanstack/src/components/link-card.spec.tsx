@@ -55,4 +55,62 @@ describe('ScraperResultCard', () => {
     const deleteButton = screen.getByRole('button', { name: /delete item/i });
     expect(deleteButton).toBeDisabled();
   });
+
+  it('does not show a NEW badge for first-seen items because no top-left badge means newly listed', () => {
+    render(
+      <LinkCard
+        {...props}
+        firstSeenRunId="11111111-1111-1111-1111-111111111111"
+        latestRunId="11111111-1111-1111-1111-111111111111"
+      />
+    );
+
+    expect(screen.queryByText(/new/i)).toBeNull();
+    expect(screen.queryByLabelText(/price decreased/i)).toBeNull();
+    expect(screen.queryByLabelText(/price increased/i)).toBeNull();
+  });
+
+  it('shows a decrease badge when the latest run lowered the price so users can spot discounts', () => {
+    render(
+      <LinkCard
+        {...props}
+        price={1200}
+        previousPrice={1500}
+        priceChangedRunId="11111111-1111-1111-1111-111111111111"
+        latestRunId="11111111-1111-1111-1111-111111111111"
+      />
+    );
+
+    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent('300');
+  });
+
+  it('shows an increase badge when the latest run raised the price so users can distinguish direction', () => {
+    render(
+      <LinkCard
+        {...props}
+        price={1800}
+        previousPrice={1500}
+        priceChangedRunId="11111111-1111-1111-1111-111111111111"
+        latestRunId="11111111-1111-1111-1111-111111111111"
+      />
+    );
+
+    expect(screen.getByLabelText(/price increased/i)).toHaveTextContent('300');
+  });
+
+  it('uses the price-change badge when an item is both first-seen and price-changed in the latest run', () => {
+    render(
+      <LinkCard
+        {...props}
+        price={1200}
+        previousPrice={1500}
+        firstSeenRunId="11111111-1111-1111-1111-111111111111"
+        priceChangedRunId="11111111-1111-1111-1111-111111111111"
+        latestRunId="11111111-1111-1111-1111-111111111111"
+      />
+    );
+
+    expect(screen.queryByText(/new/i)).toBeNull();
+    expect(screen.getByLabelText(/price decreased/i)).toHaveTextContent('300');
+  });
 });

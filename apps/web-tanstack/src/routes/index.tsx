@@ -23,6 +23,7 @@ function Home() {
   const isHydrated = useHydrated();
 
   const latestUpdateTime = lastRun?.completedAt;
+  const latestRunId = lastRun?.id;
   const {
     data: infiniteData,
     fetchNextPage,
@@ -34,7 +35,7 @@ function Home() {
       {
         limit: 48,
         orderby: 'desc',
-        updatedSince: lastRun?.sinceDate ?? undefined
+        changedInRunId: latestRunId
       },
       { getNextPageParam: (lastPage) => lastPage.nextCursor }
     )
@@ -76,6 +77,7 @@ function Home() {
         deletingId={deletingId}
         isDeleting={isDeleting}
         onDelete={handleDelete}
+        latestRunId={latestRunId}
       />
     </main>
   );
@@ -92,7 +94,7 @@ export const Route = createFileRoute('/')({
         {
           limit: 48,
           orderby: 'desc',
-          updatedSince: lastRun?.sinceDate ?? undefined
+          changedInRunId: lastRun?.id
         },
         { getNextPageParam: (lastPage) => lastPage.nextCursor }
       )
