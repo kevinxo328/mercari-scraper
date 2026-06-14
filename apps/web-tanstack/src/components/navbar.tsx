@@ -1,22 +1,14 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 
-import { useScroll } from '@/hooks/use-scroll';
 import { cn } from '@/lib/utils';
 
 type Props = {
   children?: React.ReactNode;
   centerSlot?: React.ReactNode;
-  isScrolled?: boolean;
 };
 
-export const NavBar = ({
-  children,
-  centerSlot,
-  isScrolled: propIsScrolled
-}: Props) => {
-  const internalIsScrolled = useScroll();
-  const isScrolled = propIsScrolled ?? internalIsScrolled;
+export const NavBar = ({ children, centerSlot }: Props) => {
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -35,10 +27,7 @@ export const NavBar = ({
   return (
     <header
       ref={headerRef}
-      className={cn(
-        'sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70',
-        isScrolled ? 'p-2' : 'p-4'
-      )}
+      className="sticky top-0 z-40 border-b px-4 py-2 backdrop-blur-2xl dark:border-gray-800 dark:bg-gray-950/70"
     >
       <div
         className={cn(
@@ -51,12 +40,12 @@ export const NavBar = ({
         <Link to="/" resetScroll className="flex items-center gap-2 shrink-0">
           <svg
             viewBox="0 0 50 49"
-            width={isScrolled ? '24' : '30'}
-            height={isScrolled ? '24' : '30'}
+            width="30"
+            height="30"
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
             role="img"
-            className="transition-all duration-300"
+            className=""
           >
             <g id="mercari-logo">
               <path
@@ -71,14 +60,7 @@ export const NavBar = ({
               ></path>
             </g>
           </svg>
-          <h1
-            className={cn(
-              'font-bold transition-all duration-300 hidden lg:block',
-              isScrolled ? 'text-sm' : 'text-md'
-            )}
-          >
-            Mercari Scraper
-          </h1>
+          <h1 className="font-bold text-md hidden lg:block">Mercari Scraper</h1>
         </Link>
         {centerSlot && <div className="min-w-0">{centerSlot}</div>}
         <div
