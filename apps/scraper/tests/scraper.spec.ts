@@ -10,6 +10,7 @@ import os from 'os';
 import pLimit from 'p-limit';
 import path from 'path';
 
+import { saveScrapedItems } from '../lib/save-results';
 import { getMercariUrl } from '../lib/utils';
 
 function writeResults(data: {
@@ -41,7 +42,8 @@ const VIEWPORT_HEIGHT = 72000;
 async function scrapeKeyword(
   page: Page,
   record: ScraperKeyword,
-  prisma: PrismaClient
+  prisma: PrismaClient,
+  currentRunId: string
 ): Promise<{
   keyword: string;
   foundItems: number;
@@ -164,73 +166,13 @@ async function scrapeKeyword(
         `Scraping keyword: ${record.keyword} - Found ${itemsData.length} items (Unique: ${uniqueItemsData.length})`
       );
 
-      // Fetch existing records for these URLs in a single query to reduce DB roundtrips
-      const urls = uniqueItemsData.map((data) => data.url);
-      const existingRecords = await prisma.scraperResult.findMany({
-        where: { url: { in: urls } },
-        include: { keywords: true }
+      updatedCount = await saveScrapedItems({
+        items: uniqueItemsData,
+        keyword: record,
+        prisma,
+        currentRunId,
+        concurrency: SCRAPE_CONCURRENCY
       });
-
-      const existingRecordsMap = new Map(
-        existingRecords.map((r) => [r.url, r])
-      );
-
-      // Concurrently process DB updates/creates with a concurrency limit
-      const limit = pLimit(SCRAPE_CONCURRENCY);
-      const dbTasks = uniqueItemsData.map((data) =>
-        limit(async () => {
-          const existingRecord = existingRecordsMap.get(data.url);
-
-          if (!existingRecord) {
-            // Use upsert to handle race conditions when the same URL appears
-            // across multiple concurrent keyword scrapes
-            await prisma.scraperResult.upsert({
-              where: { url: data.url },
-              create: {
-                ...data,
-                keywords: {
-                  connect: [{ id: record.id }]
-                }
-              },
-              update: {
-                keywords: {
-                  connect: [{ id: record.id }]
-                }
-              }
-            });
-            return 1; // Count as updated
-          } else {
-            const existingKeywordRelation = existingRecord.keywords.some(
-              (k: { id: string }) => k.id === record.id
-            );
-            if (
-              existingRecord.price !== data.price ||
-              existingRecord.imageUrl !== data.imageUrl ||
-              existingRecord.title !== data.title ||
-              existingRecord.currency !== data.currency ||
-              !existingKeywordRelation
-            ) {
-              await prisma.scraperResult.update({
-                where: { id: existingRecord.id },
-                data: {
-                  title: data.title,
-                  imageUrl: data.imageUrl,
-                  price: data.price,
-                  currency: data.currency,
-                  keywords: {
-                    connect: [{ id: record.id }]
-                  }
-                }
-              });
-              return 1; // Count as updated
-            }
-          }
-          return 0;
-        })
-      );
-
-      const counts = await Promise.all(dbTasks);
-      updatedCount = counts.reduce<number>((sum, n) => sum + n, 0);
     } else {
       console.log(`No items found for keyword: ${record.keyword}`);
       errorMsg = 'No items found';
@@ -273,6 +215,7 @@ test.describe('Scrape Mercari', () => {
       scraperRunId = run.id;
     } catch (e) {
       console.error('Failed to create ScraperRun:', e);
+      throw e;
     }
   });
 
@@ -295,7 +238,10 @@ test.describe('Scrape Mercari', () => {
               height: VIEWPORT_HEIGHT
             });
             try {
-              return await scrapeKeyword(newPage, record, prisma);
+              if (!scraperRunId) {
+                throw new Error('ScraperRun was not created');
+              }
+              return await scrapeKeyword(newPage, record, prisma, scraperRunId);
             } catch (e) {
               console.error(`Error scraping keyword "${record.keyword}": ${e}`);
               return {

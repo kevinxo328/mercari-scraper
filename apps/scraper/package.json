@@ -8,6 +8,7 @@
     "scraper:debug": "playwright test --debug",
     "scraper:ui": "playwright test --ui",
     "scraper:report": "playwright show-report",
+    "test": "tsx --test 'lib/**/*.test.ts'",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

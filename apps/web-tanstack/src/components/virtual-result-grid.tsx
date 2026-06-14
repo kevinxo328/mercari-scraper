@@ -15,7 +15,10 @@ type ResultItem = {
   title: string;
   imageUrl: string;
   price: number;
+  previousPrice: number | null;
   currency: string;
+  firstSeenRunId: string | null;
+  priceChangedRunId: string | null;
 };
 
 type Props = {
@@ -28,6 +31,7 @@ type Props = {
   deletingId: string | null;
   isDeleting: boolean;
   onDelete: (id: string) => void;
+  latestRunId?: string;
 };
 
 export default function VirtualResultGrid({
@@ -39,7 +43,8 @@ export default function VirtualResultGrid({
   isAuthenticated,
   deletingId,
   isDeleting,
-  onDelete
+  onDelete,
+  latestRunId
 }: Props) {
   const colCount = useColCount();
   const isHydrated = useHydrated();
@@ -123,7 +128,11 @@ export default function VirtualResultGrid({
                       title={result.title}
                       imageUrl={result.imageUrl}
                       price={result.price}
+                      previousPrice={result.previousPrice}
                       currency={result.currency}
+                      firstSeenRunId={result.firstSeenRunId}
+                      priceChangedRunId={result.priceChangedRunId}
+                      latestRunId={latestRunId}
                     />
                   ))}
                 </div>

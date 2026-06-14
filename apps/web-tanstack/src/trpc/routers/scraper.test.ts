@@ -5,6 +5,8 @@
 import type { TreeNode } from '@/components/tree-select/types';
 import { buildFlatMap } from '@/components/tree-select/utils';
 
+import { buildInfiniteResultBaseFilters } from './scraper';
+
 // Minimal fixture that mirrors the raw mercari-categories.json shape
 const RAW_TREE = [
   {
@@ -70,5 +72,28 @@ describe('getCategories transformation', () => {
       'Ladieswear',
       'トップス'
     ]);
+  });
+});
+
+describe('infiniteResults filters', () => {
+  it('filters by first-seen or price-change run so non-price edits are excluded from the homepage', () => {
+    const runId = '11111111-1111-1111-1111-111111111111';
+
+    expect(
+      buildInfiniteResultBaseFilters({ changedInRunId: runId })
+    ).toMatchObject({
+      OR: [{ firstSeenRunId: runId }, { priceChangedRunId: runId }]
+    });
+  });
+
+  it('prefers changedInRunId over updatedSince because homepage changes are run-based, not time-based', () => {
+    const runId = '11111111-1111-1111-1111-111111111111';
+
+    expect(
+      buildInfiniteResultBaseFilters({
+        changedInRunId: runId,
+        updatedSince: new Date('2026-06-13T00:00:00.000Z')
+      })
+    ).not.toHaveProperty('updatedAt');
   });
 });

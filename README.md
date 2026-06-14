@@ -34,7 +34,7 @@ This project uses [Supabase](https://supabase.com/) as the database backend. Cre
 
 ```sql
 DELETE FROM "ScraperResult"
-WHERE "updatedAt" < NOW() - INTERVAL '7 days';
+WHERE "updatedAt" < NOW() - INTERVAL '14 days';
 ```
 
 ### 3. Setup environment variables

@@ -4,6 +4,30 @@ import { z } from 'zod';
 
 import { procedure, protectedProcedure, router } from '../setup';
 
+export function buildInfiniteResultBaseFilters(input: {
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  updatedSince?: Date;
+  changedInRunId?: string;
+}) {
+  const baseFilters: Record<string, any> = {};
+  if (input.minPrice != null || input.maxPrice != null) {
+    baseFilters.price = {
+      ...(input.minPrice != null && { gte: input.minPrice }),
+      ...(input.maxPrice != null && { lte: input.maxPrice })
+    };
+  }
+  if (input.changedInRunId) {
+    baseFilters.OR = [
+      { firstSeenRunId: input.changedInRunId },
+      { priceChangedRunId: input.changedInRunId }
+    ];
+  } else if (input.updatedSince) {
+    baseFilters.updatedAt = { gte: input.updatedSince };
+  }
+  return baseFilters;
+}
+
 export const scraperRouter = router({
   getKeywords: procedure
     .input(
@@ -113,6 +137,7 @@ export const scraperRouter = router({
         maxPrice: z.number().min(0).nullish(),
         keywords: z.array(z.string()).optional(),
         updatedSince: z.date().optional(),
+        changedInRunId: z.string().uuid().optional(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().nullish(),
         orderby: z.enum(['asc', 'desc']).default('desc')
@@ -122,16 +147,7 @@ export const scraperRouter = router({
       const { db } = ctx;
 
       // Build price/date filters (no keywords here — handled per phase)
-      const baseFilters: Record<string, any> = {};
-      if (input.minPrice != null || input.maxPrice != null) {
-        baseFilters.price = {
-          ...(input.minPrice != null && { gte: input.minPrice }),
-          ...(input.maxPrice != null && { lte: input.maxPrice })
-        };
-      }
-      if (input.updatedSince) {
-        baseFilters.updatedAt = { gte: input.updatedSince };
-      }
+      const baseFilters = buildInfiniteResultBaseFilters(input);
 
       const keywordIds =
         input.keywords && input.keywords.length > 0

@@ -5,7 +5,11 @@ export type Props = {
   title: string;
   imageUrl: string;
   price: number;
+  previousPrice?: number | null;
   currency: string;
+  firstSeenRunId?: string | null;
+  priceChangedRunId?: string | null;
+  latestRunId?: string;
   showDelete?: boolean;
   isDeleting?: boolean;
   onDelete?: () => void;
@@ -14,6 +18,23 @@ export type Props = {
 const LinkCard = (props: Props) => {
   const shouldShowDelete =
     props.showDelete && typeof props.onDelete === 'function';
+  const priceDiff =
+    props.latestRunId &&
+    props.priceChangedRunId === props.latestRunId &&
+    props.previousPrice != null
+      ? props.price - props.previousPrice
+      : 0;
+  const priceBadge =
+    priceDiff === 0
+      ? null
+      : {
+          direction: priceDiff < 0 ? 'down' : 'up',
+          text: `${priceDiff < 0 ? '↓' : '↑'} ${Math.abs(priceDiff).toLocaleString()} ${props.currency}`,
+          className:
+            priceDiff < 0
+              ? 'bg-emerald-600/90 text-white'
+              : 'bg-rose-600/90 text-white'
+        };
 
   return (
     <a
@@ -30,6 +51,18 @@ const LinkCard = (props: Props) => {
           src={props.imageUrl}
           alt={props.title}
         />
+        {priceBadge && (
+          <span
+            aria-label={
+              priceBadge.direction === 'down'
+                ? 'Price decreased'
+                : 'Price increased'
+            }
+            className={`absolute left-2 top-2 z-10 rounded-md px-2 py-1 text-xs font-semibold shadow-sm ${priceBadge.className}`}
+          >
+            {priceBadge.text}
+          </span>
+        )}
         {shouldShowDelete && (
           <button
             type="button"

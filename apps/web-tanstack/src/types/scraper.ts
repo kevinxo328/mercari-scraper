@@ -2,9 +2,13 @@ export type ScraperResult = {
   id: string;
   title: string;
   price: number;
+  previousPrice: number | null;
   imageUrl: string;
   url: string;
   currency: string;
+  firstSeenRunId: string | null;
+  priceChangedAt: Date | null;
+  priceChangedRunId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
