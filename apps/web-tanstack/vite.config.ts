@@ -37,9 +37,13 @@ export default defineConfig({
   },
   plugins: [
     VitePWA({
-      registerType: 'autoUpdate',
+      injectRegister: false,
+      registerType: 'prompt',
       outDir: '.output/public',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      workbox: {
+        navigateFallback: null
+      },
       manifest: {
         name: 'Mercari Scraper',
         short_name: 'Mercari Scraper',
