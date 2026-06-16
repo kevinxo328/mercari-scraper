@@ -18,6 +18,20 @@ const reactCompilerBabelOptions = {
   presets: [reactCompilerPreset()]
 };
 
+const isVercelBuild = process.env.VERCEL === '1';
+const pwaOutDir = isVercelBuild ? '.vercel/output/static' : '.output/public';
+const noStoreHeaders = {
+  'Cache-Control': 'no-cache, no-store, must-revalidate'
+};
+const securityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+};
+
 export default defineConfig({
   resolve: {
     tsconfigPaths: true
@@ -39,7 +53,7 @@ export default defineConfig({
     VitePWA({
       injectRegister: false,
       registerType: 'prompt',
-      outDir: '.output/public',
+      outDir: pwaOutDir,
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       workbox: {
         navigateFallback: null
@@ -74,6 +88,13 @@ export default defineConfig({
       }
     }),
     nitro({
+      preset: isVercelBuild ? 'vercel' : 'node-server',
+      routeRules: {
+        '/sw.js': { headers: noStoreHeaders },
+        '/registerSW.js': { headers: noStoreHeaders },
+        '/manifest.webmanifest': { headers: noStoreHeaders },
+        '/**': { headers: securityHeaders }
+      },
       unenv: {}
     }),
     // plugin-react v6: JSX transform and Fast Refresh are handled by Oxc (no Babel).

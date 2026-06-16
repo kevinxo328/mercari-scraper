@@ -31,7 +31,9 @@ const PublicSearchRoute = PublicSearchRouteImport.update({
   id: '/_public/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_public/search.lazy').then((d) => d.Route),
+)
 const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
