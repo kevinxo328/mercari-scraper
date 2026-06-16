@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { lazy, Suspense } from 'react';
 
-import KeywordSearch from '@/components/keyword-search';
 import NavBar from '@/components/navbar';
 import {
   Avatar,
@@ -15,6 +15,8 @@ import {
 } from '@/components/shadcn/dropdown-menu';
 import { signOut, useSession } from '@/lib/auth-client';
 
+const KeywordSearch = lazy(() => import('@/components/keyword-search'));
+
 export default function AppHeader() {
   const session = useSession();
   const location = useLocation();
@@ -24,7 +26,11 @@ export default function AppHeader() {
   return (
     <NavBar
       centerSlot={
-        showSearch ? <KeywordSearch className="w-full max-w-125" /> : undefined
+        showSearch ? (
+          <Suspense fallback={<div className="h-9 w-full max-w-125" />}>
+            <KeywordSearch className="w-full max-w-125" />
+          </Suspense>
+        ) : undefined
       }
     >
       {session.data ? (
