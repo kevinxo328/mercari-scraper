@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Star } from 'lucide-react';
 import { useEffect } from 'react';
 import { ControllerRenderProps, useForm } from 'react-hook-form';
-import { z } from 'zod/v3';
+import { z } from 'zod';
 
 import { Button } from '../shadcn/button';
 import {
