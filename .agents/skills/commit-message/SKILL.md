@@ -2,13 +2,16 @@
 name: commit-message
 description: >-
   Write high-quality Git commit messages following the Conventional Commits specification.
-  Use this skill whenever the user provides a git diff, describes code changes, or asks
-  for help writing a commit message. Triggers include: write a commit, commit message,
-  git commit, how do I commit this, what should my commit say, or when the user pastes
-  a diff or describes what they changed. Always use this skill proactively, even if the
-  user just describes what they changed without explicitly asking for a commit message.
+  Use this skill whenever the user commits code, provides a git diff, describes code
+  changes, or asks for help writing a commit message. Triggers include: commit,
+  commit files, commit staged files, commit all, commit changes, commit this,
+  write a commit, commit message, git commit, git add and commit, stage and commit,
+  how do I commit this, what should my commit say, or when the user pastes a diff or
+  describes what they changed. Always use this skill proactively when the user is about
+  to commit — even if they only describe what changed or simply say "commit" without
+  explicitly asking for a message.
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Commit Message Skill
