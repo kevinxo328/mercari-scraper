@@ -5,7 +5,7 @@
       "source": "kevinxo328/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/commit-message/SKILL.md",
-      "computedHash": "55528d1f494ddf2ee8d0b11939bfa80ddd70cda40ef6ec7c1ceb4b3b5e1e35f4"
+      "computedHash": "293a8d4456ee3aa52fa8de60c28d04978b9e2215842d63ed7c9241dc72e3c6ff"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

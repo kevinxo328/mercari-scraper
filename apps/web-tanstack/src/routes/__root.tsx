@@ -79,10 +79,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'yes'
       },
       {
-        name: 'apple-mobile-web-app-status-bar-style',
-        content: 'black-translucent'
-      },
-      {
         name: 'apple-mobile-web-app-title',
         content: 'Mercari Scraper'
       }
@@ -116,7 +112,7 @@ function RootLayout() {
   useScraperForegroundRefresh();
 
   return (
-    <html lang="en" className="dark" style={{ backgroundColor: '#030712' }}>
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
