@@ -1,6 +1,13 @@
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
+function isStandalonePwa() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    ('standalone' in navigator && navigator.standalone === true)
+  );
+}
+
 export function usePwaUpdatePrompt() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) {
@@ -11,6 +18,10 @@ export function usePwaUpdatePrompt() {
     let hasPrompted = false;
 
     const promptForUpdate = (worker: ServiceWorker) => {
+      if (!isStandalonePwa()) {
+        return;
+      }
+
       if (isDisposed) {
         return;
       }
