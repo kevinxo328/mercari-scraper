@@ -1,34 +1,37 @@
 ---
 name: commit-message
 description: >-
-  Write high-quality Git commit messages following the Conventional Commits specification.
-  Use this skill whenever the user commits code, provides a git diff, describes code
-  changes, or asks for help writing a commit message. Triggers include: commit,
-  commit files, commit staged files, commit all, commit changes, commit this,
-  write a commit, commit message, git commit, git add and commit, stage and commit,
-  how do I commit this, what should my commit say, or when the user pastes a diff or
-  describes what they changed. Always use this skill proactively when the user is about
-  to commit — even if they only describe what changed or simply say "commit" without
-  explicitly asking for a message.
+  Write Conventional Commit messages. Use when the user asks to draft or revise a
+  commit message, asks to commit changes, or supplies a diff or change description
+  specifically for creating a commit message.
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # Commit Message Skill
 
-Write commit messages following Conventional Commits v1.0.0. Always capture **What** changed and **Why** — not just a summary of the diff.
+Write a Conventional Commit message from verified change context. The description states **What** changed. Add a body when the motivation, previous behavior, or trade-off is not evident from the description.
+
+## Workflow
+
+1. Establish the intended change set from the user's request, supplied diff, or repository state. When a repository is available, inspect the relevant diff and recent commit subjects before choosing wording.
+2. Classify the primary intent, scope, breaking change, and supported footers. Account for every changed concern; flag unrelated concerns and suggest separate commits.
+3. Draft only claims supported by the request or inspected changes. If missing information would change the type, breaking-change status, or rationale, ask one focused question. Otherwise state the assumption and keep the draft conservative.
+4. Validate the result against the format, the project's recent conventions, and the style rules below.
+
+Completion criterion: every claim is evidence-backed, the type matches the primary intent, every changed concern is accounted for, and the output is a ready-to-copy message.
 
 ## Format
 
 ```
-<type>[optional scope]: <subject>
+<type>[optional scope]: <description>
 
 [optional body]
 
 [optional footer(s)]
 ```
 
-**type** (required):
+**type** (required). The following are common defaults, not an exhaustive Conventional Commits list:
 
 | Type       | Description                    |
 | ---------- | ------------------------------ |
@@ -44,11 +47,11 @@ Write commit messages following Conventional Commits v1.0.0. Always capture **Wh
 | `ci`       | CI/CD pipeline changes         |
 | `build`    | Build system changes           |
 
-**scope** (optional) — area affected, e.g. `auth`, `api`, `db`, or package name in a monorepo.
+**scope** (optional) — area affected, e.g. `auth`, `api`, `db`, or package name in a monorepo. Prefer the repository's established scope names.
 
-**subject** (required) — max 50 chars, imperative mood (`add` not `added`), no trailing period.
+**description** (required) — short, specific summary. As the repository default style, keep it under 50 characters, use imperative mood (`add` not `added`), and omit a trailing period unless the repository uses another convention.
 
-**body** (optional) — blank line after subject, wrap at 72 chars. Explain _why_, not just what.
+**body** (optional) — begin after one blank line. As the repository default style, wrap at 72 characters and explain motivation or context rather than repeating the description.
 
 **footer** (optional) — issue refs (`Closes #123`), or breaking changes:
 
@@ -57,15 +60,12 @@ Write commit messages following Conventional Commits v1.0.0. Always capture **Wh
 
 ## Output Rules
 
-1. Draft the commit message.
-2. **Strip AI signatures** — pipe the draft through `strip-ai-signature.sh` before presenting it:
+1. Present the message in a code block.
+2. When cleaning an existing message or running a commit hook, strip recognized AI signatures with `strip-ai-signature.sh`:
    ```bash
    echo "$MSG" | ./skills/commit-message/strip-ai-signature.sh
    ```
-   This removes `Co-Authored-By:` lines for Claude, Copilot, GPT, Gemini, and Anthropic.
-3. Output the cleaned message in a code block.
-4. If context is insufficient, produce a best-guess then ask for adjustments.
-5. If changes cover unrelated concerns, flag it and suggest splitting into separate commits.
+   This removes `Co-Authored-By:` trailer lines naming Claude, Copilot, GPT, Gemini, or Anthropic. Newly drafted messages should contain only relevant trailers supported by the request.
 
 ## Examples
 
