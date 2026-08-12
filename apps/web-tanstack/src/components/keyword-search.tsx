@@ -14,11 +14,18 @@ import {
 import { cn } from '@/lib/utils';
 import { useTRPC } from '@/router';
 
-export default function KeywordSearch({ className }: { className?: string }) {
+type Props = {
+  className?: string;
+  selectedKeyword?: string;
+};
+
+export default function KeywordSearch({ className, selectedKeyword }: Props) {
   const trpc = useTRPC();
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(
+    selectedKeyword ?? null
+  );
   const [open, setOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileFilter, setMobileFilter] = useState('');
@@ -71,7 +78,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
 
   const handleSelect = (keyword: string) => {
     setSelected(keyword);
-    setFilterText(keyword);
+    setFilterText('');
     search(keyword);
   };
 
@@ -170,7 +177,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
       >
         <div className="flex items-center gap-1 border rounded-md px-2 bg-background h-9">
           <CommandPrimitive.Input
-            value={filterText}
+            value={filterText || selected || ''}
             onValueChange={(v) => {
               setFilterText(v);
               setSelected(null);
@@ -186,7 +193,7 @@ export default function KeywordSearch({ className }: { className?: string }) {
             placeholder="Search"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
           />
-          {filterText && (
+          {(filterText || selected) && (
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleClear}

@@ -20,17 +20,18 @@ const KeywordSearch = lazy(() => import('@/components/keyword-search'));
 export default function AppHeader() {
   const session = useSession();
   const location = useLocation();
-  const showSearch = !location.pathname.startsWith('/search');
   const navigate = useNavigate();
 
   return (
     <NavBar
       centerSlot={
-        showSearch ? (
-          <Suspense fallback={<div className="h-9 w-full max-w-125" />}>
-            <KeywordSearch className="w-full max-w-125" />
-          </Suspense>
-        ) : undefined
+        <Suspense fallback={<div className="h-9 w-full max-w-125" />}>
+          <KeywordSearch
+            key={location.href}
+            className="w-full max-w-125"
+            selectedKeyword={location.search.keyword}
+          />
+        </Suspense>
       }
     >
       {session.data ? (
