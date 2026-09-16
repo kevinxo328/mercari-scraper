@@ -10,6 +10,7 @@ import os from 'os';
 import pLimit from 'p-limit';
 import path from 'path';
 
+import { getMercariImageUrl, parseMercariPrice } from '../lib/parse-item';
 import { saveScrapedItems } from '../lib/save-results';
 import { getMercariUrl } from '../lib/utils';
 
@@ -38,6 +39,8 @@ const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
 const VIEWPORT_WIDTH = 1280;
 const VIEWPORT_HEIGHT = 72000;
+const ITEM_CELL_SELECTOR =
+  '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])';
 
 async function scrapeKeyword(
   page: Page,
@@ -57,10 +60,9 @@ async function scrapeKeyword(
   let errorMsg: string | undefined;
 
   try {
-    // Block images to speed up the loading time.
+    // Block non-data resources to speed up loading while keeping image URLs available.
     await page.route('**/*', (route) => {
-      return route.request().resourceType() === 'image' ||
-        route.request().resourceType() === 'media' ||
+      return route.request().resourceType() === 'media' ||
         route.request().resourceType() === 'font'
         ? route.abort()
         : route.continue();
@@ -106,25 +108,52 @@ async function scrapeKeyword(
 
     // Wait for items to appear, or timeout if none exist
     await page
-      .waitForSelector(
-        '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])',
-        { timeout: 15000 }
-      )
+      .waitForSelector(ITEM_CELL_SELECTOR, { timeout: 15000 })
       .catch(() => {});
 
+    // Bring each loaded item card into view so lazy-loading can assign its image URL.
+    await page.evaluate(async (selector) => {
+      const cells = Array.from(document.querySelectorAll(selector));
+      for (const cell of cells) {
+        cell.scrollIntoView({ block: 'center' });
+        await new Promise(requestAnimationFrame);
+      }
+    }, ITEM_CELL_SELECTOR);
+
+    // Do not extract until every loaded item has a real image source in the DOM.
+    await page.waitForFunction(
+      (selector) => {
+        const cells = document.querySelectorAll(selector);
+        return (
+          cells.length > 0 &&
+          Array.from(cells).every((cell) => {
+            const image = cell.querySelector('img');
+            const sources = [
+              image?.currentSrc,
+              image?.getAttribute('src'),
+              image?.getAttribute('data-src'),
+              image?.getAttribute('srcset'),
+              image?.getAttribute('data-srcset')
+            ];
+            return sources.some(
+              (source) =>
+                source &&
+                !source.startsWith('data:') &&
+                !source.startsWith('blob:')
+            );
+          })
+        );
+      },
+      ITEM_CELL_SELECTOR,
+      { timeout: 15000 }
+    );
+
     // Extract all item data via a single browser-side evaluation to reduce Playwright RPC overhead
-    const itemsData = await page.$$eval(
-      '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])',
+    const rawItemsData = await page.$$eval(
+      ITEM_CELL_SELECTOR,
       (cells, maxCount) => {
         const mercariHost = 'https://jp.mercari.com';
         return cells.slice(0, maxCount).map((cell) => {
-          const ariaLabel =
-            cell.querySelector('[itemtype]')?.getAttribute('aria-label') || '';
-          const yenMatch = ariaLabel.match(/(\d[\d,]*)円/);
-          const price = yenMatch
-            ? parseInt(yenMatch[1].replace(/,/g, ''), 10)
-            : -1;
-
           const title =
             cell
               .querySelector('[data-testid="thumbnail-item-name"]')
@@ -133,19 +162,35 @@ async function scrapeKeyword(
             cell
               .querySelector('[data-testid="thumbnail-link"]')
               ?.getAttribute('href') || '';
-          const imageUrl = cell.querySelector('img')?.getAttribute('src') || '';
+          const image = cell.querySelector('img');
 
           return {
             title,
             url: mercariHost + link,
-            imageUrl,
-            price,
-            currency: yenMatch ? 'JPY' : ''
+            priceText:
+              cell
+                .querySelector('[data-testid="item-tile-price"]')
+                ?.textContent?.trim() || '',
+            image: {
+              currentSrc: image?.currentSrc || '',
+              src: image?.getAttribute('src') || '',
+              dataSrc: image?.getAttribute('data-src') || '',
+              srcset:
+                image?.getAttribute('srcset') ||
+                image?.getAttribute('data-srcset') ||
+                ''
+            }
           };
         });
       },
       MAX_ITEM_COUNT
     );
+    const itemsData = rawItemsData.map((item) => ({
+      title: item.title,
+      url: item.url,
+      imageUrl: getMercariImageUrl(item.image),
+      ...parseMercariPrice(item.priceText)
+    }));
 
     // Release the page early to free up browser resources for other concurrent tasks
     await page.close();
