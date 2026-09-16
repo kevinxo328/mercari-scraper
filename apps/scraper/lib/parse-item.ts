@@ -27,7 +27,10 @@ export function getMercariImageUrl(attributes: MercariImageAttributes) {
     attributes.currentSrc,
     attributes.src,
     attributes.dataSrc
-  ].find((source) => source?.trim());
+  ].find((source) => {
+    const value = source?.trim();
+    return value && !value.startsWith('data:') && !value.startsWith('blob:');
+  });
 
   if (directSource) return directSource.trim();
 
@@ -36,5 +39,8 @@ export function getMercariImageUrl(attributes: MercariImageAttributes) {
     ?.trim()
     .split(/\s+/)[0];
 
-  return firstSrcsetSource || '';
+  return firstSrcsetSource?.startsWith('data:') ||
+    firstSrcsetSource?.startsWith('blob:')
+    ? ''
+    : firstSrcsetSource || '';
 }

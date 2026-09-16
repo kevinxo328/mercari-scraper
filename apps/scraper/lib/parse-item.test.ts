@@ -34,6 +34,16 @@ describe('getMercariImageUrl', () => {
     );
   });
 
+  it('ignores placeholder URLs when a real image source is available', () => {
+    assert.equal(
+      getMercariImageUrl({
+        currentSrc: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP',
+        src: 'https://static.mercdn.net/thumb/item/webp/m123_1.jpg'
+      }),
+      'https://static.mercdn.net/thumb/item/webp/m123_1.jpg'
+    );
+  });
+
   it('falls back to lazy-loading attributes when src is not populated', () => {
     assert.equal(
       getMercariImageUrl({

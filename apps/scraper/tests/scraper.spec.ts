@@ -39,6 +39,8 @@ const MAX_ITEM_COUNT = 100;
 const SCRAPE_CONCURRENCY = parseInt(process.env.SCRAPE_CONCURRENCY ?? '2', 10);
 const VIEWPORT_WIDTH = 1280;
 const VIEWPORT_HEIGHT = 72000;
+const ITEM_CELL_SELECTOR =
+  '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])';
 
 async function scrapeKeyword(
   page: Page,
@@ -106,15 +108,49 @@ async function scrapeKeyword(
 
     // Wait for items to appear, or timeout if none exist
     await page
-      .waitForSelector(
-        '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])',
-        { timeout: 15000 }
-      )
+      .waitForSelector(ITEM_CELL_SELECTOR, { timeout: 15000 })
       .catch(() => {});
+
+    // Bring each loaded item card into view so lazy-loading can assign its image URL.
+    await page.evaluate(async (selector) => {
+      const cells = Array.from(document.querySelectorAll(selector));
+      for (const cell of cells) {
+        cell.scrollIntoView({ block: 'center' });
+        await new Promise(requestAnimationFrame);
+      }
+    }, ITEM_CELL_SELECTOR);
+
+    // Do not extract until every loaded item has a real image source in the DOM.
+    await page.waitForFunction(
+      (selector) => {
+        const cells = document.querySelectorAll(selector);
+        return (
+          cells.length > 0 &&
+          Array.from(cells).every((cell) => {
+            const image = cell.querySelector('img');
+            const sources = [
+              image?.currentSrc,
+              image?.getAttribute('src'),
+              image?.getAttribute('data-src'),
+              image?.getAttribute('srcset'),
+              image?.getAttribute('data-srcset')
+            ];
+            return sources.some(
+              (source) =>
+                source &&
+                !source.startsWith('data:') &&
+                !source.startsWith('blob:')
+            );
+          })
+        );
+      },
+      ITEM_CELL_SELECTOR,
+      { timeout: 15000 }
+    );
 
     // Extract all item data via a single browser-side evaluation to reduce Playwright RPC overhead
     const rawItemsData = await page.$$eval(
-      '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])',
+      ITEM_CELL_SELECTOR,
       (cells, maxCount) => {
         const mercariHost = 'https://jp.mercari.com';
         return cells.slice(0, maxCount).map((cell) => {
