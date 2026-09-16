@@ -10,6 +10,7 @@ import os from 'os';
 import pLimit from 'p-limit';
 import path from 'path';
 
+import { getMercariImageUrl, parseMercariPrice } from '../lib/parse-item';
 import { saveScrapedItems } from '../lib/save-results';
 import { getMercariUrl } from '../lib/utils';
 
@@ -57,10 +58,9 @@ async function scrapeKeyword(
   let errorMsg: string | undefined;
 
   try {
-    // Block images to speed up the loading time.
+    // Block non-data resources to speed up loading while keeping image URLs available.
     await page.route('**/*', (route) => {
-      return route.request().resourceType() === 'image' ||
-        route.request().resourceType() === 'media' ||
+      return route.request().resourceType() === 'media' ||
         route.request().resourceType() === 'font'
         ? route.abort()
         : route.continue();
@@ -113,18 +113,11 @@ async function scrapeKeyword(
       .catch(() => {});
 
     // Extract all item data via a single browser-side evaluation to reduce Playwright RPC overhead
-    const itemsData = await page.$$eval(
+    const rawItemsData = await page.$$eval(
       '[data-testid="item-cell"]:has([data-testid="thumbnail-link"])',
       (cells, maxCount) => {
         const mercariHost = 'https://jp.mercari.com';
         return cells.slice(0, maxCount).map((cell) => {
-          const ariaLabel =
-            cell.querySelector('[itemtype]')?.getAttribute('aria-label') || '';
-          const yenMatch = ariaLabel.match(/(\d[\d,]*)円/);
-          const price = yenMatch
-            ? parseInt(yenMatch[1].replace(/,/g, ''), 10)
-            : -1;
-
           const title =
             cell
               .querySelector('[data-testid="thumbnail-item-name"]')
@@ -133,19 +126,35 @@ async function scrapeKeyword(
             cell
               .querySelector('[data-testid="thumbnail-link"]')
               ?.getAttribute('href') || '';
-          const imageUrl = cell.querySelector('img')?.getAttribute('src') || '';
+          const image = cell.querySelector('img');
 
           return {
             title,
             url: mercariHost + link,
-            imageUrl,
-            price,
-            currency: yenMatch ? 'JPY' : ''
+            priceText:
+              cell
+                .querySelector('[data-testid="item-tile-price"]')
+                ?.textContent?.trim() || '',
+            image: {
+              currentSrc: image?.currentSrc || '',
+              src: image?.getAttribute('src') || '',
+              dataSrc: image?.getAttribute('data-src') || '',
+              srcset:
+                image?.getAttribute('srcset') ||
+                image?.getAttribute('data-srcset') ||
+                ''
+            }
           };
         });
       },
       MAX_ITEM_COUNT
     );
+    const itemsData = rawItemsData.map((item) => ({
+      title: item.title,
+      url: item.url,
+      imageUrl: getMercariImageUrl(item.image),
+      ...parseMercariPrice(item.priceText)
+    }));
 
     // Release the page early to free up browser resources for other concurrent tasks
     await page.close();
