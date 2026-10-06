@@ -9,23 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PublicSearchRouteImport } from './routes/_public/search'
+import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
-import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
-import { Route as ApiAuthErrorRouteImport } from './routes/api/auth/error'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as PublicSearchRouteImport } from './routes/_public/search'
 import { Route as PublicAuthLoginRouteImport } from './routes/_public/auth/login'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAuthErrorRouteImport } from './routes/api/auth/error'
+import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/_protected',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 const PublicSearchRoute = PublicSearchRouteImport.update({
   id: '/_public/search',
@@ -34,19 +39,9 @@ const PublicSearchRoute = PublicSearchRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_public/search.lazy').then((d) => d.Route),
 )
-const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => ProtectedRoute,
-} as any)
-const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
-  id: '/api/trpc/$',
-  path: '/api/trpc/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthErrorRoute = ApiAuthErrorRouteImport.update({
-  id: '/api/auth/error',
-  path: '/api/auth/error',
+const PublicAuthLoginRoute = PublicAuthLoginRouteImport.update({
+  id: '/_public/auth/login',
+  path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -54,9 +49,14 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicAuthLoginRoute = PublicAuthLoginRouteImport.update({
-  id: '/_public/auth/login',
-  path: '/auth/login',
+const ApiAuthErrorRoute = ApiAuthErrorRouteImport.update({
+  id: '/api/auth/error',
+  path: '/api/auth/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
+  id: '/api/trpc/$',
+  path: '/api/trpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -132,13 +132,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_protected': {
-      id: '/_protected'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -146,11 +139,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_public/search': {
-      id: '/_public/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof PublicSearchRouteImport
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/dashboard': {
@@ -160,18 +153,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/api/trpc/$': {
-      id: '/api/trpc/$'
-      path: '/api/trpc/$'
-      fullPath: '/api/trpc/$'
-      preLoaderRoute: typeof ApiTrpcSplatRouteImport
+    '/_public/search': {
+      id: '/_public/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof PublicSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/error': {
-      id: '/api/auth/error'
-      path: '/api/auth/error'
-      fullPath: '/api/auth/error'
-      preLoaderRoute: typeof ApiAuthErrorRouteImport
+    '/_public/auth/login': {
+      id: '/_public/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof PublicAuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -181,11 +174,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_public/auth/login': {
-      id: '/_public/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof PublicAuthLoginRouteImport
+    '/api/auth/error': {
+      id: '/api/auth/error'
+      path: '/api/auth/error'
+      fullPath: '/api/auth/error'
+      preLoaderRoute: typeof ApiAuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/trpc/$': {
+      id: '/api/trpc/$'
+      path: '/api/trpc/$'
+      fullPath: '/api/trpc/$'
+      preLoaderRoute: typeof ApiTrpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
