@@ -18,24 +18,17 @@ describe('parseMercariPrice', () => {
     });
   });
 
-  it('parses the localized Taiwan dollar price format', () => {
+  it('rejects localized Taiwan dollar prices', () => {
     assert.deepEqual(parseMercariPrice('NT$2,398'), {
-      price: 2398,
-      currency: 'TWD'
+      price: -1,
+      currency: ''
     });
   });
 
-  it('parses prices without a visible currency symbol as yen', () => {
-    assert.deepEqual(parseMercariPrice('2,398'), {
-      price: 2398,
-      currency: 'JPY'
-    });
-  });
-
-  it('parses other localized currency prefixes', () => {
-    assert.deepEqual(parseMercariPrice('US$12,398'), {
-      price: 12398,
-      currency: 'USD'
+  it('rejects converted prices because the scraper stores Japanese yen', () => {
+    assert.deepEqual(parseMercariPrice('US$65.07'), {
+      price: -1,
+      currency: ''
     });
   });
 

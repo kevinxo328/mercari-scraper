@@ -101,9 +101,9 @@ describe('saveScrapedItems', () => {
           { ...item, url: `${item.url}-missing-image`, imageUrl: '' },
           {
             ...item,
-            url: `${item.url}-missing-price`,
-            price: -1,
-            currency: ''
+            url: `${item.url}-converted-price`,
+            price: 65,
+            currency: 'USD'
           }
         ],
         keyword,

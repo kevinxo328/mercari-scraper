@@ -60,6 +60,15 @@ async function scrapeKeyword(
   let errorMsg: string | undefined;
 
   try {
+    await page.context().addCookies([
+      {
+        name: 'country_code',
+        value: 'JP',
+        domain: '.mercari.com',
+        path: '/'
+      }
+    ]);
+
     // Block non-data resources to speed up loading while keeping image URLs available.
     await page.route('**/*', (route) => {
       return route.request().resourceType() === 'media' ||
