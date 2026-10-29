@@ -28,6 +28,13 @@ export function buildInfiniteResultBaseFilters(input: {
   return baseFilters;
 }
 
+export function buildLastRunWhere() {
+  return {
+    completedAt: { not: null },
+    successfulKeywordCount: { gt: 0 }
+  };
+}
+
 export const scraperRouter = router({
   getKeywords: procedure
     .input(
@@ -368,7 +375,7 @@ export const scraperRouter = router({
   }),
   getLastRun: procedure.query(async ({ ctx }) => {
     const runs = await ctx.db.scraperRun.findMany({
-      where: { completedAt: { not: null } },
+      where: buildLastRunWhere(),
       orderBy: { completedAt: 'desc' },
       take: 2
     });

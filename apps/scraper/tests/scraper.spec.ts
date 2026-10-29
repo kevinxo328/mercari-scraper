@@ -343,6 +343,7 @@ test.describe('Scrape Mercari', () => {
       const updatedCount = results.reduce((sum, r) => sum + r.updatedItems, 0);
       const totalFound = results.reduce((sum, r) => sum + r.foundItems, 0);
       const totalUnique = results.reduce((sum, r) => sum + r.uniqueItems, 0);
+      const successfulKeywordCount = results.filter((r) => !r.error).length;
       const failedKeywords = results
         .filter((r) => r.error)
         .map((r) => `${r.keyword} (${r.error})`);
@@ -359,11 +360,19 @@ test.describe('Scrape Mercari', () => {
       if (scraperRunId) {
         await prisma.scraperRun.update({
           where: { id: scraperRunId },
-          data: { completedAt: new Date(), updatedCount }
+          data: {
+            completedAt: new Date(),
+            updatedCount,
+            successfulKeywordCount
+          }
         });
       } else {
         await prisma.scraperRun.create({
-          data: { completedAt: new Date(), updatedCount }
+          data: {
+            completedAt: new Date(),
+            updatedCount,
+            successfulKeywordCount
+          }
         });
       }
 
