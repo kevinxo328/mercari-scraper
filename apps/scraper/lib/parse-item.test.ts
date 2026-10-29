@@ -18,6 +18,20 @@ describe('parseMercariPrice', () => {
     });
   });
 
+  it('rejects localized Taiwan dollar prices', () => {
+    assert.deepEqual(parseMercariPrice('NT$2,398'), {
+      price: -1,
+      currency: ''
+    });
+  });
+
+  it('rejects converted prices because the scraper stores Japanese yen', () => {
+    assert.deepEqual(parseMercariPrice('US$65.07'), {
+      price: -1,
+      currency: ''
+    });
+  });
+
   it('returns an invalid price when no yen amount is present', () => {
     assert.deepEqual(parseMercariPrice(''), { price: -1, currency: '' });
   });

@@ -60,6 +60,15 @@ async function scrapeKeyword(
   let errorMsg: string | undefined;
 
   try {
+    await page.context().addCookies([
+      {
+        name: 'country_code',
+        value: 'JP',
+        domain: '.mercari.com',
+        path: '/'
+      }
+    ]);
+
     // Block non-data resources to speed up loading while keeping image URLs available.
     await page.route('**/*', (route) => {
       return route.request().resourceType() === 'media' ||
@@ -77,15 +86,19 @@ async function scrapeKeyword(
       console.log(`  Categories: ${names}`);
     }
 
-    await page.goto(
-      getMercariUrl({
-        keyword: record.keyword,
-        categoryIds,
-        ...(record.minPrice && { minPrice: record.minPrice }),
-        ...(record.maxPrice && { maxPrice: record.maxPrice })
-      }),
-      { timeout: 30000 }
-    );
+    const searchUrl = getMercariUrl({
+      keyword: record.keyword,
+      categoryIds,
+      ...(record.minPrice && { minPrice: record.minPrice }),
+      ...(record.maxPrice && { maxPrice: record.maxPrice })
+    });
+    await page.goto(searchUrl, { timeout: 30000 });
+
+    const finalUrl = new URL(page.url());
+    console.log(`Mercari final URL: ${finalUrl.href}`);
+    if (finalUrl.hostname !== 'jp.mercari.com') {
+      throw new Error(`Unexpected Mercari region: ${finalUrl.hostname}`);
+    }
 
     // If the page has a dialog, close it. Wait only until the modal appears;
     // skip immediately if it never shows up.
@@ -112,21 +125,30 @@ async function scrapeKeyword(
       .catch(() => {});
 
     // Bring each loaded item card into view so lazy-loading can assign its image URL.
-    await page.evaluate(async (selector) => {
-      const cells = Array.from(document.querySelectorAll(selector));
-      for (const cell of cells) {
-        cell.scrollIntoView({ block: 'center' });
-        await new Promise(requestAnimationFrame);
-      }
-    }, ITEM_CELL_SELECTOR);
+    await page.evaluate(
+      async ({ selector, maxCount }) => {
+        const cells = Array.from(document.querySelectorAll(selector)).slice(
+          0,
+          maxCount
+        );
+        for (const cell of cells) {
+          cell.scrollIntoView({ block: 'center' });
+          await new Promise(requestAnimationFrame);
+        }
+      },
+      { selector: ITEM_CELL_SELECTOR, maxCount: MAX_ITEM_COUNT }
+    );
 
-    // Do not extract until every loaded item has a real image source in the DOM.
+    // Do not extract until every item to be scraped has a real image source in the DOM.
     await page.waitForFunction(
-      (selector) => {
-        const cells = document.querySelectorAll(selector);
+      ({ selector, maxCount }) => {
+        const cells = Array.from(document.querySelectorAll(selector)).slice(
+          0,
+          maxCount
+        );
         return (
           cells.length > 0 &&
-          Array.from(cells).every((cell) => {
+          cells.every((cell) => {
             const image = cell.querySelector('img');
             const sources = [
               image?.currentSrc,
@@ -144,7 +166,7 @@ async function scrapeKeyword(
           })
         );
       },
-      ITEM_CELL_SELECTOR,
+      { selector: ITEM_CELL_SELECTOR, maxCount: MAX_ITEM_COUNT },
       { timeout: 15000 }
     );
 
@@ -191,6 +213,21 @@ async function scrapeKeyword(
       imageUrl: getMercariImageUrl(item.image),
       ...parseMercariPrice(item.priceText)
     }));
+
+    const invalidItemIndex = itemsData.findIndex(
+      (item) =>
+        item.imageUrl.trim() === '' || item.price <= 0 || item.currency === ''
+    );
+    if (invalidItemIndex >= 0) {
+      const rawItem = rawItemsData[invalidItemIndex];
+      const imageSourceKeys = Object.entries(rawItem.image)
+        .filter(([, source]) => source.trim() !== '')
+        .map(([key]) => key);
+      console.error(
+        `Invalid Mercari item: priceText=${JSON.stringify(rawItem.priceText)} ` +
+          `imageSources=${imageSourceKeys.join(',') || 'none'}`
+      );
+    }
 
     // Release the page early to free up browser resources for other concurrent tasks
     await page.close();
@@ -306,6 +343,7 @@ test.describe('Scrape Mercari', () => {
       const updatedCount = results.reduce((sum, r) => sum + r.updatedItems, 0);
       const totalFound = results.reduce((sum, r) => sum + r.foundItems, 0);
       const totalUnique = results.reduce((sum, r) => sum + r.uniqueItems, 0);
+      const successfulKeywordCount = results.filter((r) => !r.error).length;
       const failedKeywords = results
         .filter((r) => r.error)
         .map((r) => `${r.keyword} (${r.error})`);
@@ -322,11 +360,19 @@ test.describe('Scrape Mercari', () => {
       if (scraperRunId) {
         await prisma.scraperRun.update({
           where: { id: scraperRunId },
-          data: { completedAt: new Date(), updatedCount }
+          data: {
+            completedAt: new Date(),
+            updatedCount,
+            successfulKeywordCount
+          }
         });
       } else {
         await prisma.scraperRun.create({
-          data: { completedAt: new Date(), updatedCount }
+          data: {
+            completedAt: new Date(),
+            updatedCount,
+            successfulKeywordCount
+          }
         });
       }
 

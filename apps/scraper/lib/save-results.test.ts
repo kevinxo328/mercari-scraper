@@ -91,6 +91,35 @@ describe('saveScrapedItems', () => {
     });
   });
 
+  it('rejects the whole batch when an item has no image or valid price', async () => {
+    const { prisma, calls } = createPrismaMock();
+
+    await assert.rejects(
+      saveScrapedItems({
+        items: [
+          item,
+          { ...item, url: `${item.url}-missing-image`, imageUrl: '' },
+          {
+            ...item,
+            url: `${item.url}-converted-price`,
+            price: 65,
+            currency: 'USD'
+          }
+        ],
+        keyword,
+        prisma,
+        currentRunId,
+        concurrency: 1,
+        now: () => changedAt
+      }),
+      { message: 'Image or price parsing failed: image, price' }
+    );
+
+    assert.equal(calls.findMany.length, 0);
+    assert.equal(calls.upsert.length, 0);
+    assert.equal(calls.update.length, 0);
+  });
+
   it('records previous price and run id on the first price change so a price badge can be rendered', async () => {
     const { prisma, calls } = createPrismaMock([
       {

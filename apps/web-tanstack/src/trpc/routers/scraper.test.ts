@@ -5,7 +5,7 @@
 import type { TreeNode } from '@/components/tree-select/types';
 import { buildFlatMap } from '@/components/tree-select/utils';
 
-import { buildInfiniteResultBaseFilters } from './scraper';
+import { buildInfiniteResultBaseFilters, buildLastRunWhere } from './scraper';
 
 // Minimal fixture that mirrors the raw mercari-categories.json shape
 const RAW_TREE = [
@@ -95,5 +95,14 @@ describe('infiniteResults filters', () => {
         updatedSince: new Date('2026-06-13T00:00:00.000Z')
       })
     ).not.toHaveProperty('updatedAt');
+  });
+});
+
+describe('getLastRun filters', () => {
+  it('skips runs where every keyword failed so the homepage can use the previous run', () => {
+    expect(buildLastRunWhere()).toEqual({
+      completedAt: { not: null },
+      successfulKeywordCount: { gt: 0 }
+    });
   });
 });

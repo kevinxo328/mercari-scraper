@@ -48,8 +48,9 @@ model ScraperResult {
 
 
 model ScraperRun {
-  id           String    @id @default(uuid()) @db.Uuid
-  completedAt  DateTime?
-  updatedCount Int       @default(0)
-  createdAt    DateTime  @default(now())
+  id                    String   @id @default(uuid()) @db.Uuid
+  completedAt           DateTime?
+  updatedCount          Int      @default(0)
+  successfulKeywordCount Int      @default(0)
+  createdAt             DateTime @default(now())
 }
