@@ -25,6 +25,20 @@ describe('parseMercariPrice', () => {
     });
   });
 
+  it('parses prices without a visible currency symbol as yen', () => {
+    assert.deepEqual(parseMercariPrice('2,398'), {
+      price: 2398,
+      currency: 'JPY'
+    });
+  });
+
+  it('parses other localized currency prefixes', () => {
+    assert.deepEqual(parseMercariPrice('US$12,398'), {
+      price: 12398,
+      currency: 'USD'
+    });
+  });
+
   it('returns an invalid price when no yen amount is present', () => {
     assert.deepEqual(parseMercariPrice(''), { price: -1, currency: '' });
   });

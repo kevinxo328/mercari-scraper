@@ -112,7 +112,7 @@ describe('saveScrapedItems', () => {
         concurrency: 1,
         now: () => changedAt
       }),
-      { message: 'Image or price parsing failed' }
+      { message: 'Image or price parsing failed: image, price' }
     );
 
     assert.equal(calls.findMany.length, 0);

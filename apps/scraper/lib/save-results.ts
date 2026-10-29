@@ -34,12 +34,15 @@ export async function saveScrapedItems({
   concurrency,
   now = () => new Date()
 }: SaveScrapedItemsParams): Promise<number> {
-  const hasInvalidItem = items.some(
-    (data) =>
-      data.imageUrl.trim() === '' || data.price <= 0 || data.currency === ''
-  );
-  if (hasInvalidItem) {
-    throw new Error('Image or price parsing failed');
+  const invalidFields = new Set<string>();
+  for (const data of items) {
+    if (data.imageUrl.trim() === '') invalidFields.add('image');
+    if (data.price <= 0 || data.currency === '') invalidFields.add('price');
+  }
+  if (invalidFields.size > 0) {
+    throw new Error(
+      `Image or price parsing failed: ${Array.from(invalidFields).join(', ')}`
+    );
   }
 
   const urls = items.map((data) => data.url);
