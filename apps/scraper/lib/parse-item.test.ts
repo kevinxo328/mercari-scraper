@@ -18,6 +18,13 @@ describe('parseMercariPrice', () => {
     });
   });
 
+  it('parses the localized Taiwan dollar price format', () => {
+    assert.deepEqual(parseMercariPrice('NT$2,398'), {
+      price: 2398,
+      currency: 'TWD'
+    });
+  });
+
   it('returns an invalid price when no yen amount is present', () => {
     assert.deepEqual(parseMercariPrice(''), { price: -1, currency: '' });
   });

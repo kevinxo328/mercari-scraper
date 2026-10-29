@@ -1,6 +1,6 @@
 export type MercariPrice = {
   price: number;
-  currency: 'JPY' | '';
+  currency: 'JPY' | 'TWD' | '';
 };
 
 export type MercariImageAttributes = {
@@ -11,14 +11,14 @@ export type MercariImageAttributes = {
 };
 
 export function parseMercariPrice(text: string): MercariPrice {
-  const match = text.match(/(?:¥|￥)\s*([\d,]+)|([\d,]+)\s*円/);
-  const amount = match?.[1] || match?.[2];
+  const match = text.match(/(?:¥|￥)\s*([\d,]+)|([\d,]+)\s*円|NT\$\s*([\d,]+)/);
+  const amount = match?.[1] || match?.[2] || match?.[3];
 
   if (!amount) return { price: -1, currency: '' };
 
   return {
     price: parseInt(amount.replace(/,/g, ''), 10),
-    currency: 'JPY'
+    currency: match?.[3] ? 'TWD' : 'JPY'
   };
 }
 

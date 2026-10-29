@@ -34,7 +34,12 @@ export async function saveScrapedItems({
   concurrency,
   now = () => new Date()
 }: SaveScrapedItemsParams): Promise<number> {
-  const urls = items.map((data) => data.url);
+  const validItems = items.filter(
+    (data) => data.imageUrl.trim() !== '' && data.price > 0 && data.currency
+  );
+  if (validItems.length === 0) return 0;
+
+  const urls = validItems.map((data) => data.url);
   const existingRecords = (await prisma.scraperResult.findMany({
     where: { url: { in: urls } },
     include: { keywords: true }
@@ -44,7 +49,7 @@ export async function saveScrapedItems({
 
   const limit = pLimit(concurrency);
   const counts = await Promise.all(
-    items.map(async (data) => {
+    validItems.map(async (data) => {
       return await limit(async () => {
         const existingRecord = existingRecordsMap.get(data.url);
 
