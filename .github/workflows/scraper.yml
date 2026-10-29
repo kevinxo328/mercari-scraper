@@ -33,6 +33,11 @@ jobs:
       - name: Generate prisma client
         run: pnpm run generate
 
+      - name: Apply database migrations
+        run: pnpm --filter @mercari-scraper/database db:migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(pnpm list --filter scraper @playwright/test --json | jq -r '.[0].dependencies["@playwright/test"].version')" >> $GITHUB_OUTPUT
