@@ -91,42 +91,33 @@ describe('saveScrapedItems', () => {
     });
   });
 
-  it('skips items without an image or a valid price so incomplete listings are never written', async () => {
+  it('rejects the whole batch when an item has no image or valid price', async () => {
     const { prisma, calls } = createPrismaMock();
 
-    const updatedCount = await saveScrapedItems({
-      items: [
-        item,
-        { ...item, url: `${item.url}-missing-image`, imageUrl: '' },
-        { ...item, url: `${item.url}-missing-price`, price: -1, currency: '' }
-      ],
-      keyword,
-      prisma,
-      currentRunId,
-      concurrency: 1,
-      now: () => changedAt
-    });
+    await assert.rejects(
+      saveScrapedItems({
+        items: [
+          item,
+          { ...item, url: `${item.url}-missing-image`, imageUrl: '' },
+          {
+            ...item,
+            url: `${item.url}-missing-price`,
+            price: -1,
+            currency: ''
+          }
+        ],
+        keyword,
+        prisma,
+        currentRunId,
+        concurrency: 1,
+        now: () => changedAt
+      }),
+      { message: 'Image or price parsing failed' }
+    );
 
-    assert.equal(updatedCount, 1);
-    assert.equal(calls.upsert.length, 1);
-    assert.deepEqual(calls.upsert[0], {
-      where: { url: item.url },
-      create: {
-        ...item,
-        firstSeenRunId: currentRunId,
-        previousPrice: null,
-        priceChangedAt: null,
-        priceChangedRunId: null,
-        keywords: {
-          connect: [{ id: keyword.id }]
-        }
-      },
-      update: {
-        keywords: {
-          connect: [{ id: keyword.id }]
-        }
-      }
-    });
+    assert.equal(calls.findMany.length, 0);
+    assert.equal(calls.upsert.length, 0);
+    assert.equal(calls.update.length, 0);
   });
 
   it('records previous price and run id on the first price change so a price badge can be rendered', async () => {

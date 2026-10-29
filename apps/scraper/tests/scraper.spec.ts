@@ -185,16 +185,12 @@ async function scrapeKeyword(
       },
       MAX_ITEM_COUNT
     );
-    const itemsData = rawItemsData
-      .map((item) => ({
-        title: item.title,
-        url: item.url,
-        imageUrl: getMercariImageUrl(item.image),
-        ...parseMercariPrice(item.priceText)
-      }))
-      .filter(
-        (item) => item.imageUrl.trim() !== '' && item.price > 0 && item.currency
-      );
+    const itemsData = rawItemsData.map((item) => ({
+      title: item.title,
+      url: item.url,
+      imageUrl: getMercariImageUrl(item.image),
+      ...parseMercariPrice(item.priceText)
+    }));
 
     // Release the page early to free up browser resources for other concurrent tasks
     await page.close();
